@@ -9,7 +9,7 @@ const SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString("he
 const GID = process.env.GOOGLE_CLIENT_ID || "";
 const ADMINS = (process.env.ADMIN_EMAILS || "").toLowerCase().split(",").map(s => s.trim()).filter(Boolean);
 const PAY = { delivery: ["GCash", "Maya", "Cash on Delivery", "Credit/Debit Card"], pickup: ["GCash", "Maya", "Pay at Pickup", "Credit/Debit Card"] };
-const ST = { delivery: ["Pending", "Packed", "Out for delivery", "Delivered", "Cancelled"], pickup: ["Pending", "Packed", "Ready for pickup", "Picked up", "Cancelled"] };
+const ST = { delivery: ["Awaiting payment", "Pending", "Packed", "Out for delivery", "Delivered", "Cancelled"], pickup: ["Awaiting payment", "Pending", "Packed", "Ready for pickup", "Picked up", "Cancelled"] };
 
 /* helpers */
 const bad = (m, s = 400) => Object.assign(new Error(m), { status: s });
@@ -161,8 +161,8 @@ app.post("/api/orders", lim(30), need(), wrap(async (q, s) => {
       lines.push({ id: it.id | 0, name: p.name, v, n, price: p.price }); sub += p.price * n;
     }
     const r = await c.query(
-      "insert into orders(user_id,name,phone,method,addr,pickup_at,pay,note,items,subtotal,fee,total) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) returning *",
-      [q.u.id, name, phone, m, addr && JSON.stringify(addr), pickup, b.pay, str(b.note, 300), JSON.stringify(lines), sub, fee, sub + fee]);
+      "insert into orders(user_id,name,phone,method,addr,pickup_at,pay,note,items,subtotal,fee,total,status) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) returning *",
+      [q.u.id, name, phone, m, addr && JSON.stringify(addr), pickup, b.pay, str(b.note, 300), JSON.stringify(lines), sub, fee, sub + fee, b.pay == "GCash" ? "Awaiting payment" : "Pending"]);
     await c.query("commit");
     s.json(O(r.rows[0]));
   } catch (e) { await c.query("rollback").catch(() => {}); throw e; }
@@ -185,6 +185,21 @@ app.patch("/api/admin/orders/:id", need(1), wrap(async (q, s) => {
     if (st == "Cancelled" && o.status != "Cancelled")
       for (const it of o.items) await c.query("update products set stock=stock+$2 where id=$1", [it.id, it.n]);
     const r = await c.query("update orders set status=$2 where id=$1 returning *", [o.id, st]);
+    await c.query("commit");
+    s.json(O(r.rows[0]));
+  } catch (e) { await c.query("rollback").catch(() => {}); throw e; }
+  finally { c.release(); }
+}));
+
+app.post("/api/orders/:id/cancel", need(), wrap(async (q, s) => {
+  const c = await db.connect();
+  try {
+    await c.query("begin");
+    const o = (await c.query("select * from orders where id=$1 and user_id=$2 for update", [q.params.id | 0, q.u.id])).rows[0];
+    if (!o) throw bad("Not found", 404);
+    if (!["Awaiting payment", "Pending"].includes(o.status)) throw bad("This order can no longer be cancelled. Please contact the shop.");
+    for (const it of o.items) await c.query("update products set stock=stock+$2 where id=$1", [it.id, it.n]);
+    const r = await c.query("update orders set status='Cancelled' where id=$1 returning *", [o.id]);
     await c.query("commit");
     s.json(O(r.rows[0]));
   } catch (e) { await c.query("rollback").catch(() => {}); throw e; }
