@@ -83,6 +83,7 @@ footer{background:var(--purple);padding:30px 22px;text-align:center;color:#fffff
 .rmT{position:absolute;top:42px;right:8px;z-index:3;background:#fff;color:#222;font-size:12px;font-weight:700;padding:5px 11px;border-radius:6px;box-shadow:0 2px 10px #0003;cursor:pointer}.rmT:hover{background:#f3f3f3}
 svg{flex:none!important;flex-shrink:0!important;aspect-ratio:1/1;min-width:0}img{object-fit:contain}
 .br img,#lg img{flex:none!important;width:auto;max-width:150px;height:34px;object-fit:contain}.br img.wide{height:38px;max-width:240px}
+@media(max-width:720px){.top{padding:10px 12px;gap:8px 12px;align-items:center}.br{flex:0 0 auto;min-width:0;gap:0}.top .br img,.top .br img.wide{height:30px;max-width:120px!important}.us{gap:12px;margin-left:auto;white-space:nowrap}.us a{white-space:nowrap}.sw{order:3;flex:1 1 100%}footer{padding:20px 16px}footer img{height:36px}footer b{font-size:17px}}
 </style></head><body>
 <div class="shell"><aside class="rail" id="rail"></aside><div class="col">
 <header class="top"><div class="br" onclick="go('')"><span id="lg" style="display:contents"></span><span id="brand"></span></div><div class="sw"><input id="q" placeholder="Search product" list="sg" oninput="S.q=this.value;draw()"><datalist id="sg"></datalist><svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"/></svg></div>
@@ -118,7 +119,7 @@ const IC={home:"M3 11l9-8 9 8v10H3zM9 21v-7h6v7",grid:"M4 4h7v7H4zM13 4h7v7h-7zM
 const ic=n=>`<svg viewBox="0 0 24 24"><path d="${IC[n]}"/></svg>`;
 let lastN=0;
 function theme(){const h=location.hash.slice(1),A=isA(),s=V.set;for(const k in s.col)document.documentElement.style.setProperty(k,s.col[k]);
-const nm=esc(s.name||"Your Store");$("brand").textContent=s.name||"Your Store";$("brand").style.display=s.logoWide?"none":"";
+const nm=esc(s.name||"Likha: Youth Craft");$("brand").textContent=s.name||"Likha: Youth Craft";$("brand").style.display=s.logoWide?"none":"";
 $("lg").innerHTML=s.logoWide?`<img class="wide" src="${s.logoWide}" alt="${nm}">`:s.logo?`<img src="${s.logo}" alt="">`:"";document.body.classList.toggle("hl",!!(s.logoWide||s.logo));
 function fav(u){const L=document.querySelector('link[rel=icon]');if(!u){L.href="data:,";return}const i=new Image();i.onload=()=>{const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d"),k=Math.min(64/i.width,64/i.height),w=i.width*k,h=i.height*k;x.drawImage(i,(64-w)/2,(64-h)/2,w,h);L.href=c.toDataURL("image/png")};i.onerror=()=>{L.href=u};i.src=u}
 fav(s.logo);
