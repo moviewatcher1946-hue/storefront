@@ -48,7 +48,7 @@ const hits = new Map(); setInterval(() => hits.clear(), 60e3).unref();
 const lim = n => (q, s, x) => { const k = n + q.ip, c = (hits.get(k) || 0) + 1; hits.set(k, c); c > n ? s.status(429).json({ error: "Too many requests, slow down" }) : x(); };
 
 /* mappers */
-const P = r => ({ id: r.id, name: r.name, price: r.price, was: r.was, cat: r.cat, stock: r.stock, vars: r.vars, img: r.img, desc: r.descr, arch: r.arch });
+const P = r => ({ id: r.id, name: r.name, price: r.price, was: r.was, cat: r.cat, stock: r.stock, vars: r.vars, img: r.img, desc: r.descr, arch: r.arch, favs: r.favs, sold: r.sold });
 const O = r => ({ id: r.id, name: r.name, phone: r.phone, method: r.method, addr: r.addr, pickup: r.pickup_at, pay: r.pay, note: r.note, items: r.items, subtotal: r.subtotal, fee: r.fee, total: r.total, status: r.status, created: r.created });
 const site = async () => (await db.query("select v from settings where k='site'")).rows[0]?.v || {};
 /* Philippine locations from the official PSGC list, cached in memory */
@@ -83,9 +83,10 @@ app.get("/healthz", (q, s) => s.send("ok"));
 app.get("/api/bootstrap", wrap(async (q, s) => {
   const u = await who(q), st = await site(), adm = u && u.role == "admin";
   await db.query("insert into settings(k,v) values('views','1') on conflict(k) do update set v=to_jsonb((settings.v#>>'{}')::int+1)");
-  const pr = await db.query("select * from products " + (adm ? "" : "where not arch ") + "order by id desc");
+  const pr = await db.query("select p.*, (select count(*) from favorites f where f.product_id=p.id)::int as favs, coalesce((select sum((i->>'n')::int) from orders o, jsonb_array_elements(o.items) i where o.status<>'Cancelled' and (i->>'id')::int=p.id),0)::int as sold from products p " + (adm ? "" : "where not p.arch ") + "order by p.id desc");
   const brand = { logo: "/brand/emblem.png", logoClear: "/brand/emblem.png", logoWide: "/brand/wide.png" };
   const out = { set: { ...brand, ...st }, fees: st.fees || {}, defaultFee: st.defaultFee ?? 100, gid: GID, user: u && { name: u.name, role: u.role }, prods: pr.rows.map(P) };
+  if (u) out.favs = (await db.query("select product_id from favorites where user_id=$1", [u.id])).rows.map(r => r.product_id);
   if (adm) out.views = (await db.query("select v from settings where k='views'")).rows[0]?.v;
   s.json(out);
 }));
@@ -125,6 +126,19 @@ app.patch("/api/admin/products/:id", need(1), wrap(async (q, s) => {
 }));
 app.delete("/api/admin/products/:id", need(1), wrap(async (q, s) => {
   await db.query("delete from products where id=$1", [q.params.id | 0]); s.json({ ok: 1 });
+}));
+
+/* favorites */
+app.post("/api/favorites/:id", need(), wrap(async (q, s) => {
+  const id = q.params.id | 0;
+  const p = await db.query("select 1 from products where id=$1", [id]);
+  if (!p.rows[0]) throw bad("Not found", 404);
+  await db.query("insert into favorites(user_id,product_id) values($1,$2) on conflict do nothing", [q.u.id, id]);
+  s.json({ ok: 1 });
+}));
+app.delete("/api/favorites/:id", need(), wrap(async (q, s) => {
+  await db.query("delete from favorites where user_id=$1 and product_id=$2", [q.u.id, q.params.id | 0]);
+  s.json({ ok: 1 });
 }));
 
 /* orders */
@@ -237,6 +251,7 @@ async function init() {
     create table if not exists settings(k text primary key, v jsonb not null);
     create table if not exists products(id serial primary key, name text not null, price numeric(12,2) not null, was numeric(12,2) not null default 0, cat text not null default '', stock int not null default 0, vars jsonb not null default '[]', img text not null default '', descr text not null default '', arch boolean not null default false, created timestamptz default now());
     create table if not exists orders(id serial primary key, user_id int references users(id), name text not null, phone text not null, method text not null, addr jsonb, pickup_at text not null default '', pay text not null, note text not null default '', items jsonb not null, subtotal numeric(12,2) not null, fee numeric(12,2) not null default 0, total numeric(12,2) not null, status text not null default 'Pending', created timestamptz default now());
+    create table if not exists favorites(user_id int references users(id) on delete cascade, product_id int references products(id) on delete cascade, created timestamptz default now(), primary key(user_id,product_id));
   `);
 }
 init().then(() => app.listen(process.env.PORT || 3000, () => console.log("storefront up"))).catch(e => { console.error(e); process.exit(1); });
