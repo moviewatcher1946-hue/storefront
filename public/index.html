@@ -80,6 +80,7 @@ footer{background:var(--purple);padding:30px 22px;text-align:center;color:#fffff
 @media(max-width:720px){.od{padding:14px}.od .ln{align-items:flex-start}.od .ln>span{overflow-wrap:anywhere}.od .it{overflow-wrap:anywhere}.stp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;text-align:left}.stp span{min-width:0;overflow-wrap:anywhere}.od .btn-cancel{width:100%}}
 @media(max-width:720px){button,input,select,textarea{min-height:44px}input,select,textarea{font-size:16px}.pol{overflow-x:auto}.pol table{min-width:460px}.hero{min-height:240px}}
 .pol h2{font-size:1.1rem;font-weight:700;margin:20px 0 6px}.pol p{line-height:1.7;margin:6px 0}.pol table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:8px}.pol th,.pol td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}.pol a{color:var(--terra)}
+.rmT{position:absolute;top:42px;right:8px;z-index:3;background:#fff;color:#222;font-size:12px;font-weight:700;padding:5px 11px;border-radius:6px;box-shadow:0 2px 10px #0003;cursor:pointer}.rmT:hover{background:#f3f3f3}
 </style></head><body>
 <div class="shell"><aside class="rail" id="rail"></aside><div class="col">
 <header class="top"><div class="br" onclick="go('')"><span id="lg" style="display:contents"></span><span id="brand"></span></div><div class="sw"><input id="q" placeholder="Search product" list="sg" oninput="S.q=this.value;draw()"><datalist id="sg"></datalist><svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"/></svg></div>
@@ -164,7 +165,7 @@ $("sg").innerHTML=A.map(p=>`<option value="${esc(p.name)}">`).join("");
 const pr=s.promos||[],hl=esc(s.headline||"Welcome"),faq=q&&/ship|deliver|pick|pay|gcash|maya|cod|return/.test(q)?'<div class="pn" style="margin-top:16px">Choose delivery or pickup at checkout. Pay with GCash, Maya, cash or card. Fees show before you order.</div>':"";
 return `<div class="home"><div class="box cats">${["",...cats].map(c=>`<a class="${S.cat==c?"on":""}" onclick="S.cat='${esc(c)}';draw()">${c?esc(c):"All products"}${ic("grid").replace(/<path[^>]*>/,'<path d="M9 6l6 6-6 6"/>')}</a>`).join("")}</div>
 <div><div class="hero"><div class="hc"><small>${esc(s.tagline)}</small><h1>${hl}</h1><button onclick="document.getElementById('all').scrollIntoView()">Shop now &nbsp;»</button></div>${s.banner?`<img class="bn" src="${s.banner}" alt="">`:(adm?'<div class="dz">Upload a banner image</div>':"")}${adm?chg("up(this,'banner',1600)"):""}</div>
-<div class="tiles box" style="border-top:0">${[0,1,2].map(i=>`<div class="tl" style="--i:${i}">${esc(pr[i]&&pr[i].t)}<span>${esc(pr[i]&&pr[i].s)}</span>${pr[i]&&pr[i].img?`<img src="${pr[i].img}" alt="">`:""}${adm?chg("imgT(this,"+i+")"):""}</div>`).join("")}</div></div>
+<div class="tiles box" style="border-top:0">${[0,1,2].map(i=>`<div class="tl" style="--i:${i}">${esc(pr[i]&&pr[i].t)}<span>${esc(pr[i]&&pr[i].s)}</span>${pr[i]&&pr[i].img?`<img src="${pr[i].img}" alt="">`:""}${adm?chg("imgT(this,"+i+")")+(pr[i]&&pr[i].img?`<a class="rmT" onclick="rmT(${i})">Remove</a>`:""):""}</div>`).join("")}</div></div>
 <div class="side">${side("Recently Viewed",rec,"Items you view appear here")}</div></div>${faq}
 ${deals.length?`<div class="sec"><h2>Deals of the Day</h2><span class="cd" id="cd"></span><a onclick="S.max='';S.cat='';draw()">View All Deals</a></div><div class="rowx">${deals.map(card).join("")}</div>`:""}
 <div class="sec" id="all"><h2>${S.cat?esc(S.cat):"All products"}</h2><span style="color:var(--mute)">${L.length} item${L.length==1?"":"s"}</span><span style="margin-left:auto"><input type="number" placeholder="Max price (₱)" value="${esc(S.max)}" onchange="S.max=this.value;draw()" style="width:150px"></span></div>
@@ -215,6 +216,7 @@ async function imgT(el,i){const f=el.files[0];if(!f)return;V.set.promos=V.set.pr
 const pp=(id,b)=>api("/admin/products/"+id,{method:"PATCH",body:b}).then(p=>Object.assign(V.prods.find(x=>x.id==id),p)).catch(()=>{});
 async function imgP(el,id){const f=el.files[0];if(!f)return;await pp(id,{img:await shrink(f,800)});draw()}
 const rm=k=>{V.set[k]="";ss();theme();draw()};
+function rmT(i){if(V.set.promos&&V.set.promos[i]){V.set.promos[i].img="";ss();draw()}}
 function pm(i,k,v){V.set.promos=V.set.promos||[{},{},{}];V.set.promos[i]=V.set.promos[i]||{};V.set.promos[i][k]=v;ss();draw()}
 async function addp(){const n=$("pn").value.trim(),pr=+$("pp").value;if(!n||!pr)return toast("Name and price required");const f=$("pi").files[0],img=f?await shrink(f,800):"";
 try{const p=await api("/admin/products",{method:"POST",body:{name:n,price:pr,was:+$("pw").value||0,cat:$("pc").value.trim(),stock:+$("ps").value||0,vars:$("pv").value.split(",").map(x=>x.trim()).filter(Boolean),img}});V.prods.unshift(p);draw();toast("Product saved")}catch(e){}}
