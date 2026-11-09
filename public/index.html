@@ -223,7 +223,49 @@ return `<h2 class="ph">Admin panel</h2><p style="color:var(--mute);margin:-8px 0
 <div class="pn"><h3>Products</h3>${V.prods.map(p=>`<div class="ln"><span>${esc(p.name)}${p.arch?" (archived)":""}<br><input list="cats" value="${esc(p.cat)}" placeholder="Category" style="width:180px;margin-top:4px" onchange="pp(${p.id},{cat:this.value.trim()}).then(()=>draw())"></span><span class="qt"><input type="number" value="${p.price}" style="width:100px" title="Price" onchange="pp(${p.id},{price:+this.value})"><input type="number" value="${p.stock}" style="width:80px" title="Stock" onchange="pp(${p.id},{stock:+this.value})"><a onclick="pp(${p.id},{arch:${!p.arch}}).then(draw)">${p.arch?"restore":"archive"}</a><a onclick="delp(${p.id})">delete</a></span></div>`).join("")||"None yet."}</div>
 <div class="pn"><h3>Orders &amp; analytics</h3><p>Page views: ${V.views} · Orders: ${V.orders.length} · Revenue: ${peso(V.orders.filter(o=>o.status!="Cancelled").reduce((a,o)=>a+o.total,0))} <button class="g" onclick="bk()" style="margin-left:10px">Download backup</button></p>${V.orders.map(o=>`<div class="ln"><span><b>#${o.id}</b> ${esc(o.name)} · ${esc(o.phone)}<br><small>${o.method=="pickup"?"Pickup · "+esc(o.pickup):"Deliver · "+esc([o.addr.street,o.addr.brgy,o.addr.city,o.addr.region].join(", "))}<br>${o.items.map(i=>esc(i.name)+(i.v?" ("+esc(i.v)+")":"")+" × "+i.n).join(", ")}${o.note?"<br>Note: "+esc(o.note):""}</small></span><span>${peso(o.total)} · ${esc(o.pay)} <select onchange="setSt(${o.id},this.value)">${[...STEPS[o.method],"Cancelled"].map(x=>`<option ${x==o.status?"selected":""}>${x}</option>`).join("")}</select></span></div>`).join("")}</div>`}
 const loc=()=>addr()+'<button onclick="go(\'\')">Done</button>';
-const page=k=>`<div class="pn"><h3>${k=="terms"?"Terms &amp; Conditions":"Privacy Policy"}</h3><p style="white-space:pre-wrap">${esc(V.set[k])||"Not published yet."}</p></div>`;
+const page=k=>`<div class="pn"><h3>${k=="terms"?"Terms &amp; Conditions":"Privacy Policy"}</h3><p style="white-space:pre-wrap">${esc(V.set[k])||"Last updated: October 17, 2026
+
+1. Who we are
+This website is run by Raven Castillo (Snackify) ("we", "us"). You can contact us at ravencastillo258@gmail.com or 09534514872. Our address is Pakyas, Victoria, Oriental Mindoro, Philippines.
+
+2. Using the site
+You must be able to form a binding contract to place orders. If you are under 18, use the site only with a parent or guardian. You agree to give accurate information and to keep your password private. Tell us if you think someone else has used your account.
+
+3. Orders and payment
+Prices are shown in Philippine pesos and include any discounts that apply when you check out. Orders are paid in cash when they are handed to you, unless we tell you that another payment method is available. An order is confirmed when it is placed. We may refuse or cancel an order if an item is out of stock, a price was shown in error, or we suspect misuse. If that happens, we will tell you and refund any payment already made.
+
+4. Delivery
+We deliver within the areas and time windows shown in the shop. Delivery times are estimates. If we cannot deliver, we will tell you the reason and cancel the order. Please give correct delivery details and be available to receive the order.
+
+5. Cancellations and changes
+You can cancel an order yourself only while it is still pending. Once it has been packed, please contact the shop team. Cancelled orders return their stock to the shop. Some orders can be changed for a short time after they are placed, as shown on the order.
+
+6. Returns and problems
+If an item is missing, damaged, or wrong, contact the shop team through the chat within 24 hours of delivery. We will replace it or refund it when we can confirm the problem. Food that has been opened or consumed cannot be returned for hygiene reasons, except where the law requires otherwise.
+
+7. Loyalty points, promo codes and offers
+Loyalty points are earned on delivered orders, as shown on your dashboard. Points have no cash value and cannot be transferred. We may change the earning rate, redemption rules or expiry, and we may end the programme with reasonable notice. Promo codes and offers are limited to the terms shown with them and cannot be combined unless stated.
+
+8. Custom requests
+A custom request is a request, not an order. We will reply with a quote, and nothing is charged until you accept it.
+
+9. AI assistant and messages
+The Snackify AI assistant can answer questions, show information and propose actions. It can make mistakes, so check anything important before you confirm it. Actions it proposes only happen after you press Confirm. Messages you send to the shop team may be read by our staff. Please read our Privacy Policy to learn how this information is handled.
+
+10. Acceptable use
+Do not place fake orders, abuse promo codes, harass staff or other customers, try to access accounts or data that are not yours, interfere with the site, or use the site for anything illegal. We may block accounts that break these rules.
+
+11. Intellectual property
+The site, its design and its content belong to us or our licensors. You may use it for your own shopping, but not copy or resell it.
+
+12. Liability
+To the extent the law allows, we are not liable for indirect or consequential losses, or for interruptions to the site. Nothing in these terms limits any right you have under the consumer protection laws of the Philippines.
+
+13. Changes
+We may update these terms. The date at the top shows the latest version. Continuing to use the site after a change means you accept the new terms.
+
+14. Governing law
+These terms are governed by the laws of the Republic of the Philippines. Disputes will be handled by the courts of Victoria, Oriental Mindoro, Philippines."}</p></div>`;
 /* render + transitions */
 function render(fx){const y=scrollY,h=location.hash.slice(1),a=$("app");theme();
 a.innerHTML=h=="cart"?cart():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h=="terms"||h=="privacy"?page(h):shop();
