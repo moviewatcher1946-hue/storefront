@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Storefront</title>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>CYF: Youth Craft</title>
 <link rel="icon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Krona+One&family=League+Spartan:wght@400;500;600;700;800&family=Museo+Moderno:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -130,7 +130,7 @@ $("rail").innerHTML=`<div class="lg">${lc?`<img src="${lc}" alt="">`:""}</div>${
 $("ad").style.display=A?"":"none";
 $("foot").innerHTML=(lc?`<img src="${lc}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a></div>";
 $("uname").textContent=P.user?P.user.name:"";$("ub").innerHTML=P.user?`<span class="av">${esc(P.user.name[0].toUpperCase())}</span><span>Sign out</span>`:"Sign in";$("ub").style.cssText=P.user?"display:flex;align-items:center;gap:8px":"background:var(--terra);color:var(--ink);padding:9px 16px;border-radius:8px";
-document.title=s.name||"Storefront"}
+document.title=s.name||"CYF: Youth Craft"}
 const go=h=>location.hash=h,isA=()=>P.user&&P.user.role=="admin";
 /* modals and sign-in */
 function closeM(){const m=document.querySelector("#m .modal");if(!m)return;m.classList.add("out");setTimeout(()=>$("m").innerHTML="",180)}
