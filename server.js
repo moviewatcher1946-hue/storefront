@@ -19,7 +19,13 @@ const int = x => Math.max(0, Math.floor(+x || 0));
 const arr = a => Array.isArray(a) ? a.map(x => str(x, 40)).filter(Boolean).slice(0, 20) : [];
 const slug = x => str(x, 40).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 const sn = x => Math.round((+x || 0) * 100) / 100; /* signed money, used for price modifiers */
-const IMG = (x, what) => { const t = String(x || ""); if (t.length > 1.5e6) throw bad(what + " is too large"); return t; };
+const IMG = (x, what) => {
+  const t = String(x || ""); if (t.length > 1.5e6) throw bad(what + " is too large");
+  /* these values end up inside src="..." on the storefront, so only accept real image sources */
+  if (t && !/^(data:image\/(png|jpe?g|webp|gif|avif);base64,[A-Za-z0-9+\/=]+$|https?:\/\/[^\s"'<>]+$|\/(?!\/)[^\s"'<>]*$)/i.test(t)) throw bad(what + " must be an image");
+  return t;
+};
+const sizeList = a => [...new Set(arr(a))]; /* no duplicate size buttons */
 /* Variation = { id, name, colorHex, imageUrl, priceModifier, stockCount (null = not tracked per variation) } */
 const cleanVars = a => {
   if (!Array.isArray(a)) throw bad("Bad variations");
@@ -157,10 +163,10 @@ app.post("/api/admin/products", need(1), wrap(async (q, s) => {
   const b = q.body; if (!str(b.name, 120) || !num(b.price)) throw bad("Name and price required");
   const names = arr(b.vars), vars = cleanVars(names.map(name => ({ name })));
   const r = await db.query("insert into products(name,price,was,cat,stock,vars,img,sizes,variations,descr) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) returning *",
-    [str(b.name, 120), num(b.price), num(b.was), str(b.cat, 60), int(b.stock), JSON.stringify(names), String(b.img || ""), JSON.stringify(arr(b.sizes)), JSON.stringify(vars), str(b.desc, 2000)]);
+    [str(b.name, 120), num(b.price), num(b.was), str(b.cat, 60), int(b.stock), JSON.stringify(names), IMG(b.img, "Image"), JSON.stringify(sizeList(b.sizes)), JSON.stringify(vars), str(b.desc, 2000)]);
   s.json(P(r.rows[0], true));
 }));
-const F = { name: v => str(v, 120), price: num, was: num, cat: v => str(v, 60), stock: int, vars: v => JSON.stringify(arr(v)), img: v => String(v || ""), arch: v => !!v, descr: v => str(v, 2000), sizes: v => JSON.stringify(arr(v)), variations: v => JSON.stringify(cleanVars(v)), gallery: v => JSON.stringify((Array.isArray(v) ? v : []).slice(0, 8).map(x => IMG(x, "Gallery image")).filter(Boolean)) };
+const F = { name: v => str(v, 120), price: num, was: num, cat: v => str(v, 60), stock: int, vars: v => JSON.stringify(arr(v)), img: v => IMG(v, "Image"), arch: v => !!v, descr: v => str(v, 2000), sizes: v => JSON.stringify(sizeList(v)), variations: v => JSON.stringify(cleanVars(v)), gallery: v => JSON.stringify((Array.isArray(v) ? v : []).slice(0, 8).map(x => IMG(x, "Gallery image")).filter(Boolean)) };
 app.patch("/api/admin/products/:id", need(1), wrap(async (q, s) => {
   const b = { ...q.body }; if ("desc" in b) b.descr = b.desc;
   if ("variations" in b) b.vars = cleanVars(b.variations).map(v => v.name); /* keep the legacy name list in step */
@@ -230,14 +236,14 @@ app.post("/api/orders", lim(30), need(), wrap(async (q, s) => {
     sub = num(sub);
     const r = await c.query(
       "insert into orders(user_id,name,phone,method,addr,pickup_at,pay,note,items,subtotal,fee,total,status) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) returning *",
-      [q.u.id, name, phone, m, addr && JSON.stringify(addr), pickup, b.pay, str(b.note, 300), JSON.stringify(lines), sub, fee, sub + fee, /^GCash/.test(b.pay) ? "Awaiting payment" : "Pending"]);
+      [q.u.id, name, phone, m, addr && JSON.stringify(addr), pickup, b.pay, str(b.note, 300), JSON.stringify(lines), sub, fee, sub + fee, /^(Cash on Delivery|Pay at Pickup)$/.test(b.pay) ? "Pending" : "Awaiting payment"]);
     await c.query("commit");
     s.json(O(r.rows[0]));
   } catch (e) { await c.query("rollback").catch(() => {}); throw e; }
   finally { c.release(); }
 }));
 app.get("/api/orders", need(), wrap(async (q, s) => {
-  const r = q.u.role == "admin"
+  const r = q.u.role == "admin" && q.query.all == "1" /* the Admin panel asks for everything; "Your orders" is always just your own */
     ? await db.query("select * from orders order by id desc limit 500")
     : await db.query("select * from orders where user_id=$1 order by id desc limit 100", [q.u.id]);
   s.json(r.rows.map(O));
