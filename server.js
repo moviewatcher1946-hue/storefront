@@ -1,4 +1,5 @@
 const express = require("express"), crypto = require("crypto"), path = require("path"), pg = require("pg");
+let compression = null; try { compression = require("compression"); } catch {}
 pg.types.setTypeParser(1700, parseFloat);
 
 const db = new pg.Pool({
@@ -25,6 +26,24 @@ const IMG = (x, what) => {
   if (t && !/^(data:image\/(png|jpe?g|webp|gif|avif);base64,[A-Za-z0-9+\/=]+$|https?:\/\/[^\s"'<>]+$|\/(?!\/)[^\s"'<>]*$)/i.test(t)) throw bad(what + " must be an image");
   return t;
 };
+/* Images are stored as data URLs in the database but never sent inside JSON: lists and details carry short URLs
+   (/api/img/p/:id/...?v=rev) that the browser and the service worker cache for a year. "@data" is what the light SQL below
+   puts in place of the real bytes so they never leave the database for list requests. */
+const isData = x => x === "@data" || /^data:/i.test(String(x || ""));
+const IU = (id, rev, tail, x) => !x ? "" : isData(x) ? `/api/img/p/${id}/${tail}?v=${rev || 0}` : x;
+const OWN = /^\/api\/img\/p\/(\d+)\/(?:main|v\/([^/?]+)|g\/(\d+))(?:\?.*)?$/;
+/* when the admin page sends our own image URL back, put the stored image back instead of saving the URL */
+function keepOwn(x, row) {
+  const t = String(x || ""), m = OWN.exec(t); if (!m) return t;
+  if (!row || +m[1] !== row.id) return "";
+  if (/\/main/.test(t.split("?")[0])) return row.img || "";
+  if (m[2] != null) { const v = VR(row).find(y => y.id === decodeURIComponent(m[2])); return v ? v.imageUrl || "" : ""; }
+  return (row.gallery || [])[+m[3]] || "";
+}
+const LIGHT = gal => `p.id,p.name,p.price,p.was,p.cat,p.stock,p.vars,p.sizes,p.descr,p.arch,p.rev,p.created,
+  case when p.img like 'data:%' then '@data' else p.img end as img,
+  (select coalesce(jsonb_agg(case when v->>'imageUrl' like 'data:%' then jsonb_set(v,'{imageUrl}','"@data"') else v end order by o),'[]'::jsonb) from jsonb_array_elements(p.variations) with ordinality as t(v,o)) as variations,
+  ${gal ? `(select coalesce(jsonb_agg(case when g like 'data:%' then '@data' else g end order by o),'[]'::jsonb) from jsonb_array_elements_text(p.gallery) with ordinality as t2(g,o)) as gallery` : `'[]'::jsonb as gallery`}`;
 const sizeList = a => [...new Set(arr(a))]; /* no duplicate size buttons */
 /* Variation = { id, name, colorHex, imageUrl, priceModifier, stockCount (null = not tracked per variation) } */
 const cleanVars = a => {
@@ -84,9 +103,9 @@ const P = (r, full) => {
   return {
     id: r.id, name: r.name, title: r.name, price: r.price, basePrice: r.price, was: r.was, cat: r.cat, stock: r.stock,
     vars: vs.map(v => v.name),
-    variations: vs.map(({ imageUrl, ...v }) => full ? { ...v, imageUrl, hasImage: !!imageUrl } : { ...v, hasImage: !!imageUrl }),
+    variations: vs.map(({ imageUrl, ...v }) => ({ ...v, imageUrl: IU(r.id, r.rev, "v/" + encodeURIComponent(v.id), imageUrl), hasImage: !!imageUrl })),
     sizes, hasSizes: sizes.length > 0, availableSizes: sizes.length ? sizes : null,
-    img: r.img, gallery: full ? r.gallery || [] : undefined,
+    img: IU(r.id, r.rev, "main", r.img), gallery: full ? (r.gallery || []).map((x, i) => IU(r.id, r.rev, "g/" + i, x)) : undefined,
     desc: r.descr, description: r.descr, arch: r.arch, favs: r.favs, sold: r.sold
   };
 };
@@ -117,7 +136,21 @@ const app = express();
 app.set("trust proxy", 1);
 app.disable("x-powered-by");
 app.use((q, s, n) => { s.set({ "X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY", "Referrer-Policy": "strict-origin-when-cross-origin" }); n(); });
+if (compression) app.use(compression());
 app.use(express.json({ limit: "12mb" }));
+/* product images: far-future caching (the ?v= revision changes whenever the product is edited). Before the rate limiter on purpose:
+   one page can show dozens of images. */
+function sendImg(s, v) {
+  v = String(v || ""); if (!v) throw bad("No image", 404);
+  const i = v.indexOf(";base64,");
+  if (/^data:image\//i.test(v) && i > 0) return s.set({ "Content-Type": v.slice(5, i), "Cache-Control": "public, max-age=31536000, immutable", "Content-Security-Policy": "default-src 'none'; sandbox" }).send(Buffer.from(v.slice(i + 8), "base64"));
+  if (/^(https?:\/\/|\/(?!\/))/.test(v)) return s.set("Cache-Control", "public, max-age=3600").redirect(302, v);
+  throw bad("No image", 404);
+}
+const imgRow = (cols, id) => db.query(`select ${cols} from products where id=$1`, [id | 0]).then(r => r.rows[0] || (() => { throw bad("No image", 404); })());
+app.get("/api/img/p/:id/main", wrap(async (q, s) => sendImg(s, (await imgRow("img", q.params.id)).img)));
+app.get("/api/img/p/:id/v/:vid", wrap(async (q, s) => { const r = await imgRow("variations,vars", q.params.id), v = VR(r).find(x => x.id === q.params.vid); sendImg(s, v && v.imageUrl); }));
+app.get("/api/img/p/:id/g/:i", wrap(async (q, s) => sendImg(s, ((await imgRow("gallery", q.params.id)).gallery || [])[q.params.i | 0])));
 app.use("/api", lim(300));
 app.get("/healthz", (q, s) => s.send("ok"));
 
@@ -125,19 +158,19 @@ app.get("/healthz", (q, s) => s.send("ok"));
 app.get("/api/bootstrap", wrap(async (q, s) => {
   const u = await who(q), st = await site(), adm = u && u.role == "admin";
   await db.query("insert into settings(k,v) values('views','1') on conflict(k) do update set v=to_jsonb((settings.v#>>'{}')::int+1)");
-  const pr = await db.query("select p.*, (select count(*) from favorites f where f.product_id=p.id)::int as favs, coalesce((select sum((i->>'n')::int) from orders o, jsonb_array_elements(o.items) i where o.status<>'Cancelled' and (i->>'id')::int=p.id),0)::int as sold from products p " + (adm ? "" : "where not p.arch ") + "order by p.id desc");
+  const pr = await db.query("select " + LIGHT(adm) + ", (select count(*) from favorites f where f.product_id=p.id)::int as favs, coalesce((select sum((i->>'n')::int) from orders o, jsonb_array_elements(o.items) i where o.status<>'Cancelled' and (i->>'id')::int=p.id),0)::int as sold from products p " + (adm ? "" : "where not p.arch ") + "order by p.id desc");
   const brand = { logo: "/brand/emblem.png", logoClear: "/brand/emblem.png", logoWide: "/brand/wide.png" };
   const out = { set: { ...brand, ...st }, fees: st.fees || {}, defaultFee: st.defaultFee ?? 100, gid: GID, user: u && { name: u.name, role: u.role }, prods: pr.rows.map(r => P(r, adm)) };
   if (u) out.favs = (await db.query("select product_id from favorites where user_id=$1", [u.id])).rows.map(r => r.product_id);
   if (adm) out.views = (await db.query("select v from settings where k='views'")).rows[0]?.v;
-  s.json(out);
+  s.set({ "Cache-Control": "private, no-cache", Vary: "Authorization" }).json(out); /* ETag + no-cache = the browser asks, the server answers 304 when nothing changed */
 }));
 
 app.get("/api/products/:id", wrap(async (q, s) => {
   const u = await who(q), adm = u && u.role == "admin";
-  const r = (await db.query("select p.*, (select count(*) from favorites f where f.product_id=p.id)::int as favs from products p where p.id=$1 " + (adm ? "" : "and not p.arch"), [q.params.id | 0])).rows[0];
+  const r = (await db.query("select " + LIGHT(1) + ", (select count(*) from favorites f where f.product_id=p.id)::int as favs from products p where p.id=$1 " + (adm ? "" : "and not p.arch"), [q.params.id | 0])).rows[0];
   if (!r) throw bad("Product not found", 404);
-  s.set("Cache-Control", "no-store").json(P(r, true));
+  s.set({ "Cache-Control": "private, no-cache", Vary: "Authorization" }).json(P(r, true));
 }));
 
 /* auth */
@@ -161,17 +194,24 @@ app.put("/api/admin/settings", need(1), wrap(async (q, s) => {
 }));
 app.post("/api/admin/products", need(1), wrap(async (q, s) => {
   const b = q.body; if (!str(b.name, 120) || !num(b.price)) throw bad("Name and price required");
-  const names = arr(b.vars), vars = cleanVars(names.map(name => ({ name })));
-  const r = await db.query("insert into products(name,price,was,cat,stock,vars,img,sizes,variations,descr) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) returning *",
-    [str(b.name, 120), num(b.price), num(b.was), str(b.cat, 60), int(b.stock), JSON.stringify(names), IMG(b.img, "Image"), JSON.stringify(sizeList(b.sizes)), JSON.stringify(vars), str(b.desc, 2000)]);
+  const vars = cleanVars(Array.isArray(b.variations) ? b.variations.map(v => v && typeof v == "object" ? { ...v, imageUrl: keepOwn(v.imageUrl, null) } : v) : arr(b.vars).map(name => ({ name }))), names = vars.map(v => v.name);
+  const gal = (Array.isArray(b.gallery) ? b.gallery : []).slice(0, 8).map(x => IMG(keepOwn(x, null), "Gallery image")).filter(Boolean);
+  const r = await db.query("insert into products(name,price,was,cat,stock,vars,img,sizes,variations,descr,gallery) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning *",
+    [str(b.name, 120), num(b.price), num(b.was), str(b.cat, 60), int(b.stock), JSON.stringify(names), IMG(keepOwn(b.img, null), "Image"), JSON.stringify(sizeList(b.sizes)), JSON.stringify(vars), str(b.desc, 2000), JSON.stringify(gal)]);
   s.json(P(r.rows[0], true));
 }));
 const F = { name: v => str(v, 120), price: num, was: num, cat: v => str(v, 60), stock: int, vars: v => JSON.stringify(arr(v)), img: v => IMG(v, "Image"), arch: v => !!v, descr: v => str(v, 2000), sizes: v => JSON.stringify(sizeList(v)), variations: v => JSON.stringify(cleanVars(v)), gallery: v => JSON.stringify((Array.isArray(v) ? v : []).slice(0, 8).map(x => IMG(x, "Gallery image")).filter(Boolean)) };
 app.patch("/api/admin/products/:id", need(1), wrap(async (q, s) => {
   const b = { ...q.body }; if ("desc" in b) b.descr = b.desc;
+  if (["img", "variations", "gallery"].some(k => k in b)) {
+    const row = (await db.query("select id,img,variations,vars,gallery from products where id=$1", [q.params.id | 0])).rows[0]; if (!row) throw bad("Not found", 404);
+    if ("img" in b) b.img = keepOwn(b.img, row);
+    if ("variations" in b) b.variations = (Array.isArray(b.variations) ? b.variations : []).map(v => v && typeof v == "object" ? { ...v, imageUrl: keepOwn(v.imageUrl, row) } : v);
+    if ("gallery" in b) b.gallery = (Array.isArray(b.gallery) ? b.gallery : []).map(x => keepOwn(x, row));
+  }
   if ("variations" in b) b.vars = cleanVars(b.variations).map(v => v.name); /* keep the legacy name list in step */
   const ks = Object.keys(F).filter(k => k in b); if (!ks.length) throw bad("Nothing to change");
-  const r = await db.query(`update products set ${ks.map((k, i) => k + "=$" + (i + 2)).join(",")} where id=$1 returning *`, [q.params.id | 0, ...ks.map(k => F[k](b[k]))]);
+  const r = await db.query(`update products set ${ks.map((k, i) => k + "=$" + (i + 2)).join(",")}, rev=rev+1 where id=$1 returning *`, [q.params.id | 0, ...ks.map(k => F[k](b[k]))]);
   if (!r.rows[0]) throw bad("Not found", 404);
   s.json(P(r.rows[0], true));
 }));
@@ -301,7 +341,12 @@ app.get("/api/geo/regions/:code/cities", geoRoute(c => `/regions/${c}/cities-mun
 app.get("/api/geo/provinces/:code/cities", geoRoute(c => `/provinces/${c}/cities-municipalities/`));
 app.get("/api/geo/cities/:code/barangays", geoRoute(c => `/cities-municipalities/${c}/barangays/`));
 
-app.use(express.static(path.join(__dirname, "public"), { setHeaders: (r, p) => p.endsWith(".html") && r.setHeader("Cache-Control", "no-cache") }));
+/* the page and the service worker always revalidate; logos and icons are cached for a day and refreshed in the background after that */
+app.use(express.static(path.join(__dirname, "public"), { setHeaders: (r, p) => {
+  const sw = /[\\/]sw\.js$/.test(p);
+  r.setHeader("Cache-Control", sw || /\.html$/.test(p) ? "no-cache" : "public, max-age=86400, stale-while-revalidate=604800");
+  if (sw) r.setHeader("Service-Worker-Allowed", "/");
+} }));
 app.use((e, q, s, n) => { if (!e.status) console.error(e); s.status(e.status || 500).json({ error: e.status ? e.message : "Server error" }); });
 
 async function init() {
@@ -314,6 +359,7 @@ async function init() {
     alter table products add column if not exists sizes jsonb not null default '[]';
     alter table products add column if not exists variations jsonb not null default '[]';
     alter table products add column if not exists gallery jsonb not null default '[]';
+    alter table products add column if not exists rev int not null default 0;
   `);
 }
 init().then(() => app.listen(process.env.PORT || 3000, () => console.log("storefront up"))).catch(e => { console.error(e); process.exit(1); });
