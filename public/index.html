@@ -223,6 +223,14 @@ body{font-size:17px}
 .sec h2{font-size:36px}.ph{font-size:52px}.pn{padding:32px}
 .pd{max-width:1700px}
 }
+
+/* homepage fixes: .tiles is also an admin class (flex), so the homepage tiles must win; keep banner behind text; admin buttons readable */
+.tiles.box{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.tl{min-width:0}.tl .chg,.tl .rmT{text-transform:none;white-space:nowrap;font-family:var(--fb)}
+.hc{max-width:100%}.hero h1{overflow-wrap:anywhere}
+@media(max-width:1020px){.bn{width:100%;opacity:.45;-webkit-mask-image:linear-gradient(90deg,transparent,#000 70%);mask-image:linear-gradient(90deg,transparent,#000 70%)}.hero{padding:28px}}
+@media(max-width:900px){.tiles.box{grid-template-columns:1fr}.tl{min-height:96px}}
+@media(max-width:720px){.tiles.box{grid-template-columns:1fr}}
 </style></head><body>
 <div id="offline" hidden role="status">You’re offline. Showing saved items. Ordering needs a connection.</div>
 <div class="shell"><aside class="rail" id="rail"></aside><div class="col">
