@@ -8,7 +8,7 @@
    - catalogue (/api/bootstrap, /api/products/:id)
                                network first (3 s), saved copy when offline or slow; kept separately per signed-in person
    - everything else (orders, checkout, admin writes, sign-in)  never cached */
-const VERSION = "v8";
+const VERSION = "v9";
 const SHELL = "shell-" + VERSION, ASSETS = "assets-" + VERSION, API = "api-" + VERSION;
 const KEEP = [SHELL, ASSETS, API];
 const SHELL_URLS = ["/", "/brand/emblem.png", "/brand/wide.png", "/gcash-qr.svg", "/cod.svg"];
