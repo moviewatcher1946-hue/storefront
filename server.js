@@ -82,13 +82,14 @@ const who = async q => {
   const id = vf((q.headers.authorization || "").slice(7)); if (!id) return null;
   const u = (await db.query("select id,name,email from users where id=$1", [id])).rows[0];
   if (!u) return null;
-  u.role = u.email && ADMINS.includes(u.email.toLowerCase()) ? "admin" : "customer";
+  const em = u.email ? u.email.toLowerCase() : "";
+  u.role = ADMINS.includes(em) ? "admin" : (await riderList()).includes(em) ? "rider" : "customer";
   return u;
 };
 const need = admin => wrap(async (q, s, n) => {
   q.u = await who(q);
   if (!q.u) throw bad("Please sign in", 401);
-  if (admin && q.u.role != "admin") throw bad("Admins only", 403);
+  if (admin == "r" ? !["admin", "rider"].includes(q.u.role) : admin && q.u.role != "admin") throw bad(admin == "r" ? "Riders and admins only" : "Admins only", 403);
   n();
 });
 
@@ -111,6 +112,14 @@ const P = (r, full) => {
 };
 const SA = a => a && { street: a.street || "", barangay: a.brgy || "", city: a.city || "", province: a.prov || a.region || "", region: a.region || "", postalCode: a.zip || "", country: a.country || "Philippines" };
 const O = r => ({ id: r.id, name: r.name, phone: r.phone, method: r.method, addr: r.addr, shippingAddress: SA(r.addr), pickup: r.pickup_at, pay: r.pay, paymentMethod: r.pay, note: r.note, items: r.items, subtotal: r.subtotal, fee: r.fee, total: r.total, status: r.status, orderStatus: r.status, created: r.created });
+/* riders: only the Google emails admins add in Admin > Riders (kept in the database, nothing to set in Render) */
+let RC = { t: 0, v: [] };
+const riderList = async fresh => {
+  if (!fresh && Date.now() - RC.t < 10e3) return RC.v;
+  const v = (await db.query("select v from settings where k='riders'")).rows[0]?.v;
+  RC = { t: Date.now(), v: Array.isArray(v) ? v : [] }; return RC.v;
+};
+const saveRiders = async a => { await db.query("insert into settings(k,v) values('riders',$1) on conflict(k) do update set v=excluded.v", [JSON.stringify(a)]); RC = { t: Date.now(), v: a }; };
 const site = async () => (await db.query("select v from settings where k='site'")).rows[0]?.v || {};
 /* Philippine locations from the official PSGC list, cached in memory */
 const GEO = new Map();
@@ -179,7 +188,7 @@ app.post("/api/auth/google", lim(20), wrap(async (q, s) => {
   if (!GID) throw bad("Google sign-in is not set up");
   const r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(q.body.credential || "")), t = await r.json();
   if (!r.ok || t.aud !== GID || (t.email_verified !== "true" && t.email_verified !== true)) throw bad("Google sign-in failed", 401);
-  const em = String(t.email).toLowerCase(), role = ADMINS.includes(em) ? "admin" : "customer";
+  const em = String(t.email).toLowerCase(), role = ADMINS.includes(em) ? "admin" : (await riderList()).includes(em) ? "rider" : "customer";
   const u = (await db.query(
     "insert into users(name,email,role) values($1,$2,$3) on conflict(email) do update set name=excluded.name, role=excluded.role returning id,name,role",
     [str(t.name || em, 60), em, role])).rows[0];
@@ -298,10 +307,59 @@ app.patch("/api/admin/orders/:id", need(1), wrap(async (q, s) => {
     if (o.status == "Cancelled" && st != "Cancelled") throw bad("Cancelled orders can't be reopened");
     if (st == "Cancelled" && o.status != "Cancelled") await restock(c, o.items);
     const r = await c.query("update orders set status=$2 where id=$1 returning *", [o.id, st]);
+    if (st != "Out for delivery") RIDER.delete(o.id);
     await c.query("commit");
     s.json(O(r.rows[0]));
   } catch (e) { await c.query("rollback").catch(() => {}); throw e; }
   finally { c.release(); }
+}));
+
+/* live rider location: kept in the server's memory only (never saved to the database), and only while an order is out for delivery */
+const RIDER = new Map();
+setInterval(() => { const t = Date.now() - 20 * 60e3; for (const [k, v] of RIDER) if (v.t < t) RIDER.delete(k); }, 60e3).unref();
+app.post("/api/admin/orders/:id/location", lim(60), need("r"), wrap(async (q, s) => {
+  const id = q.params.id | 0, la = Number(q.body.lat), ln = Number(q.body.lng);
+  if (!(Math.abs(la) <= 90 && Math.abs(ln) <= 180)) throw bad("Bad location");
+  const o = (await db.query("select method,status from orders where id=$1", [id])).rows[0];
+  if (!o) throw bad("Not found", 404);
+  if (o.method != "delivery" || o.status != "Out for delivery") throw bad("This order is not out for delivery");
+  RIDER.set(id, { lat: +la.toFixed(5), lng: +ln.toFixed(5), t: Date.now() });
+  s.json({ ok: 1 });
+}));
+app.delete("/api/admin/orders/:id/location", need("r"), (q, s) => { RIDER.delete(q.params.id | 0); s.json({ ok: 1 }); });
+app.get("/api/orders/:id/location", lim(120), need(), wrap(async (q, s) => {
+  const id = q.params.id | 0, o = (await db.query("select user_id,status from orders where id=$1", [id])).rows[0];
+  if (!o || (o.user_id != q.u.id && !["admin", "rider"].includes(q.u.role))) throw bad("Not found", 404);
+  const p = RIDER.get(id);
+  s.set("Cache-Control", "no-store");
+  s.json(o.status == "Out for delivery" && p && Date.now() - p.t < 10 * 60e3 ? { lat: p.lat, lng: p.lng, age: Math.round((Date.now() - p.t) / 1e3) } : {});
+}));
+
+app.get("/api/admin/riders", need(1), wrap(async (q, s) => s.json({ emails: await riderList(1) })));
+app.post("/api/admin/riders", need(1), wrap(async (q, s) => {
+  const e = str(q.body.email, 120).toLowerCase();
+  if (!/^[^\s@'"<>]+@[^\s@'"<>]+\.[^\s@'"<>]+$/.test(e)) throw bad("Enter a valid email address");
+  const a = await riderList(1); if (a.includes(e)) throw bad("That email is already a rider"); if (a.length >= 30) throw bad("Rider limit reached (30)");
+  const n = [...a, e]; await saveRiders(n);
+  await db.query("update users set role='rider' where lower(email)=$1 and role='customer'", [e]);
+  s.json({ emails: n });
+}));
+app.post("/api/admin/riders/remove", need(1), wrap(async (q, s) => {
+  const e = str(q.body.email, 120).toLowerCase(), n = (await riderList(1)).filter(x => x != e); await saveRiders(n);
+  await db.query("update users set role='customer' where lower(email)=$1 and role='rider'", [e]);
+  s.json({ emails: n });
+}));
+/* rider mode: riders added by admins and admins see packed delivery orders and can start / finish a delivery. Nothing else. */
+app.get("/api/rider/orders", need("r"), wrap(async (q, s) => {
+  s.json((await db.query("select * from orders where method='delivery' and status in ('Packed','Out for delivery') order by id")).rows.map(O));
+}));
+app.patch("/api/rider/orders/:id", need("r"), wrap(async (q, s) => {
+  const st = q.body.status; if (!["Out for delivery", "Delivered"].includes(st)) throw bad("Riders can only start or finish a delivery");
+  const from = st == "Delivered" ? "Out for delivery" : "Packed";
+  const r = await db.query("update orders set status=$2 where id=$1 and method='delivery' and status=$3 returning *", [q.params.id | 0, st, from]);
+  if (!r.rows[0]) throw bad("This order is no longer " + (from == "Packed" ? "ready to go out" : "out for delivery") + ". Refresh the list.", 409);
+  if (st != "Out for delivery") RIDER.delete(r.rows[0].id);
+  s.json(O(r.rows[0]));
 }));
 
 app.post("/api/orders/:id/cancel", need(), wrap(async (q, s) => {
