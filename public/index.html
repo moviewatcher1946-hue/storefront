@@ -90,7 +90,7 @@ svg{flex:none!important;flex-shrink:0!important;aspect-ratio:1/1;min-width:0}img
 .tag{position:absolute;top:10px;left:8px;z-index:2;pointer-events:none;background:var(--plum);color:#fff;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;letter-spacing:.02em}.tag.no{background:var(--ink)}
 .pi{height:auto!important;aspect-ratio:1/1;border-radius:10px;background:color-mix(in srgb,var(--purple) 4%,#fff)}.pi img{padding:6px}
 .pc h4{line-height:1.25;text-wrap:balance;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}.pc .pp b{font-size:16px}
-.pc .sws{margin:0 0 4px}.pc .sws i{width:16px;height:16px;box-shadow:0 0 0 2px #fff,0 0 0 3px var(--line)}.pc .sws small{background:color-mix(in srgb,var(--purple) 8%,#fff);color:var(--ink);padding:2px 9px;border-radius:999px;font-size:12px}
+.pc .sws{margin:0 0 4px}.pc .sws i{width:16px;height:16px;box-shadow:0 0 0 2px #fff,0 0 0 3px var(--line)}.pc .sws small{background:#f1ecf4;color:var(--purple);color:var(--ink);padding:2px 9px;border-radius:999px;font-size:12px}
 .pc>button svg{width:16px;height:16px;stroke-width:2.2}
 .rail a em{display:none;font-style:normal}
 /* ---- phones and tablets: touch first ---- */
@@ -716,7 +716,7 @@ const TOPIC_TILES=["Order or delivery","Payment","Product question","Returns or 
 const contactLines=()=>{const s=V.set;return [s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("")||'<p class="mute">Contact details coming soon.</p>'};
 function renderChat(){const el=$("chatlog");if(!el)return;el.textContent="";
   if(!V.chat.length){const p=document.createElement("p");p.style.cssText="color:var(--mute);margin:0";p.textContent="Hi! Pick a topic or type your question. I can help with delivery, fees, payment and pickup.";el.appendChild(p)}
-  for(const m of V.chat){const p=document.createElement("p"),u=m.role==="user";p.textContent=m.text;p.style.cssText="margin:0 0 8px;padding:8px 12px;border-radius:12px;max-width:85%;"+(u?"margin-left:auto;background:var(--terra);color:var(--ink)":"background:color-mix(in srgb,var(--purple) 8%,#fff)");el.appendChild(p);
+  for(const m of V.chat){const p=document.createElement("p"),u=m.role==="user";p.textContent=m.text;p.style.cssText="margin:0 0 8px;padding:8px 12px;border-radius:12px;max-width:85%;"+(u?"margin-left:auto;background:var(--terra);color:var(--ink)":"background:#f1ecf4;color:var(--purple)");el.appendChild(p);
     if(m.handoff){const box=document.createElement("div");box.style.cssText="margin:0 0 12px;padding:12px;border:1px dashed var(--plum);border-radius:12px";const q=document.createElement("p");q.style.cssText="margin:0 0 8px";q.textContent="I can’t fully answer this. You can browse help topics or talk to a person.";const h2=document.createElement("button");h2.type="button";h2.className="g";h2.textContent="See help topics";h2.onclick=()=>{go("support/help");draw()};const b=document.createElement("button");b.type="button";b.textContent="Talk to a person";b.onclick=talkHuman;box.appendChild(q);box.appendChild(h2);box.appendChild(document.createTextNode(" "));box.appendChild(b);el.appendChild(box)}}
   el.scrollTop=el.scrollHeight}
 /* Support is three pages: #support (help home), #support/chat (assistant), #support/contact (talk to a person) */
