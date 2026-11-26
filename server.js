@@ -383,14 +383,17 @@ app.patch("/api/admin/support/:id", need(1), wrap(async (q, s) => {
 /* AI support assistant: answers general questions about the shop (delivery, fees, payment, pickup).
    It never sees customer or order data. It uses Groq and needs GROQ_API_KEY set on the server (GROQ_MODEL overrides the default gpt-oss-120b model);
    without a key the page just offers the message form. */
+const HUMAN_RE = /\b(real (person|human|agent|people)|talk (to|with) (a |an |some |the )?(real )?(person|human|agent|representative|rep|staff|someone|somebody|people|customer service)|speak (to|with) (a |an |some )?(real )?(person|human|agent|representative|someone|somebody)|customer (service|support) (person|agent|rep|representative)|representative|human|agent|staff|kausap|tao|totoong tao|tauhan)\b/i;
 const AI_KEY = process.env.GROQ_API_KEY || "", AI_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 app.post("/api/support/chat", lim(20), wrap(async (q, s) => {
-  if (!AI_KEY) throw bad("The assistant is not available right now. Please send us a message instead.", 503);
   const raw = Array.isArray((q.body || {}).messages) ? q.body.messages.slice(-10) : [];
   const msgs = raw.filter(m => m && (m.role === "user" || m.role === "assistant"))
     .map(m => ({ role: m.role, content: str(m.content, 1000) })).filter(m => m.content);
   while (msgs.length && msgs[0].role !== "user") msgs.shift(); /* the history must start with the customer */
   if (!msgs.length || msgs[msgs.length - 1].role !== "user") throw bad("Ask a question first");
+  /* any request for a real person (or anything that is not the AI) goes straight to the message form, no model call */
+  if (HUMAN_RE.test(msgs[msgs.length - 1].content)) return s.json({ reply: "Of course. I’ll pass you to our team. Send us a message and we’ll reply by phone or email.", handled: false });
+  if (!AI_KEY) throw bad("Lumix is not available right now. Please send us a message instead.", 503);
   const st = await site(), name = st.name || "Likha: Youth Craft";
   const towns = Object.entries(st.townFees || {}).map(([t, f]) => t + ": P" + num(f)).join(", ");
   /* what the assistant knows about the store screens. It explains where things are and how to use them. It never sees the catalogue, prices, stock or orders. */
@@ -410,7 +413,7 @@ app.post("/api/support/chat", lim(20), wrap(async (q, s) => {
     "- Footer: Terms and Conditions and Privacy Policy."
   ];
   const system = [
-    "You are the support assistant for the online shop \"" + name + "\" in the Philippines. Be friendly, brief (under 80 words), and reply in the language the customer uses (English or Filipino).",
+    "You are Lumix, the support assistant for the online shop \"" + name + "\" in the Philippines. Be friendly, brief (under 80 words), and reply in the language the customer uses (English or Filipino).",
     "FACTS YOU MAY USE:",
     "- Delivery only within " + AREA.province + " (" + AREA.region + "). Customers choose their municipality at checkout.",
     "- Standard delivery fee: P" + num(st.defaultFee ?? 100) + ". Municipality fees: " + (towns || "none set, standard fee applies") + ".",
@@ -441,6 +444,42 @@ app.post("/api/support/chat", lim(20), wrap(async (q, s) => {
   try { out = JSON.parse(text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "")); } catch {}
   if (out && typeof out.answer === "string" && out.answer.trim()) s.json({ reply: out.answer.trim().slice(0, 1000), handled: out.handled === true });
   else s.json({ reply: "Sorry, I couldn't answer that.", handled: false });
+}));
+
+/* Lumix for the admin only: full store data (orders and products) to answer questions. Read only: it cannot change anything. */
+app.post("/api/admin/ai", need(1), lim(40), wrap(async (q, s) => {
+  if (!AI_KEY) throw bad("Lumix is not set up yet. Add GROQ_API_KEY on the server.", 503);
+  const raw = Array.isArray((q.body || {}).messages) ? q.body.messages.slice(-12) : [];
+  const msgs = raw.filter(m => m && (m.role === "user" || m.role === "assistant")).map(m => ({ role: m.role, content: str(m.content, 1000) })).filter(m => m.content);
+  while (msgs.length && msgs[0].role !== "user") msgs.shift();
+  if (!msgs.length || msgs[msgs.length - 1].role !== "user") throw bad("Ask a question first");
+  const orders = (await db.query("select id,status,method,pay,created,total,items from orders order by id desc limit 150")).rows;
+  const prods = (await db.query("select id,name,price,stock,arch,variations from products order by id desc limit 300")).rows;
+  const st = await site();
+  const orderLines = orders.map(o => `#${o.id} | ${o.status} | ${o.method} | ${o.pay} | ${new Date(o.created).toISOString().slice(0, 16)} | total P${num(o.total)} | ` + (o.items || []).map(i => `${i.name}${i.v ? " (" + i.v + ")" : ""}${i.size ? " size " + i.size : ""} x${i.n}`).join(", "));
+  const prodLines = prods.map(p => `${p.name} | P${num(p.price)} | stock ${p.stock} | ${p.arch ? "archived" : "active"}` + ((p.variations || []).length ? " | options: " + p.variations.map(v => v.name + " (stock " + (v.stockCount ?? "untracked") + ")").join(", ") : ""));
+  const system = [
+    "You are Lumix, the admin assistant for the shop \"" + (st.name || "Likha: Youth Craft") + "\". You answer the shop owner's questions about orders, products, stock and sales, and suggest next steps.",
+    "You can read the data below. You CANNOT change orders, products, stock or settings. If the owner wants a change, tell them which screen in the Admin panel to use.",
+    "Customer phone numbers, addresses and names are not included. Do not guess them.",
+    "Be concise and clear. Use the figures exactly as given. If the data does not answer the question, say so.",
+    "",
+    "ORDERS (latest first; format: id | status | method | pay | date | total | items):",
+    orderLines.join("\n") || "(no orders)",
+    "",
+    "PRODUCTS (format: name | price | stock | active or archived | options):",
+    prodLines.join("\n") || "(no products)"
+  ].join("\n");
+  const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: "Bearer " + AI_KEY },
+    body: JSON.stringify({ model: AI_MODEL, max_tokens: 800, temperature: 0.2, messages: [{ role: "system", content: system }, ...msgs] }),
+    signal: AbortSignal.timeout(30000)
+  });
+  if (!r.ok) throw bad("Lumix is busy. Please try again in a moment.", 502);
+  const j = await r.json().catch(() => ({}));
+  const reply = String((j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || "").trim();
+  s.json({ reply: reply || "I couldn’t come up with an answer. Try asking in a different way." });
 }));
 
 /* backup (free Render DB is not forever: download this often) */
