@@ -389,6 +389,7 @@ app.post("/api/support/chat", lim(20), wrap(async (q, s) => {
   const raw = Array.isArray((q.body || {}).messages) ? q.body.messages.slice(-10) : [];
   const msgs = raw.filter(m => m && (m.role === "user" || m.role === "assistant"))
     .map(m => ({ role: m.role, content: str(m.content, 1000) })).filter(m => m.content);
+  while (msgs.length && msgs[0].role !== "user") msgs.shift(); /* the history must start with the customer */
   if (!msgs.length || msgs[msgs.length - 1].role !== "user") throw bad("Ask a question first");
   const st = await site(), name = st.name || "Likha: Youth Craft";
   const towns = Object.entries(st.townFees || {}).map(([t, f]) => t + ": P" + num(f)).join(", ");
