@@ -342,10 +342,13 @@ function migrateAddr(){const a=P.addr||{};if(!V.area)return;const t=a.city&&town
 if(a.city&&!t)P.addr={...a,city:"",brgy:""};else if(t&&t.name!==a.city)P.addr={...a,city:t.name};
 if(P.addr.rc||P.addr.cityc||P.addr.brgyc){const{rc,provc,cityc,brgyc,...r}=P.addr;P.addr=r}save()}
 const setTown=n=>setA({city:n,region:AR().region,prov:AR().province,brgy:""});
-function pinHint(){const a=P.addr;if(!(a.lat&&a.lng))return "Optional: tap the map or use your current location to drop a pin. It helps the rider find you.";
-const lat=+a.lat,lng=+a.lng,n=nearest(lat,lng);
-if(!inArea(lat,lng))return `<span class="bad">That pin is outside ${esc(AR().province)}. We only deliver within the province.</span> <a onclick="clearPin()">Remove pin</a>`;
-return `Pin saved${n?` · Nearest town: <b>${esc(n.name)}</b>${a.city==n.name?"":` (<a onclick="setTown('${esc(n.name)}')">use ${esc(n.name)}</a>)`}`:""} · <a onclick="clearPin()">Remove pin</a>`}
+function pinHint(){const a=P.addr;if(!(a.lat&&a.lng))return "Optional: tap the map or use your current location to drop a pin. We’ll fill in your municipality and barangay from it.";
+const lat=+a.lat,lng=+a.lng,rg=MP.rg||{},n=nearest(lat,lng),clr=` · <a onclick="clearPin()">Remove pin</a>`,acc=MP.acc>150?`<br><span class="bad">Your device found you only within about ${MP.acc>=1000?(MP.acc/1000).toFixed(1)+" km":Math.round(MP.acc)+" m"}, which is common on computers. Drag the pin to your exact spot.</span>`:"";
+if(rg.status=="outside")return `<span class="bad">That pin is in ${esc(rg.name)}. We only deliver within ${esc(AR().province)}.</span>${clr}`;
+if(!inArea(lat,lng))return `<span class="bad">That pin is outside ${esc(AR().province)}. We only deliver within the province.</span>${clr}`;
+if(rg.status=="loading")return `Pin saved · Looking up your address…${clr}${acc}`;
+if(rg.status=="ok")return `Pin saved · <b>${esc(rg.town)}</b>${rg.brgy?", "+esc(rg.brgy):""}${clr}${acc}<br><small>Not right? Drag the pin or choose your municipality below.</small>`;
+return `Pin saved · We couldn’t look up the address${n?`. Closest town centre (approximate): <b>${esc(n.name)}</b>${a.city==n.name?"":` (<a onclick="setTown('${esc(n.name)}')">use ${esc(n.name)}</a>)`}`:""}${clr}${acc}`}
 const showHint=()=>{const h=$("pinhint");if(h)h.innerHTML=pinHint()};
 /* barangay suggestions come from the PSGC list when it is reachable; typing always works when it is not */
 function brgyHints(a){const paths=["/regions"],reg=(G.data["/regions"]||[]).find(r=>/mimaropa/i.test(r.name));
@@ -361,7 +364,7 @@ return `<div class="pn"><h3>Delivery location</h3>
 <label class="locked">Region<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.region)}</option></select></label>
 <label class="locked">Province<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.province)}</option></select></label>
 <label>City / Municipality<select onchange="setTown(this.value)"><option value="">Choose municipality</option>${A.towns.map(t=>`<option value="${esc(t.name)}" ${t.name==a.city?"selected":""}>${esc(t.name)} · ${peso(townFee(t.name))}</option>`).join("")}</select></label>
-<label>Barangay<input list="brgys" value="${esc(a.brgy)}" autocomplete="off" placeholder="${a.city?"Type or pick your barangay":"Choose municipality first"}" ${a.city?"":"disabled"} oninput="P.addr.brgy=this.value;save()"></label><datalist id="brgys">${hints.map(b=>`<option value="${esc(b)}">`).join("")}</datalist>
+<label>Barangay<input list="brgys" value="${esc(a.brgy)}" autocomplete="off" placeholder="${a.city?"Type or pick your barangay":"Choose municipality first"}" ${a.city?"":"disabled"} oninput="P.addr.brgy=this.value;delete P.addr.brgyAuto;save()"></label><datalist id="brgys">${hints.map(b=>`<option value="${esc(b)}">`).join("")}</datalist>
 <label>Street / house no.<input value="${esc(a.street)}" onchange="P.addr.street=this.value;save()"></label><label>Postal code<input inputmode="numeric" value="${esc(a.zip)}" onchange="P.addr.zip=this.value;save()"></label></div>
 <p class="geo-s">${a.city?`Delivering to ${esc(a.city)}${fee}`:"Choose your municipality to see the delivery fee."}</p></div>`}
 /* the map (Leaflet + OpenStreetMap) is downloaded only when an address form is on screen. The map element is kept alive between redraws. */
@@ -370,8 +373,23 @@ function loadLeaflet(){if(window.L&&window.L.map)return Promise.resolve();return
 const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>window.L&&window.L.map?ok():no(new Error("map"));s.onerror=()=>no(new Error("map"));document.head.appendChild(s)}).catch(e=>{MP.p=null;throw e}))}
 const pinIcon=()=>window.L.divIcon({className:"pinic",html:'<svg viewBox="0 0 34 44"><path d="M17 43S3 28 3 16a14 14 0 0 1 28 0c0 12-14 27-14 27z" style="fill:var(--plum)" stroke="#fff" stroke-width="2.5"/><circle cx="17" cy="16" r="5.5" fill="#fff"/></svg>',iconSize:[34,44],iconAnchor:[17,43]});
 function putMarker(lat,lng){const Lf=window.L;if(!MP.map)return;if(MP.mk)MP.mk.setLatLng([lat,lng]);else{MP.mk=Lf.marker([lat,lng],{draggable:true,icon:pinIcon(),keyboard:true,title:"Your delivery pin"}).addTo(MP.map);MP.mk.on("dragend",()=>{const p=MP.mk.getLatLng();setPin(p.lat,p.lng)})}}
-function setPin(lat,lng,zoom){P.addr={...P.addr,lat:lat.toFixed(5),lng:lng.toFixed(5)};save();putMarker(lat,lng);if(zoom&&MP.map)MP.map.setView([lat,lng],zoom);showHint()}
-function clearPin(){const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.mk&&MP.map){MP.map.removeLayer(MP.mk);MP.mk=null}showHint()}
+/* the address behind a pin comes from OpenStreetMap's Nominatim (OSM data, not our rough town centres). A short pause avoids hammering it while the pin is dragged. */
+const brgyOf=d=>d.suburb||d.village||d.neighbourhood||d.quarter||d.hamlet||"",townIn=d=>{for(const k of ["municipality","town","city","county","city_district","state_district"]){const t=d[k]&&townOf(d[k]);if(t)return t}return null};
+let rgTimer=0,rgSeq=0;
+function reverse(lat,lng){clearTimeout(rgTimer);const my=++rgSeq;MP.rg={status:"loading"};
+rgTimer=setTimeout(async()=>{let d=null;try{const r=await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&accept-language=en&lat="+lat+"&lon="+lng,{signal:AbortSignal.timeout(8000)});if(r.ok)d=(await r.json()).address||null}catch(e){}
+if(my!=rgSeq)return;const a=P.addr;
+if(!d){MP.rg={status:"fail"};return showHint()}
+const t=townIn(d),other=d.municipality||d.town||d.city||d.county||"";
+if(!t&&other){MP.rg={status:"outside",name:other};return showHint()}
+if(!t){MP.rg={status:"fail"};return showHint()}
+const b=brgyOf(d),next={...a,city:t.name,region:AR().region,prov:AR().province};
+if(b&&(!a.brgy||a.brgyAuto)){next.brgy=b;next.brgyAuto=1}if(d.road&&!a.street)next.street=d.road;if(/^\d{4}$/.test(d.postcode||"")&&!a.zip)next.zip=d.postcode;
+P.addr=next;save();MP.rg={status:"ok",town:t.name,brgy:next.brgy||""};draw()},700)}
+function setPin(lat,lng,zoom,acc){MP.acc=acc||0;P.addr={...P.addr,lat:lat.toFixed(5),lng:lng.toFixed(5)};save();putMarker(lat,lng);
+if(MP.map){if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}if(acc>40)MP.circle=window.L.circle([lat,lng],{radius:acc,weight:1,color:"#4a7bd0",fillOpacity:.12}).addTo(MP.map);if(zoom)MP.map.setView([lat,lng],acc>600?14:zoom)}
+inArea(lat,lng)?reverse(lat,lng):(rgSeq++,MP.rg={status:"fail"});showHint()}
+function clearPin(){rgSeq++;MP.rg=null;MP.acc=0;const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint()}
 function initMap(){const Lf=window.L,A=AR(),a=P.addr,has=a.lat&&a.lng;
 MP.map=Lf.map(MP.el,{minZoom:8,maxBounds:Lf.latLngBounds(A.bounds).pad(.3),maxBoundsViscosity:.8}).setView(has?[+a.lat,+a.lng]:[13.0,121.35],has?15:9);
 Lf.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(MP.map);
@@ -383,8 +401,10 @@ if(MP.map){MP.map.invalidateSize();if(P.addr.lat&&P.addr.lng)putMarker(+P.addr.l
 if(MP.starting)return;MP.starting=1;MP.failed=0;MP.el.innerHTML='<div class="mapfail">Loading map…</div>';
 loadLeaflet().then(()=>{MP.starting=0;MP.el.innerHTML="";initMap();const s2=$("mapslot");if(s2&&MP.el.parentNode!==s2)s2.appendChild(MP.el);MP.map.invalidateSize()})
 .catch(()=>{MP.starting=0;MP.failed=1;MP.el.innerHTML='<div class="mapfail"><span>The map couldn’t load. You can still choose your municipality below.</span><button type="button" class="g" onclick="mountMap()">Try again</button></div>'})}
-function locate(){if(!navigator.geolocation)return toast("Location isn’t available on this device");
-navigator.geolocation.getCurrentPosition(p=>{const lat=p.coords.latitude,lng=p.coords.longitude;if(!inArea(lat,lng))toast("You seem to be outside "+AR().province+". We only deliver within the province.");setPin(lat,lng,16)},()=>toast("Location permission denied"),{enableHighAccuracy:true,timeout:15000})}
+function locate(){if(!navigator.geolocation)return toast("Location isn’t available on this device");toast("Finding your location…");let best=null,wid=null,t=0;
+const done=()=>{clearTimeout(t);if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null;if(!best)return;const{latitude:la,longitude:ln,accuracy:ac}=best.coords;if(!inArea(la,ln))toast("You seem to be outside "+AR().province+". We only deliver within the province.");setPin(la,ln,17,ac)};
+wid=navigator.geolocation.watchPosition(p=>{if(!best||p.coords.accuracy<best.coords.accuracy){best=p;const c=p.coords;setPin(c.latitude,c.longitude,17,c.accuracy)}if(p.coords.accuracy<=25)done()},()=>{if(best)done();else{clearTimeout(t);if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null;toast("We couldn’t get your location. Check that location access is allowed, or tap the map instead.")}},{enableHighAccuracy:true,maximumAge:0,timeout:20000});
+t=setTimeout(done,9000)}
 
 const chg=f=>`<label class="chg">Change image<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
 const chgI=f=>`<label class="chg ci" title="Change image" aria-label="Change image">${ic("cam")}<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
@@ -509,7 +529,7 @@ if(!ct.name||!ct.phone)return toast("Add your name and mobile number");
 const nb=P.cart.find(needsOpt);if(nb){toast("Choose a size or option first");return go("product/"+nb.id)}
 const ov=P.cart.find(c=>{const p=V.prods.find(x=>x.id==c.id);return p&&c.n>room(p,c.vid,c.k)});if(ov)return toast("Please lower the quantity of items that are low on stock")
 if(dl&&(!a.city||!a.brgy||!a.street))return toast("Complete your delivery address");
-if(dl&&a.lat&&a.lng&&!inArea(+a.lat,+a.lng))return toast("Your map pin is outside "+AR().province+". Move it or remove it.");
+if(dl&&a.lat&&a.lng&&(!inArea(+a.lat,+a.lng)||(MP.rg&&MP.rg.status=="outside")))return toast("Your map pin is outside "+AR().province+". Move it or remove it.");
 const body={items:P.cart.map(c=>({id:c.id,vid:c.vid,size:c.size,n:c.n})),method:P.m,pay:$("pay").value,name:ct.name,phone:ct.phone,note:P.note,addr:dl?a:null,pickup:dl?"":($("pk")?$("pk").value:"")};
 const t=b.innerHTML;b.disabled=true;b.innerHTML='<span class="sp"></span>';
 try{const o=await api("/orders",{method:"POST",body});b.disabled=false;b.classList.add("ok");b.innerHTML=CK+" Order #"+o.id;P.cart=[];P.note="";save();V.ol=0;await load();theme();setTimeout(()=>go("orders"),RM?0:800)}
