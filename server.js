@@ -122,7 +122,7 @@ const site = async () => (await db.query("select v from settings where k='site'"
 const GEO = new Map();
 function geo(p) {
   if (!GEO.has(p)) {
-    const pr = fetch("https://psgc.gitlab.io/api" + p)
+    const pr = fetch("https://psgc.gitlab.io/api" + p, { signal: AbortSignal.timeout(8000) })
       .then(r => { if (!r.ok) throw new Error("PSGC " + r.status); return r.json(); })
       .catch(() => { GEO.delete(p); throw bad("Location list unavailable, try again shortly", 502); });
     GEO.set(p, pr);
@@ -130,13 +130,19 @@ function geo(p) {
   return GEO.get(p);
 }
 const pick = list => (list || []).map(x => ({ code: x.code, name: x.regionName || x.name }));
-async function regionFee(code) {
-  if (!/^\d{1,12}$/.test(code)) throw bad("Choose a delivery region");
-  const r = (await geo("/regions/")).find(x => x.code == code);
-  if (!r) throw bad("Choose a delivery region");
-  const st = await site();
-  return { name: r.regionName || r.name, fee: num((st.fees || {})[code] ?? st.defaultFee ?? 100) };
-}
+/* Delivery area: Oriental Mindoro (MIMAROPA). The delivery fee is set per municipality in the admin (settings.townFees).
+   Nothing here needs the PSGC website, so checkout keeps working when it is slow or down.
+   lat/lng are approximate town centres, only used for the map's "nearest town" hint. */
+const AREA = {
+  region: "MIMAROPA Region", province: "Oriental Mindoro", bounds: [[12.2, 120.8], [13.7, 121.7]],
+  towns: [["Baco", 13.3583, 121.0969], ["Bansud", 12.8683, 121.4500], ["Bongabong", 12.7456, 121.4881], ["Bulalacao", 12.3306, 121.3414], ["Calapan City", 13.4117, 121.1803],
+    ["Gloria", 12.9769, 121.4778], ["Mansalay", 12.5222, 121.4381], ["Naujan", 13.3217, 121.3044], ["Pinamalayan", 13.0319, 121.4817], ["Pola", 13.1583, 121.4333],
+    ["Puerto Galera", 13.5028, 120.9547], ["Roxas", 12.5953, 121.5272], ["San Teodoro", 13.4419, 121.0300], ["Socorro", 13.0583, 121.4167], ["Victoria", 13.1800, 121.2800]].map(([name, lat, lng]) => ({ name, lat, lng }))
+};
+/* "City of Calapan", "Calapan City" and "calapan" are the same town */
+const normTown = x => String(x || "").toLowerCase().replace(/\(.*?\)|\bcity of\b|\bmunicipality of\b|\bcity\b/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
+const townOf = x => AREA.towns.find(t => normTown(t.name) === normTown(x));
+const coord = v => /^-?\d{1,3}(\.\d{1,7})?$/.test(String(v || "")) ? String(v) : "";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -167,7 +173,7 @@ app.get("/api/bootstrap", wrap(async (q, s) => {
   await db.query("insert into settings(k,v) values('views','1') on conflict(k) do update set v=to_jsonb((settings.v#>>'{}')::int+1)");
   const pr = await db.query("select " + LIGHT(adm) + ", (select count(*) from favorites f where f.product_id=p.id)::int as favs, coalesce((select sum((i->>'n')::int) from orders o, jsonb_array_elements(o.items) i where o.status<>'Cancelled' and (i->>'id')::int=p.id),0)::int as sold from products p " + (adm ? "" : "where not p.arch ") + "order by p.id desc");
   const brand = { logo: "/brand/emblem.png", logoClear: "/brand/emblem.png", logoWide: "/brand/wide.png" };
-  const out = { set: { ...brand, ...st }, fees: st.fees || {}, defaultFee: st.defaultFee ?? 100, gid: GID, user: u && { name: u.name, role: u.role }, prods: pr.rows.map(r => P(r, adm)) };
+  const out = { set: { ...brand, ...st }, fees: st.fees || {}, defaultFee: st.defaultFee ?? 100, area: AREA, gid: GID, user: u && { name: u.name, role: u.role }, prods: pr.rows.map(r => P(r, adm)) };
   if (u) out.favs = (await db.query("select product_id from favorites where user_id=$1", [u.id])).rows.map(r => r.product_id);
   if (adm) out.views = (await db.query("select v from settings where k='views'")).rows[0]?.v;
   s.set({ "Cache-Control": "private, no-cache", Vary: "Authorization" }).json(out); /* ETag + no-cache = the browser asks, the server answers 304 when nothing changed */
@@ -252,10 +258,12 @@ app.post("/api/orders", lim(30), need(), wrap(async (q, s) => {
   let addr = null, pickup = "", fee = 0;
   if (m == "delivery") {
     const a = b.addr || {};
-    const rg = await regionFee(str(a.rc, 12));
-    fee = rg.fee;
-    if (!str(a.city, 60) || !str(a.brgy, 80) || !str(a.street, 120)) throw bad("Complete your delivery address");
-    addr = { region: rg.name, prov: str(a.prov, 60), city: str(a.city, 60), brgy: str(a.brgy, 80), street: str(a.street, 120), zip: str(a.zip, 10), country: "Philippines", lat: str(a.lat, 12), lng: str(a.lng, 12) };
+    const town = townOf(str(a.city, 60));
+    if (!town) throw bad("Choose your municipality in " + AREA.province);
+    if (!str(a.brgy, 80) || !str(a.street, 120)) throw bad("Complete your delivery address");
+    const st = await site();
+    fee = num((st.townFees || {})[town.name] ?? st.defaultFee ?? 100);
+    addr = { region: AREA.region, prov: AREA.province, city: town.name, brgy: str(a.brgy, 80), street: str(a.street, 120), zip: str(a.zip, 10), country: "Philippines", lat: coord(a.lat), lng: coord(a.lng) };
   } else {
     pickup = str(b.pickup, 60); if (!pickup) throw bad("Choose a pickup time");
   }
@@ -342,7 +350,8 @@ app.get("/api/admin/export", need(1), wrap(async (q, s) => {
 const geoRoute = mk => wrap(async (q, s) => {
   const c = q.params.code;
   if (c !== undefined && !/^\d{1,12}$/.test(c)) throw bad("Bad code");
-  s.set("Cache-Control", "public, max-age=86400").json(pick(await geo(mk(c))));
+  const list = pick(await geo(mk(c))); /* only a successful answer may be cached: an error must never be stored for a day */
+  s.set("Cache-Control", "public, max-age=86400").json(list);
 });
 app.get("/api/geo/regions", geoRoute(() => "/regions/"));
 app.get("/api/geo/regions/:code/provinces", geoRoute(c => `/regions/${c}/provinces/`));
