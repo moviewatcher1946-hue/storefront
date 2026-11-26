@@ -317,7 +317,7 @@ const n=P.cart.reduce((a,c)=>a+c.n,0),bump=n>lastN;lastN=n;const lc=s.logoClear|
 const it=(k,i,l)=>`<a href="#${k}" class="${h==k?"on":""}" title="${l}" aria-label="${l}"${h==k?' aria-current="page"':""}>${ic(i)}<em>${l}</em>${k=="cart"&&n?`<span class="bd${bump?" bump":""}">${n}</span>`:""}</a>`;
 $("rail").innerHTML=`<div class="lg">${lc?`<img src="${esc(lc)}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${A?it("admin","set","Admin"):""}`;
 $("ad").style.display=A?"":"none";
-$("foot").innerHTML=(lc?`<img src="${esc(lc)}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a></div>";
+$("foot").innerHTML=(lc?`<img src="${esc(lc)}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a> &nbsp;·&nbsp; <a onclick=\"go('support')\">Help &amp; Support</a></div>";
 $("uname").textContent=P.user?P.user.name:"";$("ub").innerHTML=P.user?`<span class="av">${esc(P.user.name[0].toUpperCase())}</span><span>Sign out</span>`:"Sign in";$("ub").style.cssText=P.user?"display:flex;align-items:center;gap:8px":"background:var(--terra);color:var(--ink);padding:9px 16px;border-radius:8px";
 document.title=s.name||"Likha: Youth Craft"}
 const go=h=>location.hash=h,isA=()=>P.user&&P.user.role=="admin";
@@ -577,7 +577,7 @@ async function bk(){const r=await fetch("/api/admin/export",{headers:{authorizat
    Everything here is plain, labelled and tap-friendly. Products are edited in one sheet with an explicit Save button. */
 const AD={tab:"orders",of:"todo",oq:"",pq:"",pf:"all"},LOW=5,SIZES=["XS","S","M","L","XL","2XL","3XL"];
 let AE=null; /* the product being edited in the sheet (null = sheet closed) */
-const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"]];
+const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"],["support","Support","rec"]];
 const adGo=(tab,of,pf)=>{AD.tab=tab;if(of)AD.of=of;if(pf)AD.pf=pf;draw()};
 
 /* ---------- orders ---------- */
@@ -701,6 +701,26 @@ return `<div class="pn"><h3>Name and words</h3><div class="two2">${f("name","Sho
 <div class="pn"><details><summary class="sum2">Terms &amp; Privacy pages</summary><label class="fld" style="margin-top:12px">Terms &amp; Conditions<textarea rows="8" onchange="V.set.terms=this.value;ss()">${esc(s.terms)}</textarea></label><label class="fld">Privacy Policy<textarea rows="8" onchange="V.set.privacy=this.value;ss()">${esc(s.privacy)}</textarea></label></details></div>
 <p class="hint">Changes here save by themselves.</p>`}
 const setTownFee=(n,v)=>{V.set.townFees={...(V.set.townFees||{})};v===""?delete V.set.townFees[n]:V.set.townFees[n]=Math.max(0,+v||0);ss()};
+/* admin: support contact details and the customer messages inbox */
+function adSupport(){const s=V.set,inp=(k,l,h)=>`<label class="fld">${l}<input value="${esc(s[k]||"")}" onchange="V.set.${k}=this.value;ss()">${h?`<small>${h}</small>`:""}</label>`;
+if(!V.sup&&!V.supLoad){V.supLoad=1;api("/admin/support").then(d=>{V.sup=d;V.supLoad=0;draw()}).catch(()=>{V.supLoad=0})}
+const items=V.sup?V.sup.map(m=>`<article class="acard ${m.status=="Resolved"?"ok":""}"><div class="ah"><b>#${m.id}</b><span class="badge ${m.status=="Resolved"?"done":""}">${esc(m.status)}</span><small>${fmtDate(m.created)}</small></div><div class="ag"><div><h5>From</h5><b>${esc(m.name)}</b><br>${esc(m.contact)}</div><div><h5>Topic</h5>${esc(m.topic)}</div></div><p class="an">${esc(m.message)}</p><div class="af">${m.status=="Open"?`<button type="button" onclick="supSet(${m.id},'Resolved',this)">${ic("check")}Mark resolved</button>`:`<button type="button" class="g" onclick="supSet(${m.id},'Open',this)">Reopen</button>`}</div></article>`).join(""):'<div class="empty">Loading messages…</div>';
+return `<div class="pn"><h3>Support contact</h3><p class="hint">Shown on the Help &amp; Support page.</p>${inp("supportPhone","Phone")}${inp("supportEmail","Email")}${inp("supportHours","Opening hours","e.g. Mon–Sat, 9am–6pm")}</div>
+<div class="pn"><h3>Customer messages</h3><button type="button" class="g" onclick="V.sup=null;draw()">Refresh</button>${V.sup&&!V.sup.length?'<p class="hint">No messages yet.</p>':""}${items}</div>`}
+async function supSet(id,st,b){try{if(b)b.disabled=true;const m=await api("/admin/support/"+id,{method:"PATCH",body:{status:st}});V.sup=(V.sup||[]).map(x=>x.id==id?m:x);draw()}catch(e){if(b)b.disabled=false}}
+/* customer: Help & Support page */
+const TOPICS_C=["Order or delivery","Payment","Product question","Returns or cancellation","Other"];
+function support(){const s=V.set,lines=[s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("");
+return `<h2 class="ph">Help &amp; Support</h2><div class="two"><div class="pn"><h3>Send us a message</h3><p class="hint">We reply by the phone or email you give us.</p>
+<label class="fld">Your name<input id="sn" value="${esc(P.user?P.user.name:"")}" autocomplete="name"></label>
+<label class="fld">Mobile number or email<input id="sc" autocomplete="tel"></label>
+<label class="fld">Topic<select id="st">${TOPICS_C.map(t=>`<option>${esc(t)}</option>`).join("")}</select></label>
+<label class="fld">Message<textarea id="sm" rows="5" maxlength="2000"></textarea></label>
+<button type="button" id="sb" onclick="sendSupport()">Send message</button></div>
+<div><div class="pn"><h3>Contact us</h3>${lines||'<p class="mute">Contact details coming soon. Send us a message.</p>'}</div></div></div>`}
+async function sendSupport(){const v=id=>$(id).value.trim(),b=$("sb"),body={name:v("sn"),contact:v("sc"),topic:$("st").value,message:v("sm")};
+if(body.name.length<2)return toast("Enter your name");if(body.contact.length<5)return toast("Enter a mobile number or email we can reach you on");if(body.message.length<10)return toast("Tell us a little more (at least 10 characters)");
+b.disabled=true;try{await api("/support",{method:"POST",body});toast("Thanks! We’ve got your message.");$("sm").value=""}catch(e){}finally{b.disabled=false}}
 function adShip(){const s=V.set,pk=s.pickup||{},A=AR(),
 pt=(k,l,h)=>`<label class="fld">${l}<input value="${esc(pk[k])}" onchange="V.set.pickup={...V.set.pickup,${k}:this.value};ss()">${h?`<small>${h}</small>`:""}</label>`;
 return `<div class="pn"><h3>Delivery fees</h3><label class="fld" style="margin:0 0 12px"><input type="checkbox" ${s.mapFull?"checked":""} onchange="setMapFull(this.checked)"> Show the full map to customers (off = Oriental Mindoro only)</label><p class="hint">Delivery is limited to <b>${esc(A.province)}</b> (${esc(A.region)}). Region and province are fixed on the shop page. Set the fee for each municipality. Leave a box empty to use the standard fee.</p>
@@ -713,7 +733,7 @@ const adBackup=()=>`<div class="pn"><h3>Backup</h3><p class="hint">Download a co
 function admin(){if(!isA())return '<div class="pn" style="text-align:center">Admin access only. Use Sign in with a Google account listed as admin.</div>';
 const AL=adReady()?V.orders:[],todo=AL.filter(o=>grp(o)=="todo").length,going=AL.filter(o=>grp(o)=="going").length,low=cntP("low"),sales=AL.filter(o=>o.status!="Cancelled").reduce((a,o)=>a+o.total,0),
 c=(n,l,cls,on)=>on?`<button type="button" class="stat ${cls}" onclick="${on}"><b>${n}</b><span>${l}</span></button>`:`<div class="stat"><b>${n}</b><span>${l}</span></div>`,
-body=AD.tab=="products"?adProducts():AD.tab=="look"?adLook():AD.tab=="ship"?adShip():AD.tab=="backup"?adBackup():adOrders();
+body=AD.tab=="products"?adProducts():AD.tab=="look"?adLook():AD.tab=="ship"?adShip():AD.tab=="backup"?adBackup():AD.tab=="support"?adSupport():adOrders();
 return `<h2 class="ph">Shop admin</h2><p class="adhi">Hi ${esc(P.user.name)}! Manage your orders, products and how your shop looks. <a onclick="go('')">View shop →</a></p>
 <div class="stats">${c(adReady()?todo:"…","Orders need action",todo?"hot":"","adGo('orders','todo')")}${c(adReady()?going:"…","Orders in progress","","adGo('orders','going')")}${c(low,"Low or sold out",low?"hot":"","adGo('products','','low')")}${c(adReady()?peso(sales):"…","Total sales")}${c(V.views??"–","Shop visits")}</div>
 <nav class="tabs" role="tablist">${TABS.map(([k,l,i])=>`<button type="button" role="tab" aria-selected="${AD.tab==k}" class="tab${AD.tab==k?" on":""}" onclick="AD.tab='${k}';draw()">${ic(i)}${l}${k=="orders"&&todo?`<span class="n">${todo}</span>`:""}</button>`).join("")}</nav><section>${body}</section>`}
@@ -723,7 +743,7 @@ const page=k=>`<div class="pn"><h3>${k=="terms"?"Terms &amp; Conditions":"Privac
 /* render + transitions */
 function qrView(){return `<h2 class="ph">Payment methods</h2><div class="pn" style="text-align:center"><h3>GCash</h3><img src="/gcash-qr.svg" alt="GCash QR code" style="width:240px;max-width:100%"><p><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p><h3 style="margin-top:18px">Cash on Delivery</h3><img src="/cod.svg" alt="" style="width:72px"><p><small>Pay the rider in cash when your order arrives.</small></p></div>`}
 function render(fx){const y=scrollY,h=location.hash.slice(1),a=$("app");theme();if(!h.startsWith("product/"))D.id=0;
-a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h=="terms"||h=="privacy"?page(h):shop();
+a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h=="support"?support():h=="terms"||h=="privacy"?page(h):shop();
 mountMap();const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
 a.classList.toggle("fx",!!fx);if(fx){scrollTo(0,0);setTimeout(()=>a.classList.remove("fx"),1100)}else scrollTo(0,y);
 const sc=h=="admin"?"all":"mine";if((h=="orders"||h=="admin")&&P.user&&(!V.ol||V.oScope!=sc)){const tk=V.ot=(V.ot||0)+1;V.ol=1;V.oScope=sc;api("/orders"+(sc=="all"?"?all=1":"")).then(o=>{if(tk!=V.ot)return;V.orders=o;V.ol=2;draw()}).catch(()=>{if(tk!=V.ot)return;V.ol=3;draw()})}}
