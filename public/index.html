@@ -263,7 +263,73 @@ body{font-size:17px}
 .sec h2{font-size:36px}.ph{font-size:52px}.pn{padding:32px}
 .pd{max-width:1700px}
 }
-.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}.topic{background:#fff;color:var(--purple);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:600;text-align:left;cursor:pointer;min-height:48px}.topic:hover{border-color:var(--terra)}.stack{display:flex;flex-direction:column;gap:10px;margin:10px 0}.topicrow{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:58px;background:#fff;color:var(--purple);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:16px;font-weight:600;text-align:left;cursor:pointer}.topicrow:hover{border-color:var(--terra)}.topicrow span:last-child{font-size:22px;color:var(--terra)}.chatbar{display:flex;gap:10px;align-items:stretch}.chatbar input{flex:1;min-width:0;font-size:16px;min-height:48px}.chatbar button{flex:none;min-height:48px;padding:0 20px}.chatlog p{font-size:16px;line-height:1.45}</style></head><body>
+.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}.topic{background:#fff;color:var(--purple);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:600;text-align:left;cursor:pointer;min-height:48px}.topic:hover{border-color:var(--terra)}.stack{display:flex;flex-direction:column;gap:10px;margin:10px 0}.topicrow{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:58px;background:#fff;color:var(--purple);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:16px;font-weight:600;text-align:left;cursor:pointer}.topicrow:hover{border-color:var(--terra)}.topicrow span:last-child{font-size:22px;color:var(--terra)}.chatbar{display:flex;gap:10px;align-items:stretch}.chatbar input{flex:1;min-width:0;font-size:16px;min-height:48px}.chatbar button{flex:none;min-height:48px;padding:0 20px}.chatlog p{font-size:16px;line-height:1.45}/* admin on phones: pill tabs, two-column stats, full-width order actions, roomier cards */
+@media(max-width:720px){
+.ph{font-size:28px;margin:8px 0 12px}
+.adhi{font-size:15px;line-height:1.5}
+.tabs{border-bottom:0;gap:8px;margin:0 -14px 16px;padding:2px 14px 6px}
+.tab{background:var(--card);box-shadow:inset 0 0 0 1px var(--line);border-radius:999px;padding:10px 15px;min-height:44px;font-size:15px}
+.tab.on{background:var(--purple);color:#fff;box-shadow:none}
+.tab.on:after{display:none}
+.tab.on svg{stroke:#fff}
+.stats{display:grid;grid-template-columns:1fr 1fr;overflow:visible;gap:10px;margin:0 0 16px}
+.stat{padding:12px 14px}
+.stat b{font-size:22px}
+.stat span{font-size:13px}
+.acard{padding:14px;margin-bottom:12px}
+.ah{gap:8px}
+.ah strong{width:100%;margin-left:0;font-size:22px}
+.ag{grid-template-columns:1fr;gap:12px;font-size:15px}
+.ai li{font-size:15px}
+.af{flex-direction:column;align-items:stretch;gap:8px}
+.af button,.af .stsel{width:100%;margin-left:0;min-height:48px;font-size:16px}
+.sbar input{font-size:16px}
+.tb{flex-direction:column;gap:8px}
+.chips{gap:6px}
+.chip{min-height:44px}
+.chatbar{position:sticky;bottom:70px;background:var(--bg,#f5f3f6);padding:8px 0 4px;z-index:2}
+}
+.chatcard{padding:0;overflow:hidden}.chathead{padding:14px 18px;border-bottom:1px solid var(--line)}.chathead b{display:block;color:var(--purple);font-size:17px}.chathead span{font-size:13px;color:var(--mute)}.chatcard .chatlog{min-height:280px;max-height:55vh;overflow:auto;padding:16px 18px;margin:0}.chatcard .chatbar{padding:12px;border-top:1px solid var(--line);margin:0}@media(max-width:720px){.chatcard .chatlog{min-height:300px;max-height:50vh}}/* support pages: cards, chat bubbles, focus rings */
+.sup-head{margin:0 0 18px}.sup-head p{margin:-6px 0 0;color:var(--mute);font-size:16px}
+.back{margin-bottom:12px}
+.chatcard{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 10px 30px rgba(83,12,108,.07)}
+.chathead{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:#fff}
+.chathead b{display:block;color:var(--purple);font-size:17px;line-height:1.2}
+.chathead small{display:flex;align-items:center;gap:6px;color:var(--mute);font-size:13px;margin-top:2px}
+.lav{flex:none;width:40px;height:40px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;line-height:1}
+.lav.sm{width:30px;height:30px;font-size:13px;align-self:flex-end}
+.dot{width:8px;height:8px;border-radius:50%;background:#2e9e5b;display:inline-block}
+.chatcard .chatlog{min-height:320px;max-height:56vh;overflow:auto;padding:18px;margin:0;background:#faf8fb;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;gap:8px;align-items:flex-end}.msg.u{justify-content:flex-end}
+.bub{margin:0;padding:11px 15px;border-radius:18px;max-width:80%;line-height:1.45;font-size:15px;overflow-wrap:anywhere}
+.msg.a .bub{background:#fff;color:var(--ink);border:1px solid var(--line);border-bottom-left-radius:6px}
+.msg.u .bub{background:var(--purple);color:#fff;border-bottom-right-radius:6px}
+.qrow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 2px 38px}
+.qchip{background:#fff;color:var(--purple);border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-weight:600;min-height:42px;font-size:14px}
+.qchip:hover{border-color:var(--terra)}
+.handoff{margin:6px 0 2px 38px;padding:14px;border-radius:16px;background:#fff7ef;border:1px solid #f3d6b6}
+.handoff p{margin:0 0 10px;font-size:14px;line-height:1.45}
+.handoff .row{display:flex;flex-wrap:wrap;gap:8px}
+.chatbar{display:flex;gap:10px;align-items:center;padding:12px 14px;background:#fff;border-top:1px solid var(--line)}
+.chatbar input{flex:1;min-width:0;font-size:16px;min-height:50px;border-radius:999px;padding:0 20px}
+.chatbar button{flex:none;width:50px;height:50px;min-height:50px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center}
+.sup-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+.sup-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.sup-card h3{margin:0}.sup-card p{margin:0;color:var(--mute);font-size:15px;line-height:1.5}
+.sup-card button{margin-top:auto}
+.sup-card.form{align-items:stretch;gap:14px}
+.sup-form-grid{grid-template-columns:1.4fr 1fr}
+.topicrow{box-shadow:0 1px 0 rgba(83,12,108,.04)}
+.chev{font-size:24px;color:var(--terra);line-height:1}
+.pn input:focus,.pn textarea:focus,.pn select:focus,.sup-card input:focus,.sup-card textarea:focus,.sup-card select:focus{outline:none;border-color:var(--terra);box-shadow:0 0 0 3px rgba(231,131,45,.22)}
+@media(max-width:720px){
+.sup-cards,.sup-form-grid{grid-template-columns:1fr}
+.qrow,.handoff{margin-left:0}
+.bub{max-width:86%}
+.chatcard .chatlog{min-height:300px;max-height:52vh;padding:14px}
+.sup-card{padding:18px}
+}
+.lav{background:transparent;color:#111}.lav svg{width:100%;height:100%;display:block}.lav.sm{width:32px;height:32px}</style></head><body>
 <div id="offline" hidden role="status">You’re offline. Showing saved items. Ordering needs a connection.</div>
 <div class="shell"><aside class="rail" id="rail"></aside><div class="col">
 <header class="top"><div class="br" onclick="go('')"><span id="lg" style="display:contents"></span><span id="brand"></span></div><div class="sw"><input id="q" placeholder="Search product" list="sg" oninput="S.q=this.value;draw()"><datalist id="sg"></datalist><svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"/></svg></div>
@@ -728,16 +794,21 @@ const TOPICS_C=["Order or delivery","Payment","Product question","Returns or can
 V.chat=V.chat||[];V.supView=V.supView||"help";
 const TOPIC_TILES=["Order or delivery","Payment","Product question","Returns or cancellation","Other"];
 const contactLines=()=>{const s=V.set;return [s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("")||'<p class="mute">Contact details coming soon.</p>'};
-function renderChat(){const el=$("chatlog");if(!el)return;el.textContent="";
-  if(!V.chat.length){const p=document.createElement("p");p.style.cssText="color:var(--mute);margin:0";p.textContent="Hi, I’m Lumix. Ask me about delivery, fees, payment or pickup, or ask for a person.";el.appendChild(p)}
-  for(const m of V.chat){const p=document.createElement("p"),u=m.role==="user";p.textContent=m.text;p.style.cssText="margin:0 0 8px;padding:8px 12px;border-radius:12px;max-width:85%;"+(u?"margin-left:auto;background:var(--terra);color:var(--ink)":"background:#f1ecf4;color:var(--purple)");el.appendChild(p);
-    if(m.handoff){const box=document.createElement("div");box.style.cssText="margin:0 0 12px;padding:12px;border:1px dashed var(--plum);border-radius:12px";const q=document.createElement("p");q.style.cssText="margin:0 0 8px";q.textContent="I can’t fully answer this. You can browse help topics or talk to a person.";const h2=document.createElement("button");h2.type="button";h2.className="g";h2.textContent="See help topics";h2.onclick=()=>{go("support/help");draw()};const b=document.createElement("button");b.type="button";b.textContent="Talk to a person";b.onclick=talkHuman;box.appendChild(q);box.appendChild(h2);box.appendChild(document.createTextNode(" "));box.appendChild(b);el.appendChild(box)}}
+/* Lumix starts the conversation: a greeting bubble and quick-reply buttons appear until the customer types something */
+const LUMIX_MARK=`<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M42 22 H78 A18 18 0 0 1 96 40 V64 A18 18 0 0 1 78 82 H56 L38 98 L40 82 H42 A18 18 0 0 1 24 64 V40 A18 18 0 0 1 42 22 Z" fill="#111111"/><path d="M60 36 Q62 50 76 52 Q62 54 60 68 Q58 54 44 52 Q58 50 60 36 Z" fill="#F0EDEB"/></svg>`;
+const GREETING="Hi, I’m Lumix, ready to help! Ask me about delivery, fees, payment or pickup, or pick a quick option below.";
+const SEND_ICON='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 11.5l18-8-7.5 17-2.5-6.5z" fill="#fff"/></svg>';
+function renderChat(){const el=$("chatlog");if(!el)return;
+  if(!V.chat.length)V.chat.push({role:"assistant",text:GREETING,greet:1});
+  el.textContent="";
+  for(const m of V.chat){const u=m.role==="user",row=document.createElement("div");row.className="msg "+(u?"u":"a");
+    if(!u){const av=document.createElement("span");av.className="lav sm";av.innerHTML=LUMIX_MARK;row.appendChild(av)}
+    const p=document.createElement("p");p.className="bub";p.textContent=m.text;row.appendChild(p);el.appendChild(row);
+    if(m.handoff){const box=document.createElement("div");box.className="handoff";const q=document.createElement("p");q.textContent="I can’t fully answer this. You can browse help topics or talk to a person.";const r=document.createElement("div");r.className="row";const h2=document.createElement("button");h2.type="button";h2.className="g";h2.textContent="See help topics";h2.onclick=()=>{go("support/help");draw()};const b=document.createElement("button");b.type="button";b.textContent="Talk to a person";b.onclick=talkHuman;r.appendChild(h2);r.appendChild(b);box.appendChild(q);box.appendChild(r);el.appendChild(box)}}
+  if(V.chat.length===1&&V.chat[0].greet){const row=document.createElement("div");row.className="qrow";
+    for(const q of ["Delivery fees","Payment methods","Pickup","Talk to a person"]){const b=document.createElement("button");b.type="button";b.className="qchip";b.textContent=q;b.onclick=()=>q==="Talk to a person"?talkHuman():askAI(q);row.appendChild(b)}
+    el.appendChild(row)}
   el.scrollTop=el.scrollHeight}
-/* Support is three pages: #support (help home), #support/chat (assistant), #support/contact (talk to a person) */
-/* Support is three pages, in this order when the customer needs more help:
-   #support         page 1: chat with the assistant
-   #support/help    page 2: How can we help? (topics)
-   #support/contact page 3: Talk to a person (form) */
 function chatTranscript(){return V.chat.length?"Chat with our assistant:\n"+V.chat.slice(-8).map(m=>(m.role==="user"?"Customer: ":"Assistant: ")+m.text).join("\n"):null}
 function talkHuman(){V.supPrefill={topic:"Other",message:chatTranscript()||""};go("support/contact");draw()}
 function pickTopic(t){V.supPrefill={topic:t,message:""};go("support/contact");draw()}
@@ -749,28 +820,27 @@ async function askAI(text){const i=$("chatq"),t=((text!=null?text:(i&&i.value))|
   finally{V.chatBusy=0;if(b)b.disabled=false;renderChat();const q=$("chatq");if(q&&!LOCATE_OK)q.focus()}}
 function support(h){if(h==="support/help")return supHelp();if(h==="support/contact")return supForm();return supChat()}
 /* page 1 */
-function supChat(){return `<h2 class="ph">Help &amp; Support</h2>
-<p class="hint">Ask Lumix, our assistant, about delivery, fees, payment or pickup.</p>
-<div id="chatlog" class="chatlog" aria-live="polite" style="min-height:45vh;max-height:60vh;overflow:auto;margin:8px 0 14px"></div>
-<div class="chatbar"><input id="chatq" maxlength="500" placeholder="Type your question…" aria-label="Your question" onkeydown="if(event.key=='Enter')askAI()"><button type="button" id="chatgo" onclick="askAI()">Send</button></div>
-<div class="pn" style="margin-top:18px"><h3>Still need help?</h3><div class="stack">
-<button type="button" class="g" onclick="go('support/help');draw()">See help topics</button>
-<button type="button" onclick="talkHuman()">Talk to a person</button></div></div>`}
-/* page 2 */
-function supHelp(){return `<button type="button" class="g" onclick="go('support');draw()">← Back to chat</button>
-<h2 class="ph">How can we help?</h2><p class="hint">Choose a topic and we’ll send it to our team.</p>
-<div class="stack">${TOPIC_TILES.map(t=>`<button type="button" class="topicrow" onclick="pickTopic('${esc(t)}')"><span>${esc(t)}</span><span aria-hidden="true">›</span></button>`).join("")}</div>
-<div class="pn" style="margin-top:18px"><h3>Prefer to write to us?</h3><button type="button" onclick="V.supPrefill=null;go('support/contact');draw()">Talk to a person</button></div>`}
-/* page 3 */
+function supChat(){return `<div class="sup-head"><h2 class="ph">Help &amp; Support</h2><p>Quick answers from Lumix, or reach our team directly.</p></div>
+<div class="chatcard"><div class="chathead"><span class="lav">${LUMIX_MARK}</span><div><b>Lumix</b><small><i class="dot"></i>Online · delivery, fees, payment and pickup</small></div></div>
+<div id="chatlog" class="chatlog" aria-live="polite"></div>
+<div class="chatbar"><input id="chatq" maxlength="500" placeholder="Type your question…" aria-label="Your question" onkeydown="if(event.key=='Enter')askAI()"><button type="button" id="chatgo" onclick="askAI()" aria-label="Send">${SEND_ICON}</button></div></div>
+<div class="sup-cards">
+<div class="sup-card"><h3>Browse help topics</h3><p>Pick what your question is about and we’ll route it to our team.</p><button type="button" class="g" onclick="go('support/help');draw()">See help topics</button></div>
+<div class="sup-card"><h3>Talk to a person</h3><p>Send a message and we’ll reply by phone or email.</p><button type="button" onclick="talkHuman()">Talk to a person</button></div></div>`}
+function supHelp(){return `<button type="button" class="g back" onclick="go('support');draw()">← Back to chat</button>
+<div class="sup-head"><h2 class="ph">How can we help?</h2><p>Choose a topic and we’ll send it to our team.</p></div>
+<div class="stack">${TOPIC_TILES.map(t=>`<button type="button" class="topicrow" onclick="pickTopic('${esc(t)}')"><span>${esc(t)}</span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div>
+<div class="sup-cards"><div class="sup-card"><h3>Prefer to write to us?</h3><p>Send a message and we’ll reply by phone or email.</p><button type="button" onclick="V.supPrefill=null;go('support/contact');draw()">Talk to a person</button></div></div>`}
 function supForm(){const p=V.supPrefill||{},name=P.user?P.user.name:"";
-return `<button type="button" class="g" onclick="go('support/help');draw()">← Help topics</button>
-<h2 class="ph">Talk to a person</h2><div class="pn"><h3>Send us a message</h3><p class="hint">We reply by the phone or email you give us.</p>
+return `<button type="button" class="g back" onclick="go('support/help');draw()">← Help topics</button>
+<div class="sup-head"><h2 class="ph">Talk to a person</h2><p>We reply by the phone or email you give us.</p></div>
+<div class="sup-cards sup-form-grid"><div class="sup-card form">
 <label class="fld">Your name<input id="sn" value="${esc(name)}" autocomplete="name"></label>
 <label class="fld">Mobile number or email<input id="sc" autocomplete="tel"></label>
 <label class="fld">Topic<select id="st">${TOPICS_C.map(t=>`<option${t===(p.topic||"Other")?" selected":""}>${esc(t)}</option>`).join("")}</select></label>
 <label class="fld">Message<textarea id="sm" rows="7" maxlength="2000">${esc(p.message||"")}</textarea></label>
 <button type="button" id="sb" onclick="sendSupport()">Send message</button></div>
-<div class="pn" style="margin-top:14px"><h3>Contact us</h3>${contactLines()}</div>`}
+<div class="sup-card"><h3>Contact us</h3>${contactLines()}</div></div>`}
 async function sendSupport(){const v=id=>$(id).value.trim(),b=$("sb"),body={name:v("sn"),contact:v("sc"),topic:$("st").value,message:v("sm")};
 if(body.name.length<2)return toast("Enter your name");if(body.contact.length<5)return toast("Enter a mobile number or email we can reach you on");if(body.message.length<10)return toast("Tell us a little more (at least 10 characters)");
 b.disabled=true;try{await api("/support",{method:"POST",body});V.supPrefill=null;V.chat=[];toast("Thanks! We’ve got your message.");go("support");draw()}catch(e){}finally{b.disabled=false}}
