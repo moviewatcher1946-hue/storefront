@@ -577,7 +577,7 @@ async function bk(){const r=await fetch("/api/admin/export",{headers:{authorizat
    Everything here is plain, labelled and tap-friendly. Products are edited in one sheet with an explicit Save button. */
 const AD={tab:"orders",of:"todo",oq:"",pq:"",pf:"all"},LOW=5,SIZES=["XS","S","M","L","XL","2XL","3XL"];
 let AE=null; /* the product being edited in the sheet (null = sheet closed) */
-const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"],["support","Support","rec"]];
+const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"],["support","Support","rec"],["lumix","Ask Lumix","chat"]];
 const adGo=(tab,of,pf)=>{AD.tab=tab;if(of)AD.of=of;if(pf)AD.pf=pf;draw()};
 
 /* ---------- orders ---------- */
@@ -701,6 +701,20 @@ return `<div class="pn"><h3>Name and words</h3><div class="two2">${f("name","Sho
 <div class="pn"><details><summary class="sum2">Terms &amp; Privacy pages</summary><label class="fld" style="margin-top:12px">Terms &amp; Conditions<textarea rows="8" onchange="V.set.terms=this.value;ss()">${esc(s.terms)}</textarea></label><label class="fld">Privacy Policy<textarea rows="8" onchange="V.set.privacy=this.value;ss()">${esc(s.privacy)}</textarea></label></details></div>
 <p class="hint">Changes here save by themselves.</p>`}
 const setTownFee=(n,v)=>{V.set.townFees={...(V.set.townFees||{})};v===""?delete V.set.townFees[n]:V.set.townFees[n]=Math.max(0,+v||0);ss()};
+/* admin: Lumix with full store data (read only) */
+V.achat=V.achat||[];
+function adLumix(){return `<h2 class="ph">Ask Lumix</h2><p class="hint">Lumix can read your orders and products to answer questions and suggest next steps. It can’t change anything. Customer names, phone numbers and addresses are not shared with it.</p>
+<div id="alog" class="chatlog" aria-live="polite" style="min-height:45vh;max-height:60vh;overflow:auto;margin:8px 0 14px"></div>
+<div class="chatbar"><input id="aq" maxlength="800" placeholder="e.g. Which orders need action today?" aria-label="Your question" onkeydown="if(event.key=='Enter')askAdmin()"><button type="button" id="ago" onclick="askAdmin()">Send</button></div>`}
+function renderAdminChat(){const el=$("alog");if(!el)return;el.textContent="";
+  if(!V.achat.length){const p=document.createElement("p");p.style.cssText="color:var(--mute);margin:0";p.textContent="Ask about orders, products, stock or sales.";el.appendChild(p)}
+  for(const m of V.achat){const p=document.createElement("p"),u=m.role==="user";p.textContent=m.text;p.style.cssText="margin:0 0 8px;padding:8px 12px;border-radius:12px;max-width:85%;"+(u?"margin-left:auto;background:var(--terra);color:var(--ink)":"background:#f1ecf4;color:var(--purple)");el.appendChild(p)}
+  el.scrollTop=el.scrollHeight}
+async function askAdmin(){const i=$("aq"),t=((i&&i.value)||"").trim();if(t.length<2||V.achatBusy)return;
+  V.achat.push({role:"user",text:t.slice(0,800)});if(i)i.value="";V.achatBusy=1;renderAdminChat();const b=$("ago");if(b)b.disabled=true;
+  try{const d=await api("/admin/ai",{method:"POST",body:{messages:V.achat.slice(-12).map(m=>({role:m.role,content:m.text}))}});V.achat.push({role:"assistant",text:d.reply})}
+  catch(e){V.achat.push({role:"assistant",text:"Lumix couldn’t answer just now."})}
+  finally{V.achatBusy=0;if(b)b.disabled=false;renderAdminChat();const q=$("aq");if(q&&!LOCATE_OK)q.focus()}}
 /* admin: support contact details and the customer messages inbox */
 function adSupport(){const s=V.set,inp=(k,l,h)=>`<label class="fld">${l}<input value="${esc(s[k]||"")}" onchange="V.set.${k}=this.value;ss()">${h?`<small>${h}</small>`:""}</label>`;
 if(!V.sup&&!V.supLoad){V.supLoad=1;api("/admin/support").then(d=>{V.sup=d;V.supLoad=0;draw()}).catch(()=>{V.supLoad=0})}
@@ -715,7 +729,7 @@ V.chat=V.chat||[];V.supView=V.supView||"help";
 const TOPIC_TILES=["Order or delivery","Payment","Product question","Returns or cancellation","Other"];
 const contactLines=()=>{const s=V.set;return [s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("")||'<p class="mute">Contact details coming soon.</p>'};
 function renderChat(){const el=$("chatlog");if(!el)return;el.textContent="";
-  if(!V.chat.length){const p=document.createElement("p");p.style.cssText="color:var(--mute);margin:0";p.textContent="Hi! Pick a topic or type your question. I can help with delivery, fees, payment and pickup.";el.appendChild(p)}
+  if(!V.chat.length){const p=document.createElement("p");p.style.cssText="color:var(--mute);margin:0";p.textContent="Hi, I’m Lumix. Ask me about delivery, fees, payment or pickup, or ask for a person.";el.appendChild(p)}
   for(const m of V.chat){const p=document.createElement("p"),u=m.role==="user";p.textContent=m.text;p.style.cssText="margin:0 0 8px;padding:8px 12px;border-radius:12px;max-width:85%;"+(u?"margin-left:auto;background:var(--terra);color:var(--ink)":"background:#f1ecf4;color:var(--purple)");el.appendChild(p);
     if(m.handoff){const box=document.createElement("div");box.style.cssText="margin:0 0 12px;padding:12px;border:1px dashed var(--plum);border-radius:12px";const q=document.createElement("p");q.style.cssText="margin:0 0 8px";q.textContent="I can’t fully answer this. You can browse help topics or talk to a person.";const h2=document.createElement("button");h2.type="button";h2.className="g";h2.textContent="See help topics";h2.onclick=()=>{go("support/help");draw()};const b=document.createElement("button");b.type="button";b.textContent="Talk to a person";b.onclick=talkHuman;box.appendChild(q);box.appendChild(h2);box.appendChild(document.createTextNode(" "));box.appendChild(b);el.appendChild(box)}}
   el.scrollTop=el.scrollHeight}
@@ -736,7 +750,7 @@ async function askAI(text){const i=$("chatq"),t=((text!=null?text:(i&&i.value))|
 function support(h){if(h==="support/help")return supHelp();if(h==="support/contact")return supForm();return supChat()}
 /* page 1 */
 function supChat(){return `<h2 class="ph">Help &amp; Support</h2>
-<p class="hint">Ask our assistant about delivery, fees, payment or pickup.</p>
+<p class="hint">Ask Lumix, our assistant, about delivery, fees, payment or pickup.</p>
 <div id="chatlog" class="chatlog" aria-live="polite" style="min-height:45vh;max-height:60vh;overflow:auto;margin:8px 0 14px"></div>
 <div class="chatbar"><input id="chatq" maxlength="500" placeholder="Type your question…" aria-label="Your question" onkeydown="if(event.key=='Enter')askAI()"><button type="button" id="chatgo" onclick="askAI()">Send</button></div>
 <div class="pn" style="margin-top:18px"><h3>Still need help?</h3><div class="stack">
@@ -772,7 +786,7 @@ const adBackup=()=>`<div class="pn"><h3>Backup</h3><p class="hint">Download a co
 function admin(){if(!isA())return '<div class="pn" style="text-align:center">Admin access only. Use Sign in with a Google account listed as admin.</div>';
 const AL=adReady()?V.orders:[],todo=AL.filter(o=>grp(o)=="todo").length,going=AL.filter(o=>grp(o)=="going").length,low=cntP("low"),sales=AL.filter(o=>o.status!="Cancelled").reduce((a,o)=>a+o.total,0),
 c=(n,l,cls,on)=>on?`<button type="button" class="stat ${cls}" onclick="${on}"><b>${n}</b><span>${l}</span></button>`:`<div class="stat"><b>${n}</b><span>${l}</span></div>`,
-body=AD.tab=="products"?adProducts():AD.tab=="look"?adLook():AD.tab=="ship"?adShip():AD.tab=="backup"?adBackup():AD.tab=="support"?adSupport():adOrders();
+body=AD.tab=="products"?adProducts():AD.tab=="look"?adLook():AD.tab=="ship"?adShip():AD.tab=="backup"?adBackup():AD.tab=="support"?adSupport():AD.tab=="lumix"?adLumix():adOrders();
 return `<h2 class="ph">Shop admin</h2><p class="adhi">Hi ${esc(P.user.name)}! Manage your orders, products and how your shop looks. <a onclick="go('')">View shop →</a></p>
 <div class="stats">${c(adReady()?todo:"…","Orders need action",todo?"hot":"","adGo('orders','todo')")}${c(adReady()?going:"…","Orders in progress","","adGo('orders','going')")}${c(low,"Low or sold out",low?"hot":"","adGo('products','','low')")}${c(adReady()?peso(sales):"…","Total sales")}${c(V.views??"–","Shop visits")}</div>
 <nav class="tabs" role="tablist">${TABS.map(([k,l,i])=>`<button type="button" role="tab" aria-selected="${AD.tab==k}" class="tab${AD.tab==k?" on":""}" onclick="AD.tab='${k}';draw()">${ic(i)}${l}${k=="orders"&&todo?`<span class="n">${todo}</span>`:""}</button>`).join("")}</nav><section>${body}</section>`}
@@ -782,7 +796,7 @@ const page=k=>`<div class="pn"><h3>${k=="terms"?"Terms &amp; Conditions":"Privac
 /* render + transitions */
 function qrView(){return `<h2 class="ph">Payment methods</h2><div class="pn" style="text-align:center"><h3>GCash</h3><img src="/gcash-qr.svg" alt="GCash QR code" style="width:240px;max-width:100%"><p><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p><h3 style="margin-top:18px">Cash on Delivery</h3><img src="/cod.svg" alt="" style="width:72px"><p><small>Pay the rider in cash when your order arrives.</small></p></div>`}
 function render(fx){const y=scrollY,h=location.hash.slice(1),a=$("app");theme();if(!h.startsWith("product/"))D.id=0;
-a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h.split("/")[0]=="support"?support(h):h=="terms"||h=="privacy"?page(h):shop();if(h==="support")renderChat();
+a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h.split("/")[0]=="support"?support(h):h=="terms"||h=="privacy"?page(h):shop();if(h==="support")renderChat();if(h==="admin"&&AD.tab==="lumix")renderAdminChat();
 mountMap();const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
 a.classList.toggle("fx",!!fx);if(fx){scrollTo(0,0);setTimeout(()=>a.classList.remove("fx"),1100)}else scrollTo(0,y);
 const sc=h=="admin"?"all":"mine";if((h=="orders"||h=="admin")&&P.user&&(!V.ol||V.oScope!=sc)){const tk=V.ot=(V.ot||0)+1;V.ol=1;V.oScope=sc;api("/orders"+(sc=="all"?"?all=1":"")).then(o=>{if(tk!=V.ot)return;V.orders=o;V.ol=2;draw()}).catch(()=>{if(tk!=V.ot)return;V.ol=3;draw()})}}
