@@ -173,12 +173,12 @@ button.stat:hover{transform:none;filter:none;box-shadow:0 4px 14px #0000001a}.st
 .sh-h{display:flex;justify-content:space-between;align-items:center;padding:calc(12px + env(safe-area-inset-top,0px)) 18px 12px;border-bottom:1px solid var(--line)}.sh-h h3{margin:0;font-size:20px}.ib{width:44px;height:44px;padding:0;display:grid;place-items:center;border-radius:50%}
 .sh-body{overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px;flex:1}
 .sh-f{border-top:1px solid var(--line);padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card)}.sh-f>div{display:flex;gap:10px;align-items:center}.sp1{flex:1}.dgr{color:#b00020}
-.err{color:#b00020;background:#fdecee;border-radius:10px;padding:10px 12px;margin:0 0 10px;font-weight:700}
+.sherr{color:#b00020;background:#fdecee;border-radius:10px;padding:10px 12px;margin:0 0 10px;font-weight:700}
 @media(min-width:900px){#sheet{align-items:center}.sh{height:min(92vh,920px);border-radius:18px;box-shadow:0 24px 80px #0008;overflow:hidden}}
 .sec2{margin-bottom:28px}.sec2 h4{font-size:18px;margin:0 0 6px}.sec2 h4 i{font-style:normal;font-weight:500;font-size:13px;color:var(--mute);margin-left:6px}.hint{color:var(--mute);margin:0 0 12px;font-size:14px;line-height:1.5}
 .fld{display:grid;gap:5px;font-weight:700;font-size:14px;margin-bottom:12px;align-content:start}.fld small{font-weight:500;color:var(--mute);font-size:12.5px}.fld input,.fld textarea,.fld select{width:100%}.fld input[type=color]{height:48px;padding:3px;cursor:pointer}
 .two2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:380px){.two2{grid-template-columns:1fr}}
-.tiles,.tiles2,.tiles3{display:flex;flex-wrap:wrap;gap:12px}.tiles3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.tiles2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.colors{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.regs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px}
+.utiles,.utiles2,.utiles3{display:flex;flex-wrap:wrap;gap:12px}.utiles3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.utiles2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.colors{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.regs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px}
 .sum2{cursor:pointer;font-weight:800;font-size:16px;min-height:44px;display:flex;align-items:center}
 .up{position:relative;width:100px;height:100px;flex:none}.up.lg{width:150px;height:150px}.up.sm{width:84px;height:84px}
 .up>label{display:grid;place-items:center;width:100%;height:100%;border:2px dashed var(--line);border-radius:14px;background:color-mix(in srgb,var(--purple) 4%,#fff);cursor:pointer;overflow:hidden;text-align:center;color:var(--mute)}.up>label:hover{border-color:var(--terra)}.up.has>label{border-style:solid}.up img{width:100%;height:100%;object-fit:cover;padding:0;border:0;border-radius:0;max-width:none;background:none}
@@ -219,6 +219,16 @@ button.stat:hover{transform:none;filter:none;box-shadow:0 4px 14px #0000001a}.st
 .vr{position:relative;grid-template-columns:auto minmax(0,1fr)}.rmv{position:absolute;top:8px;right:8px;grid-column:auto;width:38px;height:38px}.vf>.fld:first-child{margin-right:40px}
 .vg{grid-template-columns:1fr 1fr}.vg .fld:nth-child(3){grid-column:1/-1}.vg .fld small{font-size:11.5px}
 }
+
+/* ===== delivery area + map ===== */
+.area{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--terra) 12%,#fff);border-radius:12px;padding:10px 12px;margin:0 0 12px;line-height:1.45}.area svg{width:20px;height:20px;flex:none;margin-top:2px;color:var(--terra)}
+.mapslot{margin:0 0 8px}#lmap{height:340px;border-radius:14px;border:1px solid var(--line);overflow:hidden;position:relative;z-index:0;isolation:isolate;background:color-mix(in srgb,var(--purple) 6%,#fff)}.leaflet-container{font:inherit}
+.pinhint{font-size:13px;color:var(--mute);margin:0 0 12px;line-height:1.5}.pinhint a{color:var(--plum);font-weight:700;cursor:pointer}.pinhint .bad{color:#b00020;font-weight:700}
+.pinic{background:none;border:0}.pinic svg{width:34px;height:44px;filter:drop-shadow(0 3px 4px #0005)}
+.mapfail{display:grid;place-content:center;justify-items:center;gap:12px;height:100%;text-align:center;padding:20px;color:var(--mute)}
+.locked select{background:color-mix(in srgb,var(--purple) 7%,#fff);color:var(--mute);cursor:not-allowed;opacity:.9}
+.side a.box{color:inherit;text-decoration:none;cursor:pointer}.side .box{overflow:hidden}.side .im{min-height:0}.side .box small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:8px;text-align:left;line-height:1.3}
+@media(max-width:720px){#lmap{height:280px}}
 /* ================= DESKTOP SIZING (tune the numbers here) =================
    Phones are untouched (everything above 720px only). Two steps: laptops 1024px+, big monitors 1440px+. */
 @media(min-width:1024px){
@@ -280,7 +290,7 @@ let tt;function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on"
 async function api(u,o={}){const h={"content-type":"application/json"};if(P.token)h.authorization="Bearer "+P.token;
 let r,j;try{r=await fetch("/api"+u,{...o,headers:h,body:o.body&&JSON.stringify(o.body)});j=await r.json().catch(()=>({}))}catch(e){toast("No connection");throw e}
 if(r.status==401&&P.token){P.token="";P.user=null;save()}if(!r.ok){toast(j.error||"Error "+r.status);throw new Error(j.error)}return j}
-async function load(){const j=await api("/bootstrap");V.set=Object.assign({promos:[{},{},{}],pickup:{}},j.set);V.set.col=Object.assign({},COL,V.set.col);V.prods=j.prods;V.fees=j.fees||{};V.defaultFee=j.defaultFee??100;V.gid=j.gid||"";V.views=j.views||0;V.favs=j.favs||[];P.user=j.user;if(!j.user)P.token="";Object.keys(PD).forEach(k=>delete PD[k]);Object.keys(PL).forEach(k=>delete PL[k]);fixCart();save()}
+async function load(){const j=await api("/bootstrap");V.set=Object.assign({promos:[{},{},{}],pickup:{}},j.set);V.set.col=Object.assign({},COL,V.set.col);V.prods=j.prods;V.fees=j.fees||{};V.defaultFee=j.defaultFee??100;V.area=j.area||V.area;V.gid=j.gid||"";V.views=j.views||0;V.favs=j.favs||[];P.user=j.user;if(!j.user)P.token="";migrateAddr();Object.keys(PD).forEach(k=>delete PD[k]);Object.keys(PL).forEach(k=>delete PL[k]);fixCart();save()}
 /* Re-validate the saved cart against the live catalogue: drop lines whose product is gone, convert old name-based option keys to ids,
    clear sizes/options the product no longer has, and merge lines that now collapse into the same key. */
 function fixCart(){const out=[];for(const c of P.cart||[]){const p=V.prods.find(x=>x.id==c.id);if(!p)continue;
@@ -289,7 +299,7 @@ h?h.n=Math.min(99,h.n+n):out.push({k,id:c.id,vid,size,n})}P.cart=out}
 /* offline + caching: the service worker keeps the shop usable without a connection (see sw.js) */
 const swClear=()=>{try{navigator.serviceWorker&&navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:"clear-private"})}catch(e){}};
 if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
-{const off=()=>{const b=$("offline");if(b)b.hidden=navigator.onLine};addEventListener("offline",off);addEventListener("online",()=>{off();load().then(()=>draw()).catch(()=>{})});addEventListener("DOMContentLoaded",off)}
+{const off=()=>{const b=$("offline");if(b)b.hidden=navigator.onLine};addEventListener("offline",off);addEventListener("online",()=>{off();load().then(()=>draw()).catch(()=>{});if(MP.failed)mountMap()});addEventListener("DOMContentLoaded",off)}
 const ek=k=>encodeURIComponent(k).replace(/'/g,"%27");
 /* locations: fetched once per list, cached by the server too */
 function fetchGeo(paths){const todo=paths.filter(p=>!G.lists[p]);if(!todo.length)return;
@@ -318,26 +328,64 @@ function gis(){const run=()=>{google.accounts.id.initialize({client_id:V.gid,cal
 async function login(u,b){try{const j=await api(u,{method:"POST",body:b});swClear();P.token=j.token;P.user=j.user;save();V.ol=0;V.orders=[];closeM();await load();toast("Signed in as "+j.user.name);draw()}catch(e){}}
 function signout(){swClear();P.user=null;P.token="";P.ct={};save();V.ol=0;V.orders=[];load().then(()=>{draw(1);if(location.hash=="#admin")go("")})}
 function ck(v){P.ck=v;save();const c=$("cookie");c.classList.add("out");setTimeout(()=>c.hidden=true,200)}
-function locate(){if(!navigator.geolocation)return toast("Geolocation unavailable");navigator.geolocation.getCurrentPosition(p=>{P.addr.lat=p.coords.latitude.toFixed(4);P.addr.lng=p.coords.longitude.toFixed(4);save();toast("Coordinates saved. Now confirm your region and city");draw()},()=>toast("Location permission denied"))}
 /* delivery address: Region > Province > City/Municipality > Barangay, all official PSGC names */
-function addr(){const a=P.addr,paths=["/regions"];
-if(a.rc)paths.push("/regions/"+a.rc+"/provinces","/regions/"+a.rc+"/cities");
-if(a.provc)paths.push("/provinces/"+a.provc+"/cities");
-if(a.cityc)paths.push("/cities/"+a.cityc+"/barangays");
-fetchGeo(paths);
-const rs=G.data["/regions"]||[],ps=a.rc?G.data["/regions/"+a.rc+"/provinces"]:undefined;
-let cs=[];if(a.provc)cs=G.data["/provinces/"+a.provc+"/cities"]||[];else if(a.rc&&ps&&!ps.length)cs=G.data["/regions/"+a.rc+"/cities"]||[];
-const bs=a.cityc?G.data["/cities/"+a.cityc+"/barangays"]||[]:[];
-const o=(l,sel,ph)=>`<option value="">${ph}</option>`+l.map(x=>`<option value="${esc(x.code)}" ${x.code==sel?"selected":""}>${esc(x.name)}</option>`).join("");
-const fee=a.rc?` · Delivery fee <b>${peso(V.fees[a.rc]??V.defaultFee)}</b>`:"";
-return `<div class="pn"><h3>Delivery location</h3><button class="g" onclick="locate()">Use my current location</button> ${a.lat?`<small>GPS ${a.lat}, ${a.lng}</small>`:""}
+/* ---------- delivery area, fees per municipality, and the map ---------- */
+const AR=()=>V.area||{region:"MIMAROPA Region",province:"Oriental Mindoro",bounds:[[12.2,120.8],[13.7,121.7]],towns:[]};
+const normTown=x=>String(x||"").toLowerCase().replace(/\(.*?\)|\bcity of\b|\bmunicipality of\b|\bcity\b/g," ").replace(/[^a-z0-9]+/g," ").trim();
+const townOf=x=>AR().towns.find(t=>normTown(t.name)===normTown(x));
+const townFee=n=>{const f=(V.set.townFees||{})[n];return f===undefined||f===null||f===""?V.defaultFee:+f};
+const inArea=(lat,lng)=>{const b=AR().bounds;return lat>=b[0][0]&&lat<=b[1][0]&&lng>=b[0][1]&&lng<=b[1][1]};
+const km=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x))};
+const nearest=(lat,lng)=>AR().towns.reduce((m,t)=>{const d=km(lat,lng,t.lat,t.lng);return !m||d<m.d?{name:t.name,d}:m},null);
+/* saved addresses from before (PSGC names and codes) are mapped to the new municipality list, or cleared if they do not match */
+function migrateAddr(){const a=P.addr||{};if(!V.area)return;const t=a.city&&townOf(a.city);
+if(a.city&&!t)P.addr={...a,city:"",brgy:""};else if(t&&t.name!==a.city)P.addr={...a,city:t.name};
+if(P.addr.rc||P.addr.cityc||P.addr.brgyc){const{rc,provc,cityc,brgyc,...r}=P.addr;P.addr=r}save()}
+const setTown=n=>setA({city:n,region:AR().region,prov:AR().province,brgy:""});
+function pinHint(){const a=P.addr;if(!(a.lat&&a.lng))return "Optional: tap the map or use your current location to drop a pin. It helps the rider find you.";
+const lat=+a.lat,lng=+a.lng,n=nearest(lat,lng);
+if(!inArea(lat,lng))return `<span class="bad">That pin is outside ${esc(AR().province)}. We only deliver within the province.</span> <a onclick="clearPin()">Remove pin</a>`;
+return `Pin saved${n?` · Nearest town: <b>${esc(n.name)}</b>${a.city==n.name?"":` (<a onclick="setTown('${esc(n.name)}')">use ${esc(n.name)}</a>)`}`:""} · <a onclick="clearPin()">Remove pin</a>`}
+const showHint=()=>{const h=$("pinhint");if(h)h.innerHTML=pinHint()};
+/* barangay suggestions come from the PSGC list when it is reachable; typing always works when it is not */
+function brgyHints(a){const paths=["/regions"],reg=(G.data["/regions"]||[]).find(r=>/mimaropa/i.test(r.name));
+if(reg)paths.push("/regions/"+reg.code+"/provinces");const prv=reg&&(G.data["/regions/"+reg.code+"/provinces"]||[]).find(p=>/oriental mindoro/i.test(p.name));
+if(prv)paths.push("/provinces/"+prv.code+"/cities");const tw=prv&&a.city&&(G.data["/provinces/"+prv.code+"/cities"]||[]).find(c=>normTown(c.name)===normTown(a.city));
+if(tw)paths.push("/cities/"+tw.code+"/barangays");fetchGeo(paths);return tw?(G.data["/cities/"+tw.code+"/barangays"]||[]).map(b=>b.name):[]}
+function addr(){const a=P.addr,A=AR(),hints=brgyHints(a),fee=a.city?` · Delivery fee <b>${peso(townFee(a.city))}</b>`:"";
+return `<div class="pn"><h3>Delivery location</h3>
+<p class="area">${ic("pin")}<span>We deliver within <b>${esc(A.province)}</b> only. Choose your municipality to see the delivery fee.</span></p>
+<div id="mapslot" class="mapslot"></div><p class="pinhint" id="pinhint">${pinHint()}</p>
+<button type="button" class="g" onclick="locate()">${ic("pin")}Use my current location</button>
 <div class="row" style="margin-top:12px">
-<label>Region<select onchange="setA({rc:this.value,region:this.selectedOptions[0].text,prov:'',provc:'',city:'',cityc:'',brgy:'',brgyc:''})">${o(rs,a.rc,"Choose region")}</select></label>
-${a.rc&&ps&&ps.length?`<label>Province<select onchange="setA({provc:this.value,prov:this.selectedOptions[0].text,city:'',cityc:'',brgy:'',brgyc:''})">${o(ps,a.provc,"Choose province")}</select></label>`:""}
-<label>City / Municipality<select onchange="setA({cityc:this.value,city:this.selectedOptions[0].text,brgy:'',brgyc:''})" ${cs.length?"":"disabled"}>${o(cs,a.cityc,a.rc?"Choose city":"Choose region first")}</select></label>
-<label>Barangay<select onchange="setA({brgyc:this.value,brgy:this.selectedOptions[0].text})" ${bs.length?"":"disabled"}>${o(bs,a.brgyc,a.cityc?"Choose barangay":"Choose city first")}</select></label>
-<label>Street / house no.<input value="${esc(a.street)}" onchange="P.addr.street=this.value;save()"></label><label>Postal code<input value="${esc(a.zip)}" onchange="P.addr.zip=this.value;save()"></label></div>
-<p class="geo-s">${a.rc?`Delivering to ${esc(a.city||a.region)}${fee}`:"Choose your region to see the delivery fee."}</p></div>`}
+<label class="locked">Region<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.region)}</option></select></label>
+<label class="locked">Province<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.province)}</option></select></label>
+<label>City / Municipality<select onchange="setTown(this.value)"><option value="">Choose municipality</option>${A.towns.map(t=>`<option value="${esc(t.name)}" ${t.name==a.city?"selected":""}>${esc(t.name)} · ${peso(townFee(t.name))}</option>`).join("")}</select></label>
+<label>Barangay<input list="brgys" value="${esc(a.brgy)}" autocomplete="off" placeholder="${a.city?"Type or pick your barangay":"Choose municipality first"}" ${a.city?"":"disabled"} oninput="P.addr.brgy=this.value;save()"></label><datalist id="brgys">${hints.map(b=>`<option value="${esc(b)}">`).join("")}</datalist>
+<label>Street / house no.<input value="${esc(a.street)}" onchange="P.addr.street=this.value;save()"></label><label>Postal code<input inputmode="numeric" value="${esc(a.zip)}" onchange="P.addr.zip=this.value;save()"></label></div>
+<p class="geo-s">${a.city?`Delivering to ${esc(a.city)}${fee}`:"Choose your municipality to see the delivery fee."}</p></div>`}
+/* the map (Leaflet + OpenStreetMap) is downloaded only when an address form is on screen. The map element is kept alive between redraws. */
+const MP={el:null,map:null,mk:null,p:null,starting:0,failed:0};
+function loadLeaflet(){if(window.L&&window.L.map)return Promise.resolve();return MP.p||(MP.p=new Promise((ok,no)=>{const l=document.createElement("link");l.rel="stylesheet";l.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(l);
+const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>window.L&&window.L.map?ok():no(new Error("map"));s.onerror=()=>no(new Error("map"));document.head.appendChild(s)}).catch(e=>{MP.p=null;throw e}))}
+const pinIcon=()=>window.L.divIcon({className:"pinic",html:'<svg viewBox="0 0 34 44"><path d="M17 43S3 28 3 16a14 14 0 0 1 28 0c0 12-14 27-14 27z" style="fill:var(--plum)" stroke="#fff" stroke-width="2.5"/><circle cx="17" cy="16" r="5.5" fill="#fff"/></svg>',iconSize:[34,44],iconAnchor:[17,43]});
+function putMarker(lat,lng){const Lf=window.L;if(!MP.map)return;if(MP.mk)MP.mk.setLatLng([lat,lng]);else{MP.mk=Lf.marker([lat,lng],{draggable:true,icon:pinIcon(),keyboard:true,title:"Your delivery pin"}).addTo(MP.map);MP.mk.on("dragend",()=>{const p=MP.mk.getLatLng();setPin(p.lat,p.lng)})}}
+function setPin(lat,lng,zoom){P.addr={...P.addr,lat:lat.toFixed(5),lng:lng.toFixed(5)};save();putMarker(lat,lng);if(zoom&&MP.map)MP.map.setView([lat,lng],zoom);showHint()}
+function clearPin(){const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.mk&&MP.map){MP.map.removeLayer(MP.mk);MP.mk=null}showHint()}
+function initMap(){const Lf=window.L,A=AR(),a=P.addr,has=a.lat&&a.lng;
+MP.map=Lf.map(MP.el,{minZoom:8,maxBounds:Lf.latLngBounds(A.bounds).pad(.3),maxBoundsViscosity:.8}).setView(has?[+a.lat,+a.lng]:[13.0,121.35],has?15:9);
+Lf.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(MP.map);
+MP.map.on("click",e=>setPin(e.latlng.lat,e.latlng.lng));if(has)putMarker(+a.lat,+a.lng)}
+function mountMap(){const sl=$("mapslot");if(!sl)return;
+if(!MP.el){MP.el=document.createElement("div");MP.el.id="lmap";MP.el.setAttribute("role","application");MP.el.setAttribute("aria-label","Delivery map. Tap the map to place your pin.")}
+sl.appendChild(MP.el);
+if(MP.map){MP.map.invalidateSize();if(P.addr.lat&&P.addr.lng)putMarker(+P.addr.lat,+P.addr.lng);return}
+if(MP.starting)return;MP.starting=1;MP.failed=0;MP.el.innerHTML='<div class="mapfail">Loading map…</div>';
+loadLeaflet().then(()=>{MP.starting=0;MP.el.innerHTML="";initMap();const s2=$("mapslot");if(s2&&MP.el.parentNode!==s2)s2.appendChild(MP.el);MP.map.invalidateSize()})
+.catch(()=>{MP.starting=0;MP.failed=1;MP.el.innerHTML='<div class="mapfail"><span>The map couldn’t load. You can still choose your municipality below.</span><button type="button" class="g" onclick="mountMap()">Try again</button></div>'})}
+function locate(){if(!navigator.geolocation)return toast("Location isn’t available on this device");
+navigator.geolocation.getCurrentPosition(p=>{const lat=p.coords.latitude,lng=p.coords.longitude;if(!inArea(lat,lng))toast("You seem to be outside "+AR().province+". We only deliver within the province.");setPin(lat,lng,16)},()=>toast("Location permission denied"),{enableHighAccuracy:true,timeout:15000})}
+
 const chg=f=>`<label class="chg">Change image<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
 const chgI=f=>`<label class="chg ci" title="Change image" aria-label="Change image">${ic("cam")}<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
 const heart=p=>{const on=(V.favs||[]).includes(p.id);return `<button class="fv${on?" on":""}${V.popId==p.id?" pop":""}" onclick="tf(${p.id})" aria-pressed="${on}" aria-label="${on?"Remove from favorites":"Add to favorites"}">${ic("heart")}${p.favs>0?`<span>${p.favs}</span>`:""}</button>`};
@@ -349,7 +397,7 @@ function cgroups(L){return [...new Set(L.map(p=>p.cat||"Other"))].map(c=>{const 
 function shop(){const q=S.q.toLowerCase(),A=V.prods.filter(p=>!p.arch),adm=isA(),s=V.set,grouped=!S.cat&&!q,
 L=A.filter(p=>(!q||(p.name+p.cat).toLowerCase().includes(q))&&(!S.cat||p.cat==S.cat)&&(!S.max||p.price<=+S.max)),
 cats=[...new Set(A.map(p=>p.cat).filter(Boolean))],deals=L.filter(p=>p.was>p.price),pick=A.filter(p=>(p.favs||0)+(p.sold||0)>0).sort((a,b)=>((b.sold||0)+(b.favs||0))-((a.sold||0)+(a.favs||0))).slice(0,8),rec=(P.recent||[]).map(id=>A.find(p=>p.id==id)).filter(Boolean)[0],
-side=(t,p)=>`<h3>${t}</h3><div class="box"><div class="im">${p&&p.img?`<img loading="lazy" src="${p.img}" alt="">`:""}</div>${p?`<small>${esc(p.name)}</small>`:""}</div>`;
+side=(t,p)=>`<h3>${t}</h3>${p?`<a class="box" href="#product/${p.id}" aria-label="Open ${esc(p.name)}">`:'<div class="box">'}<div class="im">${p&&p.img?`<img loading="lazy" src="${esc(p.img)}" alt="">`:""}</div>${p?`<small>${esc(p.name)}</small>`:'<small class="mute">Items you view appear here</small>'}${p?"</a>":"</div>"}`;
 $("sg").innerHTML=A.map(p=>`<option value="${esc(p.name)}">`).join("");
 const pr=s.promos||[],hl=esc(s.headline||"Welcome"),faq=q&&/ship|deliver|pick|pay|gcash|maya|cod|return/.test(q)?'<div class="pn" style="margin-top:16px">Choose delivery or pickup at checkout. Pay with GCash, Maya, cash or card. Fees show before you order.</div>':"";
 return `<div class="home"><div class="box cats">${["",...cats].map(c=>`<a class="${S.cat==c?"on":""}" onclick="S.cat='${esc(c)}';draw()">${c?esc(c):"All products"}${ic("grid").replace(/<path[^>]*>/,'<path d="M9 6l6 6-6 6"/>')}</a>`).join("")}</div>
@@ -438,7 +486,7 @@ P.recent=[id,...(P.recent||[]).filter(x=>x!=id)].slice(0,5);c?c.n+=add:P.cart.pu
 if(add<n)toast("Only "+cap+" available, added "+add);else if(b&&!b.classList.contains("ok")){const t=b.innerHTML;b.classList.add("ok");b.innerHTML=CK;setTimeout(()=>{b.classList.remove("ok");b.innerHTML=t},1100)}else toast("Added to cart")}
 const add=(id,b)=>cartAdd(id,"","",1,b);
 function qty(k,d){k=decodeURIComponent(k);const c=P.cart.find(x=>x.k==k);if(!c)return;if(d>0){const p=V.prods.find(x=>x.id==c.id);if(p&&c.n+d>room(p,c.vid,k))return toast("No more stock available")}c.n+=d;if(c.n<=0)P.cart=P.cart.filter(x=>x!=c);save();theme();draw()}
-const fee=()=>P.m=="delivery"&&P.addr.rc?(V.fees[P.addr.rc]??V.defaultFee):0;
+const fee=()=>P.m=="delivery"&&P.addr.city?townFee(P.addr.city):0;
 function slots(){const o=[],n=new Date;for(let d=0;d<4;d++)for(const h of[10,13,16]){const t=new Date(n);t.setDate(n.getDate()+d);t.setHours(h,0,0,0);if(t-n<36e5)continue;o.push(t.toLocaleDateString("en-PH",{weekday:"short",month:"short",day:"numeric"})+" · "+t.toLocaleTimeString("en-PH",{hour:"numeric",minute:"2-digit"}))}return o.slice(0,9)}
 function setM(m){P.m=m;save();const s=document.querySelector(".seg");if(s)s.dataset.v=m;setTimeout(draw,RM?0:280)}
 function cart(){const L=P.cart.map(c=>({...c,p:V.prods.find(p=>p.id==c.id)})).filter(c=>c.p),sub=L.reduce((a,c)=>a+unit(c.p,c.vid)*c.n,0);
@@ -450,7 +498,7 @@ return `<h2 class="ph">Your cart</h2><div class="two"><div><div class="pn">${L.m
 ${dl?addr():`<div class="pn"><h3>Pickup</h3><p style="margin:0 0 12px"><b>${esc(pk.name||"Our store")}</b><br>${esc(pk.addr||"Address coming soon")}<br><small>${esc(pk.hours)}</small></p><label class="lb">Pickup time<select id="pk" onchange="P.pk=this.value;save()">${sl.map(s=>`<option ${s==P.pk?"selected":""}>${s}</option>`).join("")}</select></label></div>`}
 <label class="lb pn" style="display:grid">Note to seller (optional)<textarea style="width:100%" onchange="P.note=this.value;save()">${esc(P.note)}</textarea></label></div>
 <div class="pn sum"><h3>Payment</h3><select id="pay" style="width:100%" onchange="payHint()">${PAY[P.m].map(x=>`<option>${x}</option>`).join("")}</select><div id="ph">${payHtml(PAY[P.m][0])}</div>
-<p>Subtotal ${peso(sub)}<br>${dl?"Delivery "+(P.addr.rc?peso(fee()):"choose a region"):"Pickup · Free"}<br><span class="tot">${peso(sub+fee())}</span></p><button id="po" onclick="order()" style="width:100%">Place order</button></div></div>`}
+<p>Subtotal ${peso(sub)}<br>${dl?"Delivery "+(P.addr.city?peso(fee()):"choose a municipality"):"Pickup · Free"}<br><span class="tot">${peso(sub+fee())}</span></p><button id="po" onclick="order()" style="width:100%">Place order</button></div></div>`}
 function payHtml(v){
 if(/GCash/.test(v))return '<div style="margin-top:12px;text-align:center"><img src="/gcash-qr.svg" alt="GCash QR code" style="width:180px;max-width:100%"><p style="margin:8px 0 0"><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p></div>';
 if(v=="Cash on Delivery")return '<div style="margin-top:12px;text-align:center"><img src="/cod.svg" alt="" style="width:72px"><p style="margin:6px 0 0"><small>Pay the rider in cash when your order arrives.</small></p></div>';
@@ -460,7 +508,8 @@ async function order(){if(!P.user)return auth();if(!navigator.onLine)return toas
 if(!ct.name||!ct.phone)return toast("Add your name and mobile number");
 const nb=P.cart.find(needsOpt);if(nb){toast("Choose a size or option first");return go("product/"+nb.id)}
 const ov=P.cart.find(c=>{const p=V.prods.find(x=>x.id==c.id);return p&&c.n>room(p,c.vid,c.k)});if(ov)return toast("Please lower the quantity of items that are low on stock")
-if(dl&&(!a.rc||!a.cityc||!a.brgyc||!a.street))return toast("Complete your delivery address");
+if(dl&&(!a.city||!a.brgy||!a.street))return toast("Complete your delivery address");
+if(dl&&a.lat&&a.lng&&!inArea(+a.lat,+a.lng))return toast("Your map pin is outside "+AR().province+". Move it or remove it.");
 const body={items:P.cart.map(c=>({id:c.id,vid:c.vid,size:c.size,n:c.n})),method:P.m,pay:$("pay").value,name:ct.name,phone:ct.phone,note:P.note,addr:dl?a:null,pickup:dl?"":($("pk")?$("pk").value:"")};
 const t=b.innerHTML;b.disabled=true;b.innerHTML='<span class="sp"></span>';
 try{const o=await api("/orders",{method:"POST",body});b.disabled=false;b.classList.add("ok");b.innerHTML=CK+" Order #"+o.id;P.cart=[];P.note="";save();V.ol=0;await load();theme();setTimeout(()=>go("orders"),RM?0:800)}
@@ -495,11 +544,12 @@ const nextStatus=o=>{const f=["Awaiting payment",...STEPS[o.method]],i=f.indexOf
 const cashPay=o=>/^(Cash on Delivery|Pay at Pickup)$/.test(o.pay||"");
 const payNote=o=>o.status=="Cancelled"?"Order cancelled":cashPay(o)?(o.status==STEPS[o.method].slice(-1)[0]?"Paid in cash":o.method=="pickup"?"Collect payment at pickup":"Collect payment on delivery"):o.status=="Awaiting payment"?"Waiting for payment. Check your account, then press “Payment received”.":"Payment confirmed";
 const adReady=()=>V.ol==2&&V.oScope=="all";
+const pinLink=o=>{const a=o.addr||{},la=Number(a.lat),ln=Number(a.lng);return a.lat&&a.lng&&Number.isFinite(la)&&Number.isFinite(ln)?`<br><a href="https://www.openstreetmap.org/?mlat=${la}&mlon=${ln}#map=17/${la}/${ln}" target="_blank" rel="noopener">View map pin</a>`:""};
 const adOrder=o=>{const nx=nextStatus(o),cx=o.status=="Cancelled",done=DONE.includes(o.status),
 items=(o.items||[]).map(i=>`<li><span>${esc(i.name)}${i.v?" · "+esc(i.v):""}${i.size?" · Size "+esc(i.size):""}</span><b>× ${i.n}</b></li>`).join("");
 return `<article class="acard ${cx?"cx":done?"ok":""}"><div class="ah"><b>#${o.id}</b><span class="badge ${cx?"cx":done?"done":""}">${esc(o.status)}</span><small>${fmtDate(o.created)}</small><strong>${peso(o.total)}</strong></div>
 <div class="ag"><div><h5>Customer</h5><b>${esc(o.name)}</b><br><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></div>
-<div><h5>${o.method=="pickup"?"Pickup":"Deliver to"}</h5>${o.method=="pickup"?(o.pickup?esc(o.pickup):'<span class="mute">Time not set</span>'):addrHtml(o.shippingAddress)||'<span class="mute">Address not recorded</span>'}</div>
+<div><h5>${o.method=="pickup"?"Pickup":"Deliver to"}</h5>${o.method=="pickup"?(o.pickup?esc(o.pickup):'<span class="mute">Time not set</span>'):(addrHtml(o.shippingAddress)||'<span class="mute">Address not recorded</span>')+pinLink(o)}</div>
 <div><h5>Payment</h5><b>${esc(o.pay||"Not recorded")}</b><br><small>${payNote(o)}</small></div></div>
 <ul class="ai">${items||'<li class="mute">No items</li>'}</ul>${o.note?`<p class="an">Note from customer: ${esc(o.note)}</p>`:""}
 <div class="af">${nx?`<button type="button" onclick="adSet(${o.id},'${nx}',this)">${ic("check")}${STEP_BTN[nx]}</button>`:""}${cx||done?"":`<button type="button" class="g" onclick="adCancel(${o.id},this)">Cancel order</button>`}
@@ -553,7 +603,7 @@ return `<div class="sh-bg" onclick="edClose()"></div><div class="sh" role="dialo
 <div class="sh-h"><h3>${a.id?"Edit product":"Add a product"}</h3><button type="button" class="g ib" aria-label="Close" onclick="edClose()">${ic("x")}</button></div>
 <div class="sh-body"><datalist id="cats">${cats.map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
 <section class="sec2"><h4>1. Photos</h4><p class="hint">The main photo is what shoppers see in the shop. Tap a box to take a photo or pick one from your phone or computer.</p>
-<div class="tiles"><div class="capw">${tile(a.img,"edImg(this)","edSet('img','');renderEd()","Main photo","lg")}<small>Main photo</small></div>${a.gallery.map((g,i)=>tile(g,`edGalSet(this,${i})`,`edGalDel(${i})`,"")).join("")}${a.gallery.length<8?tile("","edGalAdd(this)","","More photos","",1):""}</div></section>
+<div class="utiles"><div class="capw">${tile(a.img,"edImg(this)","edSet('img','');renderEd()","Main photo","lg")}<small>Main photo</small></div>${a.gallery.map((g,i)=>tile(g,`edGalSet(this,${i})`,`edGalDel(${i})`,"")).join("")}${a.gallery.length<8?tile("","edGalAdd(this)","","More photos","",1):""}</div></section>
 <section class="sec2"><h4>2. Details</h4>
 <label class="fld">Product name *<input data-first value="${esc(a.name)}" maxlength="120" placeholder="e.g. Faith over Fear T-shirt" oninput="edSet('name',this.value)"></label>
 <div class="two2"><label class="fld">Price (₱) *<input type="number" inputmode="decimal" min="0" step="0.01" value="${a.price}" oninput="edSet('price',this.value)"></label>
@@ -567,7 +617,7 @@ return `<div class="sh-bg" onclick="edClose()"></div><div class="sh" role="dialo
 ${a.sizes.length?`<div class="szp"><h5>Photo for each size <i>optional</i></h5><p class="hint">If a size has its own photo, shoppers see it when they pick that size. Sizes without one keep showing the variation’s photo.</p><div class="szg">${sortSizes(a.sizes).map(z=>{const i=a.sizes.indexOf(z);return `<div class="szr">${tile(a.sizeImages[z],`edSzImg(this,${i})`,`edSzDel(${i})`,"Add photo","sm")}<b>${esc(z)}</b></div>`}).join("")}</div></div>`:""}</section>
 <section class="sec2"><h4>4. Variations <i>optional</i></h4><p class="hint">Colors, designs or editions. Give each its own photo: shoppers see that photo when they choose it. You can also change the price or count stock per variation.</p>
 ${a.vars.map(edVRow).join("")}<div class="vbtns"><button type="button" class="g" onclick="edVAdd()">${ic("plus")}Add a variation</button><label class="btnl">${ic("cam")}Add from several photos<input type="file" accept="image/*" multiple hidden onchange="edVMany(this)"></label></div></section></div>
-<div class="sh-f">${a.err?`<p class="err" role="alert">${esc(a.err)}</p>`:""}<div>${a.id?`<button type="button" class="g dgr ib" aria-label="Delete product" title="Delete product" onclick="edDelete()">${ic("trash")}</button>`:""}<span class="sp1"></span><button type="button" class="g" onclick="edClose()">Cancel</button><button type="button" onclick="edSave()" ${a.busy?"disabled":""}>${a.busy?'<span class="sp"></span>':ic("check")}${a.id?"Save changes":"Add product"}</button></div></div></div>`}
+<div class="sh-f">${a.err?`<p class="sherr" role="alert">${esc(a.err)}</p>`:""}<div>${a.id?`<button type="button" class="g dgr ib" aria-label="Delete product" title="Delete product" onclick="edDelete()">${ic("trash")}</button>`:""}<span class="sp1"></span><button type="button" class="g" onclick="edClose()">Cancel</button><button type="button" onclick="edSave()" ${a.busy?"disabled":""}>${a.busy?'<span class="sp"></span>':ic("check")}${a.id?"Save changes":"Add product"}</button></div></div></div>`}
 const edSet=(k,v)=>{AE[k]=v;AE.dirty=1},edV=(i,k,v)=>{AE.vars[i][k]=v;AE.dirty=1},edRe=()=>{AE.dirty=1;renderEd()};
 const edImg=async el=>{const f=el.files[0];if(!f)return;AE.img=await shrink(f,1000);edRe()};
 const edGalAdd=async el=>{for(const f of [...el.files].slice(0,8-AE.gallery.length))AE.gallery.push(await shrink(f,1200));edRe()};
@@ -601,14 +651,16 @@ function adLook(){const s=V.set,f=(k,l,h)=>`<label class="fld">${l}<input value=
 im=(k,l,m,h)=>`<div class="fld">${l}${tile(s[k],`up(this,'${k}',${m})`,`rm('${k}')`,"Add image","lg")}<small>${h}</small></div>`;
 return `<div class="pn"><h3>Name and words</h3><div class="two2">${f("name","Shop name")}${f("tagline","Tagline","Small line under the name")}</div>${f("headline","Homepage headline","Big text on the banner")}${f("footer","Footer text")}</div>
 <div class="pn"><h3>Colors</h3><div class="colors">${[["--purple","Main color","Header, side bar and headings"],["--terra","Button color","Buttons and highlights"],["--plum","Accent color","Sale badges, hearts and prices"],["--cream","Soft background","Warm background areas"]].map(([k,l,h])=>`<label class="fld">${l}<input type="color" value="${esc(s.col[k])}" oninput="V.set.col['${k}']=this.value;ss();theme()"><small>${h}</small></label>`).join("")}</div></div>
-<div class="pn"><h3>Logos and banner</h3><p class="hint">Tip: you can also tap “Change image” right on the homepage.</p><div class="tiles2">${im("logo","Square logo",600,"Icon in the side bar")}${im("logoWide","Wide logo",900,"Shown in the top bar")}${im("logoClear","Transparent logo",600,"For purple areas")}${im("banner","Banner picture",1600,"Right side of the homepage banner")}</div></div>
-<div class="pn"><h3>Homepage tiles</h3><div class="tiles3">${[0,1,2].map(i=>{const p=(s.promos||[])[i]||{};return `<div class="fld"><b>Tile ${i+1}</b>${tile(p.img,`imgT(this,${i})`,`rmT(${i})`,"Add image","")}<input placeholder="Title" value="${esc(p.t)}" onchange="pm(${i},'t',this.value)"><input placeholder="Subtitle" value="${esc(p.s)}" onchange="pm(${i},'s',this.value)"></div>`}).join("")}</div></div>
+<div class="pn"><h3>Logos and banner</h3><p class="hint">Tip: you can also tap “Change image” right on the homepage.</p><div class="utiles2">${im("logo","Square logo",600,"Icon in the side bar")}${im("logoWide","Wide logo",900,"Shown in the top bar")}${im("logoClear","Transparent logo",600,"For purple areas")}${im("banner","Banner picture",1600,"Right side of the homepage banner")}</div></div>
+<div class="pn"><h3>Homepage tiles</h3><div class="utiles3">${[0,1,2].map(i=>{const p=(s.promos||[])[i]||{};return `<div class="fld"><b>Tile ${i+1}</b>${tile(p.img,`imgT(this,${i})`,`rmT(${i})`,"Add image","")}<input placeholder="Title" value="${esc(p.t)}" onchange="pm(${i},'t',this.value)"><input placeholder="Subtitle" value="${esc(p.s)}" onchange="pm(${i},'s',this.value)"></div>`}).join("")}</div></div>
 <div class="pn"><details><summary class="sum2">Terms &amp; Privacy pages</summary><label class="fld" style="margin-top:12px">Terms &amp; Conditions<textarea rows="8" onchange="V.set.terms=this.value;ss()">${esc(s.terms)}</textarea></label><label class="fld">Privacy Policy<textarea rows="8" onchange="V.set.privacy=this.value;ss()">${esc(s.privacy)}</textarea></label></details></div>
 <p class="hint">Changes here save by themselves.</p>`}
-function adShip(){const s=V.set,pk=s.pickup||{},regs=G.data["/regions"]||[];if(!G.lists["/regions"])fetchGeo(["/regions"]);
-const pt=(k,l,h)=>`<label class="fld">${l}<input value="${esc(pk[k])}" onchange="V.set.pickup={...V.set.pickup,${k}:this.value};ss()">${h?`<small>${h}</small>`:""}</label>`;
-return `<div class="pn"><h3>Delivery fee</h3><label class="fld" style="max-width:280px">Standard fee (₱)<input type="number" inputmode="decimal" min="0" value="${V.defaultFee}" onchange="V.defaultFee=+this.value;V.set.defaultFee=V.defaultFee;ss()"><small>Charged when a region has no special fee.</small></label>
-<details><summary class="sum2">Different fee for certain regions</summary><div class="regs">${regs.map(r=>`<label class="fld">${esc(r.name)} (₱)<input type="number" inputmode="decimal" min="0" placeholder="${V.defaultFee}" value="${V.fees[r.code]??""}" onchange="V.fees['${r.code}']=this.value===''?undefined:+this.value;V.set.fees=V.fees;ss()"></label>`).join("")||'<small class="mute">Loading regions…</small>'}</div></details></div>
+const setTownFee=(n,v)=>{V.set.townFees={...(V.set.townFees||{})};v===""?delete V.set.townFees[n]:V.set.townFees[n]=Math.max(0,+v||0);ss()};
+function adShip(){const s=V.set,pk=s.pickup||{},A=AR(),
+pt=(k,l,h)=>`<label class="fld">${l}<input value="${esc(pk[k])}" onchange="V.set.pickup={...V.set.pickup,${k}:this.value};ss()">${h?`<small>${h}</small>`:""}</label>`;
+return `<div class="pn"><h3>Delivery fees</h3><p class="hint">Delivery is limited to <b>${esc(A.province)}</b> (${esc(A.region)}). Region and province are fixed on the shop page. Set the fee for each municipality. Leave a box empty to use the standard fee.</p>
+<label class="fld" style="max-width:280px">Standard fee (₱)<input type="number" inputmode="decimal" min="0" value="${V.defaultFee}" onchange="V.defaultFee=+this.value;V.set.defaultFee=V.defaultFee;ss();draw()"><small>Used for any municipality without its own fee.</small></label>
+<div class="regs">${A.towns.map(t=>`<label class="fld">${esc(t.name)} (₱)<input type="number" inputmode="decimal" min="0" placeholder="${V.defaultFee}" value="${(s.townFees||{})[t.name]??""}" onchange="setTownFee('${esc(t.name)}',this.value)"></label>`).join("")}</div></div>
 <div class="pn"><h3>Pickup</h3><div class="two2">${pt("name","Pickup place","e.g. Our school booth")}${pt("hours","Pickup hours","e.g. Mon–Fri, 12–1 PM")}</div>${pt("addr","Pickup address")}</div><p class="hint">Changes here save by themselves.</p>`}
 const adBackup=()=>`<div class="pn"><h3>Backup</h3><p class="hint">Download a copy of your products, orders and settings. Keep it somewhere safe, like your email or a drive.</p><button type="button" onclick="bk()">${ic("dl")}Download backup</button></div>`;
 
@@ -627,7 +679,7 @@ const page=k=>`<div class="pn"><h3>${k=="terms"?"Terms &amp; Conditions":"Privac
 function qrView(){return `<h2 class="ph">Payment methods</h2><div class="pn" style="text-align:center"><h3>GCash</h3><img src="/gcash-qr.svg" alt="GCash QR code" style="width:240px;max-width:100%"><p><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p><h3 style="margin-top:18px">Cash on Delivery</h3><img src="/cod.svg" alt="" style="width:72px"><p><small>Pay the rider in cash when your order arrives.</small></p></div>`}
 function render(fx){const y=scrollY,h=location.hash.slice(1),a=$("app");theme();if(!h.startsWith("product/"))D.id=0;
 a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h=="terms"||h=="privacy"?page(h):shop();
-const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
+mountMap();const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
 a.classList.toggle("fx",!!fx);if(fx){scrollTo(0,0);setTimeout(()=>a.classList.remove("fx"),1100)}else scrollTo(0,y);
 const sc=h=="admin"?"all":"mine";if((h=="orders"||h=="admin")&&P.user&&(!V.ol||V.oScope!=sc)){const tk=V.ot=(V.ot||0)+1;V.ol=1;V.oScope=sc;api("/orders"+(sc=="all"?"?all=1":"")).then(o=>{if(tk!=V.ot)return;V.orders=o;V.ol=2;draw()}).catch(()=>{if(tk!=V.ot)return;V.ol=3;draw()})}}
 function draw(nav){if(nav&&!RM&&document.startViewTransition)document.startViewTransition(()=>render(1));else render(nav)}
