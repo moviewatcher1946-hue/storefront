@@ -144,6 +144,24 @@ const normTown = x => String(x || "").toLowerCase().replace(/\(.*?\)|\bcity of\b
 const townOf = x => AREA.towns.find(t => normTown(t.name) === normTown(x));
 const coord = v => /^-?\d{1,3}(\.\d{1,7})?$/.test(String(v || "")) ? String(v) : "";
 
+/* admin settings: whitelist the keys the storefront uses and check every value, so nothing unchecked reaches the shop page */
+const HEXC = /^#[0-9a-f]{6}$/i;
+const TEXT = { name: 80, tagline: 120, headline: 160, footer: 300, terms: 20000, privacy: 20000 };
+const plainObj = (o, n) => { const out = {}; if (!o || typeof o != "object" || Array.isArray(o)) return out;
+  for (const [k, v] of Object.entries(o).slice(0, 20)) { const key = str(k, 40); if (!key) continue; if (typeof v == "number") out[key] = num(v); else if (typeof v == "string") out[key] = str(v, n); } return out; };
+function cleanSettings(b) {
+  const out = {};
+  for (const [k, n] of Object.entries(TEXT)) if (b[k] != null) out[k] = str(b[k], n);
+  for (const k of ["logo", "logoWide", "logoClear", "banner"]) if (b[k]) out[k] = IMG(b[k], "Image");
+  if (Array.isArray(b.promos)) out.promos = b.promos.slice(0, 3).map(p => { const x = p && typeof p == "object" ? p : {}; return { t: str(x.t, 80), s: str(x.s, 160), img: x.img ? IMG(x.img, "Tile image") : "" }; });
+  if (b.pickup && typeof b.pickup == "object") out.pickup = plainObj(b.pickup, 300);
+  if (b.col && typeof b.col == "object" && !Array.isArray(b.col)) { out.col = {}; for (const [k, v] of Object.entries(b.col).slice(0, 10)) if (/^--[a-z-]{1,30}$/.test(k) && HEXC.test(String(v))) out.col[k] = v; }
+  if (b.townFees && typeof b.townFees == "object" && !Array.isArray(b.townFees)) { out.townFees = {}; for (const [t, f] of Object.entries(b.townFees).slice(0, 40)) { const tw = townOf(t); if (tw) out.townFees[tw.name] = num(f); } }
+  if (b.defaultFee != null) out.defaultFee = num(b.defaultFee);
+  out.mapFull = !!b.mapFull; /* false = map limited to Oriental Mindoro */
+  return out;
+}
+
 const app = express();
 app.set("trust proxy", 1);
 app.disable("x-powered-by");
@@ -190,8 +208,8 @@ app.get("/api/products/:id", wrap(async (q, s) => {
 const done = (s, u) => s.json({ token: mk(u.id), user: { name: u.name, role: u.role } });
 app.post("/api/auth/google", lim(20), wrap(async (q, s) => {
   if (!GID) throw bad("Google sign-in is not set up");
-  const r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(q.body.credential || "")), t = await r.json();
-  if (!r.ok || t.aud !== GID || (t.email_verified !== "true" && t.email_verified !== true)) throw bad("Google sign-in failed", 401);
+  const r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(q.body.credential || ""), { signal: AbortSignal.timeout(8000) }), t = await r.json().catch(() => ({}));
+  if (!r.ok || t.aud !== GID || !t.email || (t.email_verified !== "true" && t.email_verified !== true)) throw bad("Google sign-in failed", 401);
   const em = String(t.email).toLowerCase(), role = ADMINS.includes(em) ? "admin" : "customer";
   const u = (await db.query(
     "insert into users(name,email,role) values($1,$2,$3) on conflict(email) do update set name=excluded.name, role=excluded.role returning id,name,role",
@@ -202,7 +220,7 @@ app.post("/api/auth/google", lim(20), wrap(async (q, s) => {
 /* admin: settings + products */
 app.put("/api/admin/settings", need(1), wrap(async (q, s) => {
   const b = q.body; if (!b || typeof b != "object" || Array.isArray(b)) throw bad("Bad settings");
-  await db.query("insert into settings(k,v) values('site',$1) on conflict(k) do update set v=excluded.v", [JSON.stringify(b)]);
+  await db.query("insert into settings(k,v) values('site',$1) on conflict(k) do update set v=excluded.v", [JSON.stringify(cleanSettings(b))]);
   s.json({ ok: 1 });
 }));
 app.post("/api/admin/products", need(1), wrap(async (q, s) => {
@@ -213,7 +231,7 @@ app.post("/api/admin/products", need(1), wrap(async (q, s) => {
     [str(b.name, 120), num(b.price), num(b.was), str(b.cat, 60), int(b.stock), JSON.stringify(names), IMG(keepOwn(b.img, null), "Image"), JSON.stringify(sizeList(b.sizes)), JSON.stringify(vars), str(b.desc, 2000), JSON.stringify(gal), JSON.stringify(sizeImgsFrom(b.sizeImages, null, szs))]);
   s.json(P(r.rows[0], true));
 }));
-const F = { size_images: v => JSON.stringify(v), name: v => str(v, 120), price: num, was: num, cat: v => str(v, 60), stock: int, vars: v => JSON.stringify(arr(v)), img: v => IMG(v, "Image"), arch: v => !!v, descr: v => str(v, 2000), sizes: v => JSON.stringify(sizeList(v)), variations: v => JSON.stringify(cleanVars(v)), gallery: v => JSON.stringify((Array.isArray(v) ? v : []).slice(0, 8).map(x => IMG(x, "Gallery image")).filter(Boolean)) };
+const F = { size_images: v => JSON.stringify(v && typeof v == "object" && !Array.isArray(v) ? cleanSizeImages(v) : {}), name: v => str(v, 120), price: num, was: num, cat: v => str(v, 60), stock: int, vars: v => JSON.stringify(arr(v)), img: v => IMG(v, "Image"), arch: v => !!v, descr: v => str(v, 2000), sizes: v => JSON.stringify(sizeList(v)), variations: v => JSON.stringify(cleanVars(v)), gallery: v => JSON.stringify((Array.isArray(v) ? v : []).slice(0, 8).map(x => IMG(x, "Gallery image")).filter(Boolean)) };
 app.patch("/api/admin/products/:id", need(1), wrap(async (q, s) => {
   const b = { ...q.body }; if ("desc" in b) b.descr = b.desc;
   if (["img", "variations", "gallery", "sizeImages", "sizes"].some(k => k in b)) {
@@ -287,7 +305,9 @@ app.post("/api/orders", lim(30), need(), wrap(async (q, s) => {
       if (sizes.length) { size = str(it.size, 40); if (!sizes.includes(size)) throw bad("Pick a size for " + p.name); }
       const upd = v && v.stockCount != null ? vs.map(x => x === v ? { ...x, stockCount: x.stockCount - n } : x) : null;
       await c.query("update products set stock=stock-$2" + (upd ? ",variations=$3" : "") + " where id=$1", upd ? [id, n, JSON.stringify(upd)] : [id, n]);
-      const price = num(p.price + (v ? v.priceModifier : 0)); /* price always comes from the database, never from the browser */
+      const rawPrice = Number(p.price) + (v ? v.priceModifier : 0); /* price always comes from the database, never from the browser */
+      if (rawPrice < 0) throw bad(p.name + " has an invalid option price");
+      const price = num(rawPrice);
       lines.push({ id, name: p.name, v: v ? v.name : "", vid: v ? v.id : "", size, n, price }); sub += price * n;
     }
     sub = num(sub);
@@ -363,6 +383,7 @@ app.get("/api/geo/cities/:code/barangays", geoRoute(c => `/cities-municipalities
 app.use(express.static(path.join(__dirname, "public"), { setHeaders: (r, p) => {
   const sw = /[\\/]sw\.js$/.test(p);
   r.setHeader("Cache-Control", sw || /\.html$/.test(p) ? "no-cache" : "public, max-age=86400, stale-while-revalidate=604800");
+  if (/\.html$/.test(p)) r.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://nominatim.openstreetmap.org https://accounts.google.com; frame-src https://accounts.google.com; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
   if (sw) r.setHeader("Service-Worker-Allowed", "/");
 } }));
 app.use((e, q, s, n) => { if (!e.status) console.error(e); s.status(e.status || 500).json({ error: e.status ? e.message : "Server error" }); });
