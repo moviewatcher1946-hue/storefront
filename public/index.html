@@ -342,7 +342,7 @@ function migrateAddr(){const a=P.addr||{};if(!V.area)return;const t=a.city&&town
 if(a.city&&!t)P.addr={...a,city:"",brgy:""};else if(t&&t.name!==a.city)P.addr={...a,city:t.name};
 if(P.addr.rc||P.addr.cityc||P.addr.brgyc){const{rc,provc,cityc,brgyc,...r}=P.addr;P.addr=r}save()}
 const setTown=n=>setA({city:n,region:AR().region,prov:AR().province,brgy:""});
-function pinHint(){const a=P.addr;if(!(a.lat&&a.lng))return "Optional: tap the map or use your current location to drop a pin. We’ll fill in your municipality and barangay from it.";
+function pinHint(){const a=P.addr;if(!(a.lat&&a.lng)){if(MP.note)return `<span class="bad">That spot is outside ${esc(AR().province)}. We only deliver there. Tap the map inside the province to set your pin.</span>`;return "Optional: tap the map"+(LOCATE_OK?" or use your current location":"")+" to drop a pin. We’ll fill in your municipality and barangay from it.";}
 const lat=+a.lat,lng=+a.lng,rg=MP.rg||{},n=nearest(lat,lng),clr=` · <a onclick="clearPin()">Remove pin</a>`,acc=MP.acc>150?`<br><span class="bad">Your device found you only within about ${MP.acc>=1000?(MP.acc/1000).toFixed(1)+" km":Math.round(MP.acc)+" m"}, which is common on computers. Drag the pin to your exact spot.</span>`:"";
 if(rg.status=="outside")return `<span class="bad">That pin is in ${esc(rg.name)}. We only deliver within ${esc(AR().province)}.</span>${clr}`;
 if(!inArea(lat,lng))return `<span class="bad">That pin is outside ${esc(AR().province)}. We only deliver within the province.</span>${clr}`;
@@ -359,7 +359,7 @@ function addr(){const a=P.addr,A=AR(),hints=brgyHints(a),fee=a.city?` · Deliver
 return `<div class="pn"><h3>Delivery location</h3>
 <p class="area">${ic("pin")}<span>We deliver within <b>${esc(A.province)}</b> only. Choose your municipality to see the delivery fee.</span></p>
 <div id="mapslot" class="mapslot"></div><p class="pinhint" id="pinhint">${pinHint()}</p>
-<button type="button" class="g" onclick="locate()">${ic("pin")}Use my current location</button>
+${LOCATE_OK?`<button type="button" class="g" onclick="locate()">${ic("pin")}Use my current location</button>`:""}
 <div class="row" style="margin-top:12px">
 <label class="locked">Region<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.region)}</option></select></label>
 <label class="locked">Province<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.province)}</option></select></label>
@@ -368,7 +368,9 @@ return `<div class="pn"><h3>Delivery location</h3>
 <label>Street / house no.<input value="${esc(a.street)}" onchange="P.addr.street=this.value;save()"></label><label>Postal code<input inputmode="numeric" value="${esc(a.zip)}" onchange="P.addr.zip=this.value;save()"></label></div>
 <p class="geo-s">${a.city?`Delivering to ${esc(a.city)}${fee}`:"Choose your municipality to see the delivery fee."}</p></div>`}
 /* the map (Leaflet + OpenStreetMap) is downloaded only when an address form is on screen. The map element is kept alive between redraws. */
-const MP={el:null,map:null,mk:null,p:null,starting:0,failed:0};
+/* the "use my current location" button is shown on phones and tablets only (touch screens); laptops and desktops get the map and the search instead */
+const LOCATE_OK=matchMedia("(pointer: coarse)").matches;
+const MP={el:null,map:null,mk:null,p:null,starting:0,failed:0,note:0};
 function loadLeaflet(){if(window.L&&window.L.map)return Promise.resolve();return MP.p||(MP.p=new Promise((ok,no)=>{const l=document.createElement("link");l.rel="stylesheet";l.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(l);
 const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>window.L&&window.L.map?ok():no(new Error("map"));s.onerror=()=>no(new Error("map"));document.head.appendChild(s)}).catch(e=>{MP.p=null;throw e}))}
 const pinIcon=()=>window.L.divIcon({className:"pinic",html:'<svg viewBox="0 0 34 44"><path d="M17 43S3 28 3 16a14 14 0 0 1 28 0c0 12-14 27-14 27z" style="fill:var(--plum)" stroke="#fff" stroke-width="2.5"/><circle cx="17" cy="16" r="5.5" fill="#fff"/></svg>',iconSize:[34,44],iconAnchor:[17,43]});
@@ -386,10 +388,14 @@ if(!t){MP.rg={status:"fail"};return showHint()}
 const b=brgyOf(d),next={...a,city:t.name,region:AR().region,prov:AR().province};
 if(b&&(!a.brgy||a.brgyAuto)){next.brgy=b;next.brgyAuto=1}if(d.road&&!a.street)next.street=d.road;if(/^\d{4}$/.test(d.postcode||"")&&!a.zip)next.zip=d.postcode;
 P.addr=next;save();MP.rg={status:"ok",town:t.name,brgy:next.brgy||""};draw()},700)}
-function setPin(lat,lng,zoom,acc){MP.acc=acc||0;P.addr={...P.addr,lat:lat.toFixed(5),lng:lng.toFixed(5)};save();putMarker(lat,lng);
+function setPin(lat,lng,zoom,acc){
+/* a spot outside the delivery province is never saved or shown: the map stays on the province and the customer is told why */
+if(!inArea(lat,lng)){rgSeq++;MP.rg=null;MP.note=1;MP.acc=0;const{lat:_x,lng:_y,...r}=P.addr;P.addr=r;save();
+  if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint();return}
+MP.note=0;MP.acc=acc||0;P.addr={...P.addr,lat:lat.toFixed(5),lng:lng.toFixed(5)};save();putMarker(lat,lng);
 if(MP.map){if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}if(acc>40)MP.circle=window.L.circle([lat,lng],{radius:acc,weight:1,color:"#4a7bd0",fillOpacity:.12}).addTo(MP.map);if(zoom)MP.map.setView([lat,lng],acc>600?14:zoom)}
 inArea(lat,lng)?reverse(lat,lng):(rgSeq++,MP.rg={status:"fail"});showHint()}
-function clearPin(){rgSeq++;MP.rg=null;MP.acc=0;const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint()}
+function clearPin(){rgSeq++;MP.rg=null;MP.note=0;MP.acc=0;const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint()}
 function initMap(){const Lf=window.L,A=AR(),a=P.addr,has=a.lat&&a.lng,full=!!V.set.mapFull;
 /* default: the map stays on Oriental Mindoro (no panning or zooming past the province). The admin can turn on the full map. */
 const o=full?{minZoom:3}:{minZoom:8,maxBounds:Lf.latLngBounds(A.bounds),maxBoundsViscosity:1};
