@@ -310,16 +310,16 @@ const ic=n=>`<svg viewBox="0 0 24 24"><path d="${IC[n]}"/></svg>`;
 let lastN=0;
 function theme(){const h=location.hash.slice(1),A=isA(),s=V.set;for(const k in s.col)document.documentElement.style.setProperty(k,s.col[k]);
 const nm=esc(s.name||"Likha: Youth Craft");$("brand").textContent=s.name||"Likha: Youth Craft";$("brand").style.display=s.logoWide?"none":"";
-$("lg").innerHTML=s.logoWide?`<img class="wide" src="${s.logoWide}" alt="${nm}">`:s.logo?`<img src="${s.logo}" alt="">`:"";document.body.classList.toggle("hl",!!(s.logoWide||s.logo));
+$("lg").innerHTML=s.logoWide?`<img class="wide" src="${esc(s.logoWide)}" alt="${nm}">`:s.logo?`<img src="${esc(s.logo)}" alt="">`:"";document.body.classList.toggle("hl",!!(s.logoWide||s.logo));
 function fav(u){const L=document.querySelector('link[rel=icon]');if(!u){L.href="data:,";return}const i=new Image();i.onload=()=>{const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d"),k=Math.min(64/i.width,64/i.height),w=i.width*k,h=i.height*k;x.drawImage(i,(64-w)/2,(64-h)/2,w,h);L.href=c.toDataURL("image/png")};i.onerror=()=>{L.href=u};i.src=u}
 fav(s.logo);
 const n=P.cart.reduce((a,c)=>a+c.n,0),bump=n>lastN;lastN=n;const lc=s.logoClear||s.logo;
 const it=(k,i,l)=>`<a href="#${k}" class="${h==k?"on":""}" title="${l}" aria-label="${l}"${h==k?' aria-current="page"':""}>${ic(i)}<em>${l}</em>${k=="cart"&&n?`<span class="bd${bump?" bump":""}">${n}</span>`:""}</a>`;
-$("rail").innerHTML=`<div class="lg">${lc?`<img src="${lc}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${A?it("admin","set","Admin"):""}`;
+$("rail").innerHTML=`<div class="lg">${lc?`<img src="${esc(lc)}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${A?it("admin","set","Admin"):""}`;
 $("ad").style.display=A?"":"none";
-$("foot").innerHTML=(lc?`<img src="${lc}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a></div>";
+$("foot").innerHTML=(lc?`<img src="${esc(lc)}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a></div>";
 $("uname").textContent=P.user?P.user.name:"";$("ub").innerHTML=P.user?`<span class="av">${esc(P.user.name[0].toUpperCase())}</span><span>Sign out</span>`:"Sign in";$("ub").style.cssText=P.user?"display:flex;align-items:center;gap:8px":"background:var(--terra);color:var(--ink);padding:9px 16px;border-radius:8px";
-document.title=s.name||"CYF: Youth Craft"}
+document.title=s.name||"Likha: Youth Craft"}
 const go=h=>location.hash=h,isA=()=>P.user&&P.user.role=="admin";
 /* modals and sign-in */
 function closeM(){const m=document.querySelector("#m .modal");if(!m)return;m.classList.add("out");setTimeout(()=>$("m").innerHTML="",180)}
@@ -390,10 +390,14 @@ function setPin(lat,lng,zoom,acc){MP.acc=acc||0;P.addr={...P.addr,lat:lat.toFixe
 if(MP.map){if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}if(acc>40)MP.circle=window.L.circle([lat,lng],{radius:acc,weight:1,color:"#4a7bd0",fillOpacity:.12}).addTo(MP.map);if(zoom)MP.map.setView([lat,lng],acc>600?14:zoom)}
 inArea(lat,lng)?reverse(lat,lng):(rgSeq++,MP.rg={status:"fail"});showHint()}
 function clearPin(){rgSeq++;MP.rg=null;MP.acc=0;const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint()}
-function initMap(){const Lf=window.L,A=AR(),a=P.addr,has=a.lat&&a.lng;
-MP.map=Lf.map(MP.el,{minZoom:8,maxBounds:Lf.latLngBounds(A.bounds).pad(.3),maxBoundsViscosity:.8}).setView(has?[+a.lat,+a.lng]:[13.0,121.35],has?15:9);
+function initMap(){const Lf=window.L,A=AR(),a=P.addr,has=a.lat&&a.lng,full=!!V.set.mapFull;
+/* default: the map stays on Oriental Mindoro (no panning or zooming past the province). The admin can turn on the full map. */
+const o=full?{minZoom:3}:{minZoom:8,maxBounds:Lf.latLngBounds(A.bounds),maxBoundsViscosity:1};
+MP.map=Lf.map(MP.el,o).setView(has?[+a.lat,+a.lng]:(full?[12.9,121.0]:[13.0,121.35]),has?15:(full?6:9));
 Lf.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(MP.map);
 MP.map.on("click",e=>setPin(e.latlng.lat,e.latlng.lng));if(has)putMarker(+a.lat,+a.lng)}
+/* admin switch: rebuild the map so the change shows at once */
+function setMapFull(v){V.set.mapFull=!!v;ss();if(MP.map){MP.map.remove();MP.map=null}MP.mk=null;MP.circle=null;if(MP.el&&MP.el.parentNode)MP.el.parentNode.removeChild(MP.el);MP.el=null;draw()}
 function mountMap(){const sl=$("mapslot");if(!sl)return;
 if(!MP.el){MP.el=document.createElement("div");MP.el.id="lmap";MP.el.setAttribute("role","application");MP.el.setAttribute("aria-label","Delivery map. Tap the map to place your pin.")}
 sl.appendChild(MP.el);
@@ -407,19 +411,19 @@ toast("Finding your location…");
 let best=null,wid=null,t=null,fin=false,high=true;
 const stopWatch=()=>{if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null};
 const finish=()=>{if(fin)return;fin=true;stopWatch();clearTimeout(t);
-if(!best)return toast("We couldn’t get your location. Check that location is on for this browser, or tap the map.");
-const{latitude:la,longitude:ln}=best.coords;
-toast(inArea(la,ln)?"Location found. Drag the pin if it isn’t exact.":"You seem to be outside "+AR().province+". We only deliver within the province.")};
-const take=p=>{if(fin)return;const c=p.coords;if(!best||c.accuracy<best.coords.accuracy){best=p;setPin(c.latitude,c.longitude,17,c.accuracy)}if(c.accuracy<=60)finish()};
-const onErr=e=>{
-  if(fin)return;
+ if(!best)return toast("Couldn’t get your location. Check that location is on for this browser, or tap the map.");
+ const{latitude:la,longitude:ln,accuracy:ac}=best.coords;
+ toast(!inArea(la,ln)?"You seem to be outside "+AR().province+". We only deliver within the province.":ac<=60?"Location found.":"Location found, within about "+Math.round(ac)+" m. Drag the pin if it isn’t exact.")};
+const take=p=>{if(fin)return;const c=p.coords;if(!best||c.accuracy<best.coords.accuracy){best=p;setPin(c.latitude,c.longitude,17,c.accuracy)}if(c.accuracy<=30)finish()};
+const onErr=e=>{if(fin)return;
   if(e&&e.code===1){fin=true;stopWatch();clearTimeout(t);return toast("Location access is blocked. Allow it in your browser or phone settings, or tap the map.")}
-  // high accuracy failed (common on laptops and some phones): retry with network/Wi-Fi location
-  if(!best&&high){high=false;stopWatch();start()}
-};
-const start=()=>{wid=navigator.geolocation.watchPosition(take,onErr,{enableHighAccuracy:high,maximumAge:30000,timeout:high?12000:20000})};
+  if(!best&&high){high=false;stopWatch();start()}};
+const start=()=>{wid=navigator.geolocation.watchPosition(take,onErr,{enableHighAccuracy:high,maximumAge:0,timeout:high?12000:20000})};
+/* 1) a quick, rough fix (last known or network location) so the pin appears at once */
+navigator.geolocation.getCurrentPosition(take,()=>{},{enableHighAccuracy:false,maximumAge:300000,timeout:5000});
+/* 2) keep refining with the best sensor for up to 20 seconds */
 start();
-t=setTimeout(finish,22000)}
+t=setTimeout(finish,20000)}
 
 const chg=f=>`<label class="chg">Change image<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
 const chgI=f=>`<label class="chg ci" title="Change image" aria-label="Change image">${ic("cam")}<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
@@ -427,7 +431,7 @@ const heart=p=>{const on=(V.favs||[]).includes(p.id);return `<button class="fv${
 async function tf(id){if(!P.user)return auth();const on=(V.favs||[]).includes(id);try{await api("/favorites/"+id,{method:on?"DELETE":"POST"});V.favs=on?V.favs.filter(x=>x!=id):[...(V.favs||[]),id];V.popId=on?0:id;setTimeout(()=>V.popId=0,700);const p=V.prods.find(x=>x.id==id);if(p)p.favs=Math.max(0,(p.favs||0)+(on?-1:1));draw()}catch(e){toast("Could not update favorites")}}
 const card=(p,i)=>{const vs=p.variations||[],opt=vs.length>0||p.hasSizes,out=p.stock<=0,dots=vs.filter(v=>v.colorHex).slice(0,5),
 meta=[vs.length?vs.length+" option"+(vs.length>1?"s":""):"",p.hasSizes?p.availableSizes.length+(p.availableSizes.length>1?" sizes":" size"):""].filter(Boolean).join(" · ");
-return `<div class="pc" style="--i:${i||0}" ><div class="pi">${p.img?`<img loading="lazy" src="${p.img}" alt="${esc(p.name)}">`:""}${out?'<span class="tag no">Sold out</span>':p.was>p.price?`<span class="tag">−${Math.round((1-p.price/p.was)*100)}%</span>`:""}${isA()?chgI("imgP(this,"+p.id+")"):""}${heart(p)}</div><h4><a class="pl" href="#product/${p.id}">${esc(p.name)}</a></h4><div class="pp"><b>${peso(p.price)}</b>${p.was>p.price?`<s>${peso(p.was)}</s>`:""}</div>${meta?`<div class="sws">${dots.map(v=>`<i style="--c:${esc(v.colorHex)}" title="${esc(v.name)}"></i>`).join("")}<small>${meta}</small></div>`:""}${opt?`<button onclick="go('product/${p.id}')" style="width:100%;margin-top:8px">${out?"View":"Choose options"}${out?"":ic("chev")}</button>`:`<button ${out?"disabled":""} onclick="add(${p.id},this)" style="width:100%;margin-top:8px">${out?"Sold out":"Add to cart"}</button>`}</div>`};
+return `<div class="pc" style="--i:${i||0}" ><div class="pi">${p.img?`<img loading="lazy" src="${esc(p.img)}" alt="${esc(p.name)}">`:""}${out?'<span class="tag no">Sold out</span>':p.was>p.price?`<span class="tag">−${Math.round((1-p.price/p.was)*100)}%</span>`:""}${isA()?chgI("imgP(this,"+p.id+")"):""}${heart(p)}</div><h4><a class="pl" href="#product/${p.id}">${esc(p.name)}</a></h4><div class="pp"><b>${peso(p.price)}</b>${p.was>p.price?`<s>${peso(p.was)}</s>`:""}</div>${meta?`<div class="sws">${dots.map(v=>`<i style="--c:${esc(v.colorHex)}" title="${esc(v.name)}"></i>`).join("")}<small>${meta}</small></div>`:""}${opt?`<button onclick="go('product/${p.id}')" style="width:100%;margin-top:8px">${out?"View":"Choose options"}${out?"":ic("chev")}</button>`:`<button ${out?"disabled":""} onclick="add(${p.id},this)" style="width:100%;margin-top:8px">${out?"Sold out":"Add to cart"}</button>`}</div>`};
 function cgroups(L){return [...new Set(L.map(p=>p.cat||"Other"))].map(c=>{const items=L.filter(p=>(p.cat||"Other")==c);return `<div class="sec" style="margin:26px 0 12px;padding-top:0;border:0"><h2 style="font-size:20px">${esc(c)}</h2><span style="color:var(--mute)">${items.length}</span></div><div class="gr">${items.map(card).join("")}</div>`}).join("")}
 function shop(){const q=S.q.toLowerCase(),A=V.prods.filter(p=>!p.arch),adm=isA(),s=V.set,grouped=!S.cat&&!q,
 L=A.filter(p=>(!q||(p.name+p.cat).toLowerCase().includes(q))&&(!S.cat||p.cat==S.cat)&&(!S.max||p.price<=+S.max)),
@@ -436,8 +440,8 @@ side=(t,p)=>`<h3>${t}</h3>${p?`<a class="box" href="#product/${p.id}" aria-label
 $("sg").innerHTML=A.map(p=>`<option value="${esc(p.name)}">`).join("");
 const pr=s.promos||[],hl=esc(s.headline||"Welcome"),faq=q&&/ship|deliver|pick|pay|gcash|maya|cod|return/.test(q)?'<div class="pn" style="margin-top:16px">Choose delivery or pickup at checkout. Pay with GCash, Maya, cash or card. Fees show before you order.</div>':"";
 return `<div class="home"><div class="box cats">${["",...cats].map(c=>`<a class="${S.cat==c?"on":""}" onclick="S.cat='${esc(c)}';draw()">${c?esc(c):"All products"}${ic("grid").replace(/<path[^>]*>/,'<path d="M9 6l6 6-6 6"/>')}</a>`).join("")}</div>
-<div><div class="hero"><div class="hc"><small>${esc(s.tagline)}</small><h1>${hl}</h1><button onclick="document.getElementById('all').scrollIntoView()">Shop now &nbsp;»</button></div>${s.banner?`<img class="bn" src="${s.banner}" alt="">`:(adm?'<div class="dz">Upload a banner image</div>':"")}${adm?chg("up(this,'banner',1600)"):""}</div>
-<div class="tiles box" style="border-top:0">${[0,1,2].map(i=>`<div class="tl${pr[i]&&(pr[i].t||pr[i].s)?"":" nt"}" style="--i:${i}">${esc(pr[i]&&pr[i].t)}<span>${esc(pr[i]&&pr[i].s)}</span>${pr[i]&&pr[i].img?`<img src="${pr[i].img}" alt="">`:""}${adm?chg("imgT(this,"+i+")")+(pr[i]&&pr[i].img?`<a class="rmT" onclick="rmT(${i})">Remove</a>`:""):""}</div>`).join("")}</div></div>
+<div><div class="hero"><div class="hc"><small>${esc(s.tagline)}</small><h1>${hl}</h1><button onclick="document.getElementById('all').scrollIntoView()">Shop now &nbsp;»</button></div>${s.banner?`<img class="bn" src="${esc(s.banner)}" alt="">`:(adm?'<div class="dz">Upload a banner image</div>':"")}${adm?chg("up(this,'banner',1600)"):""}</div>
+<div class="tiles box" style="border-top:0">${[0,1,2].map(i=>`<div class="tl${pr[i]&&(pr[i].t||pr[i].s)?"":" nt"}" style="--i:${i}">${esc(pr[i]&&pr[i].t)}<span>${esc(pr[i]&&pr[i].s)}</span>${pr[i]&&pr[i].img?`<img src="${esc(pr[i].img)}" alt="">`:""}${adm?chg("imgT(this,"+i+")")+(pr[i]&&pr[i].img?`<a class="rmT" onclick="rmT(${i})">Remove</a>`:""):""}</div>`).join("")}</div></div>
 <div class="side">${side("Recently Viewed",rec,"Items you view appear here")}</div></div>${faq}
 ${grouped&&pick.length?`<div class="sec"><h2>Front page picks</h2><span style="color:var(--mute)">Most loved &amp; best sellers</span></div><div class="rowx">${pick.map(card).join("")}</div>`:""}
 ${deals.length?`<div class="sec"><h2>Deals of the Day</h2><span class="cd" id="cd"></span><a onclick="S.max='';S.cat='';draw()">View All Deals</a></div><div class="rowx">${deals.map(card).join("")}</div>`:""}
@@ -693,7 +697,7 @@ return `<div class="pn"><h3>Name and words</h3><div class="two2">${f("name","Sho
 const setTownFee=(n,v)=>{V.set.townFees={...(V.set.townFees||{})};v===""?delete V.set.townFees[n]:V.set.townFees[n]=Math.max(0,+v||0);ss()};
 function adShip(){const s=V.set,pk=s.pickup||{},A=AR(),
 pt=(k,l,h)=>`<label class="fld">${l}<input value="${esc(pk[k])}" onchange="V.set.pickup={...V.set.pickup,${k}:this.value};ss()">${h?`<small>${h}</small>`:""}</label>`;
-return `<div class="pn"><h3>Delivery fees</h3><p class="hint">Delivery is limited to <b>${esc(A.province)}</b> (${esc(A.region)}). Region and province are fixed on the shop page. Set the fee for each municipality. Leave a box empty to use the standard fee.</p>
+return `<div class="pn"><h3>Delivery fees</h3><label class="fld" style="margin:0 0 12px"><input type="checkbox" ${s.mapFull?"checked":""} onchange="setMapFull(this.checked)"> Show the full map to customers (off = Oriental Mindoro only)</label><p class="hint">Delivery is limited to <b>${esc(A.province)}</b> (${esc(A.region)}). Region and province are fixed on the shop page. Set the fee for each municipality. Leave a box empty to use the standard fee.</p>
 <label class="fld" style="max-width:280px">Standard fee (₱)<input type="number" inputmode="decimal" min="0" value="${V.defaultFee}" onchange="V.defaultFee=+this.value;V.set.defaultFee=V.defaultFee;ss();draw()"><small>Used for any municipality without its own fee.</small></label>
 <div class="regs">${A.towns.map(t=>`<label class="fld">${esc(t.name)} (₱)<input type="number" inputmode="decimal" min="0" placeholder="${V.defaultFee}" value="${(s.townFees||{})[t.name]??""}" onchange="setTownFee('${esc(t.name)}',this.value)"></label>`).join("")}</div></div>
 <div class="pn"><h3>Pickup</h3><div class="two2">${pt("name","Pickup place","e.g. Our school booth")}${pt("hours","Pickup hours","e.g. Mon–Fri, 12–1 PM")}</div>${pt("addr","Pickup address")}</div><p class="hint">Changes here save by themselves.</p>`}
