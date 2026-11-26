@@ -401,10 +401,25 @@ if(MP.map){MP.map.invalidateSize();if(P.addr.lat&&P.addr.lng)putMarker(+P.addr.l
 if(MP.starting)return;MP.starting=1;MP.failed=0;MP.el.innerHTML='<div class="mapfail">Loading map…</div>';
 loadLeaflet().then(()=>{MP.starting=0;MP.el.innerHTML="";initMap();const s2=$("mapslot");if(s2&&MP.el.parentNode!==s2)s2.appendChild(MP.el);MP.map.invalidateSize()})
 .catch(()=>{MP.starting=0;MP.failed=1;MP.el.innerHTML='<div class="mapfail"><span>The map couldn’t load. You can still choose your municipality below.</span><button type="button" class="g" onclick="mountMap()">Try again</button></div>'})}
-function locate(){if(!navigator.geolocation)return toast("Location isn’t available on this device");toast("Finding your location…");let best=null,wid=null,t=0;
-const done=()=>{clearTimeout(t);if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null;if(!best)return;const{latitude:la,longitude:ln,accuracy:ac}=best.coords;if(!inArea(la,ln))toast("You seem to be outside "+AR().province+". We only deliver within the province.");setPin(la,ln,17,ac)};
-wid=navigator.geolocation.watchPosition(p=>{if(!best||p.coords.accuracy<best.coords.accuracy){best=p;const c=p.coords;setPin(c.latitude,c.longitude,17,c.accuracy)}if(p.coords.accuracy<=25)done()},()=>{if(best)done();else{clearTimeout(t);if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null;toast("We couldn’t get your location. Check that location access is allowed, or tap the map instead.")}},{enableHighAccuracy:true,maximumAge:0,timeout:20000});
-t=setTimeout(done,9000)}
+function locate(){
+if(!window.isSecureContext||!navigator.geolocation)return toast("Location needs an https page in a browser that supports it. You can still tap the map.");
+toast("Finding your location…");
+let best=null,wid=null,t=null,fin=false,high=true;
+const stopWatch=()=>{if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null};
+const finish=()=>{if(fin)return;fin=true;stopWatch();clearTimeout(t);
+if(!best)return toast("We couldn’t get your location. Check that location is on for this browser, or tap the map.");
+const{latitude:la,longitude:ln}=best.coords;
+toast(inArea(la,ln)?"Location found. Drag the pin if it isn’t exact.":"You seem to be outside "+AR().province+". We only deliver within the province.")};
+const take=p=>{if(fin)return;const c=p.coords;if(!best||c.accuracy<best.coords.accuracy){best=p;setPin(c.latitude,c.longitude,17,c.accuracy)}if(c.accuracy<=60)finish()};
+const onErr=e=>{
+  if(fin)return;
+  if(e&&e.code===1){fin=true;stopWatch();clearTimeout(t);return toast("Location access is blocked. Allow it in your browser or phone settings, or tap the map.")}
+  // high accuracy failed (common on laptops and some phones): retry with network/Wi-Fi location
+  if(!best&&high){high=false;stopWatch();start()}
+};
+const start=()=>{wid=navigator.geolocation.watchPosition(take,onErr,{enableHighAccuracy:high,maximumAge:30000,timeout:high?12000:20000})};
+start();
+t=setTimeout(finish,22000)}
 
 const chg=f=>`<label class="chg">Change image<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
 const chgI=f=>`<label class="chg ci" title="Change image" aria-label="Change image">${ic("cam")}<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
