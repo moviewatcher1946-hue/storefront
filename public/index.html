@@ -263,7 +263,7 @@ body{font-size:17px}
 .sec h2{font-size:36px}.ph{font-size:52px}.pn{padding:32px}
 .pd{max-width:1700px}
 }
-</style></head><body>
+.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}.topic{background:#fff;color:var(--purple);border:1px solid var(--line);border-radius:14px;padding:14px;font-weight:600;text-align:left;cursor:pointer;min-height:48px}.topic:hover{border-color:var(--terra)}.stack{display:flex;flex-direction:column;gap:10px;margin:10px 0}.topicrow{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:58px;background:#fff;color:var(--purple);border:1px solid var(--line);border-radius:14px;padding:16px 18px;font-size:16px;font-weight:600;text-align:left;cursor:pointer}.topicrow:hover{border-color:var(--terra)}.topicrow span:last-child{font-size:22px;color:var(--terra)}.chatbar{display:flex;gap:10px;align-items:stretch}.chatbar input{flex:1;min-width:0;font-size:16px;min-height:48px}.chatbar button{flex:none;min-height:48px;padding:0 20px}.chatlog p{font-size:16px;line-height:1.45}</style></head><body>
 <div id="offline" hidden role="status">You’re offline. Showing saved items. Ordering needs a connection.</div>
 <div class="shell"><aside class="rail" id="rail"></aside><div class="col">
 <header class="top"><div class="br" onclick="go('')"><span id="lg" style="display:contents"></span><span id="brand"></span></div><div class="sw"><input id="q" placeholder="Search product" list="sg" oninput="S.q=this.value;draw()"><datalist id="sg"></datalist><svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"/></svg></div>
@@ -314,7 +314,7 @@ $("lg").innerHTML=s.logoWide?`<img class="wide" src="${esc(s.logoWide)}" alt="${
 function fav(u){const L=document.querySelector('link[rel=icon]');if(!u){L.href="data:,";return}const i=new Image();i.onload=()=>{const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d"),k=Math.min(64/i.width,64/i.height),w=i.width*k,h=i.height*k;x.drawImage(i,(64-w)/2,(64-h)/2,w,h);L.href=c.toDataURL("image/png")};i.onerror=()=>{L.href=u};i.src=u}
 fav(s.logo);
 const n=P.cart.reduce((a,c)=>a+c.n,0),bump=n>lastN;lastN=n;const lc=s.logoClear||s.logo;
-const it=(k,i,l)=>`<a href="#${k}" class="${h==k?"on":""}" title="${l}" aria-label="${l}"${h==k?' aria-current="page"':""}>${ic(i)}<em>${l}</em>${k=="cart"&&n?`<span class="bd${bump?" bump":""}">${n}</span>`:""}</a>`;
+const it=(k,i,l)=>`<a href="#${k}" class="${h.split("/")[0]==k?"on":""}" title="${l}" aria-label="${l}"${h.split("/")[0]==k?' aria-current="page"':""}>${ic(i)}<em>${l}</em>${k=="cart"&&n?`<span class="bd${bump?" bump":""}">${n}</span>`:""}</a>`;
 $("rail").innerHTML=`<div class="lg">${lc?`<img src="${esc(lc)}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${it("support","chat","Support")}${A?it("admin","set","Admin"):""}`;
 $("ad").style.display=A?"":"none";
 $("foot").innerHTML=(lc?`<img src="${esc(lc)}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a></div>";
@@ -710,33 +710,56 @@ return `<div class="pn"><h3>Support contact</h3><p class="hint">Shown on the Hel
 async function supSet(id,st,b){try{if(b)b.disabled=true;const m=await api("/admin/support/"+id,{method:"PATCH",body:{status:st}});V.sup=(V.sup||[]).map(x=>x.id==id?m:x);draw()}catch(e){if(b)b.disabled=false}}
 /* customer: Help & Support page */
 const TOPICS_C=["Order or delivery","Payment","Product question","Returns or cancellation","Other"];
-/* AI assistant chat on the support page (history lives only in this browser tab) */
-V.chat=V.chat||[];
+/* Help & Support: the AI assistant answers first; if it cannot help, the customer can talk to a person */
+V.chat=V.chat||[];V.supView=V.supView||"help";
+const TOPIC_TILES=["Order or delivery","Payment","Product question","Returns or cancellation","Other"];
+const contactLines=()=>{const s=V.set;return [s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("")||'<p class="mute">Contact details coming soon.</p>'};
 function renderChat(){const el=$("chatlog");if(!el)return;el.textContent="";
-  if(!V.chat.length){const p=document.createElement("p");p.style.cssText="color:var(--mute);margin:0";p.textContent="Hi! Ask me about delivery, fees, payment or pickup.";el.appendChild(p)}
-  for(const m of V.chat){const p=document.createElement("p"),u=m.role==="user";p.textContent=m.text;p.style.cssText="margin:0 0 8px;padding:8px 12px;border-radius:12px;max-width:85%;"+(u?"margin-left:auto;background:var(--terra);color:var(--ink)":"background:color-mix(in srgb,var(--purple) 8%,#fff)");el.appendChild(p)}
+  if(!V.chat.length){const p=document.createElement("p");p.style.cssText="color:var(--mute);margin:0";p.textContent="Hi! Pick a topic or type your question. I can help with delivery, fees, payment and pickup.";el.appendChild(p)}
+  for(const m of V.chat){const p=document.createElement("p"),u=m.role==="user";p.textContent=m.text;p.style.cssText="margin:0 0 8px;padding:8px 12px;border-radius:12px;max-width:85%;"+(u?"margin-left:auto;background:var(--terra);color:var(--ink)":"background:color-mix(in srgb,var(--purple) 8%,#fff)");el.appendChild(p);
+    if(m.handoff){const box=document.createElement("div");box.style.cssText="margin:0 0 12px;padding:12px;border:1px dashed var(--plum);border-radius:12px";const q=document.createElement("p");q.style.cssText="margin:0 0 8px";q.textContent="I can’t fully answer this. You can browse help topics or talk to a person.";const h2=document.createElement("button");h2.type="button";h2.className="g";h2.textContent="See help topics";h2.onclick=()=>{go("support/help");draw()};const b=document.createElement("button");b.type="button";b.textContent="Talk to a person";b.onclick=talkHuman;box.appendChild(q);box.appendChild(h2);box.appendChild(document.createTextNode(" "));box.appendChild(b);el.appendChild(box)}}
   el.scrollTop=el.scrollHeight}
-async function askAI(){const i=$("chatq"),t=(i&&i.value||"").trim();if(t.length<2||V.chatBusy)return;
-  V.chat.push({role:"user",text:t.slice(0,500)});i.value="";V.chatBusy=1;renderChat();
+/* Support is three pages: #support (help home), #support/chat (assistant), #support/contact (talk to a person) */
+/* Support is three pages, in this order when the customer needs more help:
+   #support         page 1: chat with the assistant
+   #support/help    page 2: How can we help? (topics)
+   #support/contact page 3: Talk to a person (form) */
+function chatTranscript(){return V.chat.length?"Chat with our assistant:\n"+V.chat.slice(-8).map(m=>(m.role==="user"?"Customer: ":"Assistant: ")+m.text).join("\n"):null}
+function talkHuman(){V.supPrefill={topic:"Other",message:chatTranscript()||""};go("support/contact");draw()}
+function pickTopic(t){V.supPrefill={topic:t,message:""};go("support/contact");draw()}
+async function askAI(text){const i=$("chatq"),t=((text!=null?text:(i&&i.value))||"").trim();if(t.length<2||V.chatBusy)return;
+  V.chat.push({role:"user",text:t.slice(0,500)});if(i)i.value="";V.chatBusy=1;renderChat();
   const b=$("chatgo");if(b)b.disabled=true;
-  try{const d=await api("/support/chat",{method:"POST",body:{messages:V.chat.slice(-10).map(m=>({role:m.role,content:m.text}))}});V.chat.push({role:"assistant",text:d.reply})}
-  catch(e){V.chat.push({role:"assistant",text:"I couldn’t answer just now. Please send us a message using the form below."})}
-  finally{V.chatBusy=0;if(b)b.disabled=false;renderChat();const q=$("chatq");if(q)q.focus()}}
-function support(){const s=V.set,lines=[s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("");
-return `<h2 class="ph">Help &amp; Support</h2>
-<div class="pn"><h3>Ask our assistant</h3><p class="hint">Quick answers about delivery, fees, payment and pickup. For a specific order, send us a message below.</p>
-<div id="chatlog" class="chatlog" aria-live="polite" style="max-height:280px;overflow:auto;margin:10px 0"></div>
-<div style="display:flex;gap:8px"><input id="chatq" maxlength="500" placeholder="Type your question…" aria-label="Your question" style="flex:1" onkeydown="if(event.key=='Enter')askAI()"><button type="button" id="chatgo" onclick="askAI()">Ask</button></div></div>
-<div class="two"><div class="pn"><h3>Send us a message</h3><p class="hint">We reply by the phone or email you give us.</p>
-<label class="fld">Your name<input id="sn" value="${esc(P.user?P.user.name:"")}" autocomplete="name"></label>
+  try{const d=await api("/support/chat",{method:"POST",body:{messages:V.chat.slice(-10).map(m=>({role:m.role,content:m.text}))}});V.chat.push({role:"assistant",text:d.reply,handoff:!d.handled})}
+  catch(e){V.chat.push({role:"assistant",text:"I couldn’t answer just now.",handoff:true})}
+  finally{V.chatBusy=0;if(b)b.disabled=false;renderChat();const q=$("chatq");if(q&&!LOCATE_OK)q.focus()}}
+function support(h){if(h==="support/help")return supHelp();if(h==="support/contact")return supForm();return supChat()}
+/* page 1 */
+function supChat(){return `<h2 class="ph">Help &amp; Support</h2>
+<p class="hint">Ask our assistant about delivery, fees, payment or pickup.</p>
+<div id="chatlog" class="chatlog" aria-live="polite" style="min-height:45vh;max-height:60vh;overflow:auto;margin:8px 0 14px"></div>
+<div class="chatbar"><input id="chatq" maxlength="500" placeholder="Type your question…" aria-label="Your question" onkeydown="if(event.key=='Enter')askAI()"><button type="button" id="chatgo" onclick="askAI()">Send</button></div>
+<div class="pn" style="margin-top:18px"><h3>Still need help?</h3><div class="stack">
+<button type="button" class="g" onclick="go('support/help');draw()">See help topics</button>
+<button type="button" onclick="talkHuman()">Talk to a person</button></div></div>`}
+/* page 2 */
+function supHelp(){return `<button type="button" class="g" onclick="go('support');draw()">← Back to chat</button>
+<h2 class="ph">How can we help?</h2><p class="hint">Choose a topic and we’ll send it to our team.</p>
+<div class="stack">${TOPIC_TILES.map(t=>`<button type="button" class="topicrow" onclick="pickTopic('${esc(t)}')"><span>${esc(t)}</span><span aria-hidden="true">›</span></button>`).join("")}</div>
+<div class="pn" style="margin-top:18px"><h3>Prefer to write to us?</h3><button type="button" onclick="V.supPrefill=null;go('support/contact');draw()">Talk to a person</button></div>`}
+/* page 3 */
+function supForm(){const p=V.supPrefill||{},name=P.user?P.user.name:"";
+return `<button type="button" class="g" onclick="go('support/help');draw()">← Help topics</button>
+<h2 class="ph">Talk to a person</h2><div class="pn"><h3>Send us a message</h3><p class="hint">We reply by the phone or email you give us.</p>
+<label class="fld">Your name<input id="sn" value="${esc(name)}" autocomplete="name"></label>
 <label class="fld">Mobile number or email<input id="sc" autocomplete="tel"></label>
-<label class="fld">Topic<select id="st">${TOPICS_C.map(t=>`<option>${esc(t)}</option>`).join("")}</select></label>
-<label class="fld">Message<textarea id="sm" rows="5" maxlength="2000"></textarea></label>
+<label class="fld">Topic<select id="st">${TOPICS_C.map(t=>`<option${t===(p.topic||"Other")?" selected":""}>${esc(t)}</option>`).join("")}</select></label>
+<label class="fld">Message<textarea id="sm" rows="7" maxlength="2000">${esc(p.message||"")}</textarea></label>
 <button type="button" id="sb" onclick="sendSupport()">Send message</button></div>
-<div><div class="pn"><h3>Contact us</h3>${lines||'<p class="mute">Contact details coming soon. Send us a message.</p>'}</div></div></div>`}
+<div class="pn" style="margin-top:14px"><h3>Contact us</h3>${contactLines()}</div>`}
 async function sendSupport(){const v=id=>$(id).value.trim(),b=$("sb"),body={name:v("sn"),contact:v("sc"),topic:$("st").value,message:v("sm")};
 if(body.name.length<2)return toast("Enter your name");if(body.contact.length<5)return toast("Enter a mobile number or email we can reach you on");if(body.message.length<10)return toast("Tell us a little more (at least 10 characters)");
-b.disabled=true;try{await api("/support",{method:"POST",body});toast("Thanks! We’ve got your message.");$("sm").value=""}catch(e){}finally{b.disabled=false}}
+b.disabled=true;try{await api("/support",{method:"POST",body});V.supPrefill=null;V.chat=[];toast("Thanks! We’ve got your message.");go("support");draw()}catch(e){}finally{b.disabled=false}}
 function adShip(){const s=V.set,pk=s.pickup||{},A=AR(),
 pt=(k,l,h)=>`<label class="fld">${l}<input value="${esc(pk[k])}" onchange="V.set.pickup={...V.set.pickup,${k}:this.value};ss()">${h?`<small>${h}</small>`:""}</label>`;
 return `<div class="pn"><h3>Delivery fees</h3><label class="fld" style="margin:0 0 12px"><input type="checkbox" ${s.mapFull?"checked":""} onchange="setMapFull(this.checked)"> Show the full map to customers (off = Oriental Mindoro only)</label><p class="hint">Delivery is limited to <b>${esc(A.province)}</b> (${esc(A.region)}). Region and province are fixed on the shop page. Set the fee for each municipality. Leave a box empty to use the standard fee.</p>
@@ -759,7 +782,7 @@ const page=k=>`<div class="pn"><h3>${k=="terms"?"Terms &amp; Conditions":"Privac
 /* render + transitions */
 function qrView(){return `<h2 class="ph">Payment methods</h2><div class="pn" style="text-align:center"><h3>GCash</h3><img src="/gcash-qr.svg" alt="GCash QR code" style="width:240px;max-width:100%"><p><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p><h3 style="margin-top:18px">Cash on Delivery</h3><img src="/cod.svg" alt="" style="width:72px"><p><small>Pay the rider in cash when your order arrives.</small></p></div>`}
 function render(fx){const y=scrollY,h=location.hash.slice(1),a=$("app");theme();if(!h.startsWith("product/"))D.id=0;
-a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h=="support"?support():h=="terms"||h=="privacy"?page(h):shop();if(h=="support")renderChat();
+a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h.split("/")[0]=="support"?support(h):h=="terms"||h=="privacy"?page(h):shop();if(h==="support")renderChat();
 mountMap();const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
 a.classList.toggle("fx",!!fx);if(fx){scrollTo(0,0);setTimeout(()=>a.classList.remove("fx"),1100)}else scrollTo(0,y);
 const sc=h=="admin"?"all":"mine";if((h=="orders"||h=="admin")&&P.user&&(!V.ol||V.oScope!=sc)){const tk=V.ot=(V.ot||0)+1;V.ol=1;V.oScope=sc;api("/orders"+(sc=="all"?"?all=1":"")).then(o=>{if(tk!=V.ot)return;V.orders=o;V.ol=2;draw()}).catch(()=>{if(tk!=V.ot)return;V.ol=3;draw()})}}
