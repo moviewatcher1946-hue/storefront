@@ -147,7 +147,7 @@ const coord = v => /^-?\d{1,3}(\.\d{1,7})?$/.test(String(v || "")) ? String(v) :
 
 /* admin settings: whitelist the keys the storefront uses and check every value, so nothing unchecked reaches the shop page */
 const HEXC = /^#[0-9a-f]{6}$/i;
-const TEXT = { name: 80, tagline: 120, headline: 160, footer: 300, terms: 20000, privacy: 20000 };
+const TEXT = { name: 80, tagline: 120, headline: 160, footer: 300, terms: 20000, privacy: 20000, supportPhone: 40, supportEmail: 120, supportHours: 120 };
 const plainObj = (o, n) => { const out = {}; if (!o || typeof o != "object" || Array.isArray(o)) return out;
   for (const [k, v] of Object.entries(o).slice(0, 20)) { const key = str(k, 40); if (!key) continue; if (typeof v == "number") out[key] = num(v); else if (typeof v == "string") out[key] = str(v, n); } return out; };
 function cleanSettings(b) {
@@ -357,6 +357,29 @@ app.post("/api/orders/:id/cancel", need(), wrap(async (q, s) => {
   finally { c.release(); }
 }));
 
+/* customer support: anyone can send a message (signed in or not); only the admin reads them */
+const TOPICS = ["Order or delivery", "Payment", "Product question", "Returns or cancellation", "Other"];
+const SUP = r => ({ id: r.id, name: r.name, contact: r.contact, topic: r.topic, message: r.message, status: r.status, created: r.created });
+app.post("/api/support", lim(10), wrap(async (q, s) => {
+  const u = await who(q), b = q.body || {};
+  const name = str(b.name, 80), contact = str(b.contact, 120), topic = str(b.topic, 60), message = str(b.message, 2000);
+  if (name.length < 2) throw bad("Enter your name");
+  if (contact.length < 5) throw bad("Enter a mobile number or email we can reach you on");
+  if (!TOPICS.includes(topic)) throw bad("Choose a topic");
+  if (message.length < 10) throw bad("Tell us a little more (at least 10 characters)");
+  await db.query("insert into support(user_id,name,contact,topic,message) values($1,$2,$3,$4,$5)", [u ? u.id : null, name, contact, topic, message]);
+  s.json({ ok: 1 });
+}));
+app.get("/api/admin/support", need(1), wrap(async (q, s) => {
+  s.json((await db.query("select * from support order by id desc limit 300")).rows.map(SUP));
+}));
+app.patch("/api/admin/support/:id", need(1), wrap(async (q, s) => {
+  const st = q.body && q.body.status; if (!["Open", "Resolved"].includes(st)) throw bad("Bad status");
+  const r = await db.query("update support set status=$2 where id=$1 returning *", [q.params.id | 0, st]);
+  if (!r.rows[0]) throw bad("Not found", 404);
+  s.json(SUP(r.rows[0]));
+}));
+
 /* backup (free Render DB is not forever: download this often) */
 app.get("/api/admin/export", need(1), wrap(async (q, s) => {
   const out = {
@@ -401,6 +424,7 @@ async function init() {
     alter table products add column if not exists gallery jsonb not null default '[]';
     alter table products add column if not exists rev int not null default 0;
     alter table products add column if not exists size_images jsonb not null default '{}';
+    create table if not exists support(id serial primary key, user_id int references users(id) on delete set null, name text not null, contact text not null, topic text not null, message text not null, status text not null default 'Open', created timestamptz default now());
   `);
 }
 init().then(() => app.listen(process.env.PORT || 3000, () => console.log("storefront up"))).catch(e => { console.error(e); process.exit(1); });
