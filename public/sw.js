@@ -8,7 +8,7 @@
    - catalogue (/api/bootstrap, /api/products/:id)
                                network first (3 s), saved copy when offline or slow; kept separately per signed-in person
    - everything else (orders, checkout, admin writes, sign-in)  never cached */
-const VERSION = "v10";
+const VERSION = "v11";
 const SHELL = "shell-" + VERSION, ASSETS = "assets-" + VERSION, API = "api-" + VERSION;
 const KEEP = [SHELL, ASSETS, API];
 const SHELL_URLS = ["/", "/brand/emblem.png", "/brand/wide.png", "/gcash-qr.svg", "/cod.svg"];
@@ -28,7 +28,8 @@ self.addEventListener("message", e => {
   if (e.data && e.data.type === "clear-private") e.waitUntil(caches.delete(API));
 });
 
-const hash = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+/* two 32-bit hashes, so two different sign-ins are very unlikely to share a saved catalogue */
+const hash = s => { let a = 5381, b = 52711; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); a = (((a << 5) + a) ^ c) | 0; b = (((b << 5) + b) ^ c) | 0; } return (a >>> 0).toString(36) + (b >>> 0).toString(36); };
 const trim = async name => {
   const max = LIMITS[name]; if (!max) return;
   const c = await caches.open(name), ks = await c.keys();
