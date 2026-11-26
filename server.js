@@ -122,6 +122,7 @@ const site = async () => (await db.query("select v from settings where k='site'"
 const GEO = new Map();
 function geo(p) {
   if (!GEO.has(p)) {
+    if (GEO.size >= 500) GEO.clear(); /* bounded: random codes from visitors can not grow memory forever */
     const pr = fetch("https://psgc.gitlab.io/api" + p, { signal: AbortSignal.timeout(8000) })
       .then(r => { if (!r.ok) throw new Error("PSGC " + r.status); return r.json(); })
       .catch(() => { GEO.delete(p); throw bad("Location list unavailable, try again shortly", 502); });
