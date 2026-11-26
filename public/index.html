@@ -1,759 +1,338 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>CYF: Youth Craft</title>
-<meta name="theme-color" content="#530C6C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="format-detection" content="telephone=no">
-<link rel="icon" href="data:,">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Krona+One&family=League+Spartan:wght@400;500;600;700;800&family=Museo+Moderno:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-@font-face{font-family:"Museo Moderno";src:url(/fonts/MuseoModerno.woff2) format("woff2"),url(/fonts/MuseoModerno.otf) format("opentype"),url(/fonts/MuseoModerno.ttf) format("truetype");font-weight:100 900;font-display:swap}
-@font-face{font-family:"League Spartan";src:url(/fonts/LeagueSpartan.woff2) format("woff2"),url(/fonts/LeagueSpartan.ttf) format("truetype");font-weight:100 900;font-display:swap}
-@font-face{font-family:"Krona One";src:url(/fonts/KronaOne.woff2) format("woff2"),url(/fonts/KronaOne.ttf) format("truetype");font-weight:400;font-display:swap}
-:root{--cream:#E8D7BE;--terra:#E7832D;--plum:#A73954;--purple:#530C6C;color-scheme:light;--bg:color-mix(in srgb,var(--purple) 5%,#fff);--card:#fff;--ink:var(--purple);--mute:color-mix(in srgb,var(--ink) 66%,transparent);--line:color-mix(in srgb,var(--ink) 13%,transparent);
---fh:"Museo Moderno",system-ui,sans-serif;--fb:"League Spartan",system-ui,sans-serif;--fw:"Krona One","Museo Moderno",system-ui,sans-serif;
---out:cubic-bezier(.16,1,.3,1);--spring:cubic-bezier(.34,1.56,.64,1);--in:cubic-bezier(.7,0,.84,0);
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:inherit}html{scroll-behavior:smooth}body{margin:0;font:15px/1.5 var(--fb);color:var(--ink);background:var(--bg)}
-h1,h2,h3,h4{margin:0;font-family:var(--fh);font-weight:800;letter-spacing:-.01em}
-button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:8px;padding:9px 16px;background:var(--terra);color:var(--ink);position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:transform .16s var(--out),filter .2s,box-shadow .25s var(--out)}
-button:hover{filter:brightness(1.06);transform:translateY(-1px);box-shadow:0 8px 16px -6px #e7832d99}button:active{transform:scale(.95);box-shadow:none;transition-duration:.08s}button:disabled{opacity:.4;cursor:default;transform:none;box-shadow:none}
-button.g{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}button.g:hover{box-shadow:inset 0 0 0 1px var(--terra),0 8px 16px -8px #0003}button.d{background:var(--ink);color:#fff}
-button.ok{background:#2e9e5b;color:#fff}.sp{width:16px;height:16px;border:2px solid #fff6;border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}@keyframes dr{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
-.ripple{position:absolute;border-radius:50%;background:#ffffff66;transform:scale(0);animation:rp .6s var(--out) forwards;pointer-events:none}@keyframes rp{to{transform:scale(3.2);opacity:0}}
-input,select,textarea{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 11px;max-width:100%;outline:0;transition:border-color .2s,box-shadow .25s var(--out)}input:focus,select:focus,textarea:focus{border-color:var(--terra);box-shadow:0 0 0 3px #e7832d33}
-svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
-.shell{display:grid;grid-template-columns:64px 1fr;min-height:100vh}.col{display:flex;flex-direction:column;min-height:100vh}.col main{flex:1}
-.rail{background:var(--purple);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;align-items:center}
-.rail a{width:100%;height:62px;display:grid;place-items:center;color:#ffffffb3;border-bottom:1px solid #ffffff1f;position:relative;transition:color .2s,background .25s}.rail a svg{transition:transform .3s var(--spring)}.rail a:hover{color:#fff;background:#ffffff0d}.rail a:hover svg{transform:scale(1.15)}.rail a:active svg{transform:scale(.9)}
-.rail a.on{background:#ffffff1f;color:var(--terra)}.rail a.on:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--terra);animation:bar .35s var(--out)}@keyframes bar{from{transform:scaleY(0)}}
-.rail .lg{height:62px;display:grid;place-items:center;width:100%;border-bottom:1px solid #ffffff1f}.rail .lg img{width:40px;height:40px;object-fit:contain}.bd{position:absolute;top:12px;right:12px;background:var(--terra);color:var(--purple);border-radius:9px;font-size:10px;font-weight:800;padding:0 5px}.bd.bump{animation:bump .45s var(--spring)}@keyframes bump{40%{transform:scale(1.6)}}
-.top{display:flex;align-items:center;gap:18px;padding:12px 22px;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 8px #0000000a;position:sticky;top:0;z-index:8}
-.br{display:flex;align-items:center;gap:10px;font-family:var(--fh);font-weight:800;font-size:18px;cursor:pointer;min-width:150px}.br img{height:34px;max-width:150px;object-fit:contain;transition:transform .4s var(--spring)}.br:hover img{transform:rotate(-4deg) scale(1.05)}.br img.wide{height:38px;max-width:240px}
-.sw{flex:1;max-width:560px;margin:0 auto;position:relative}.sw input{width:100%;border-radius:999px;padding:11px 44px 11px 20px;background:var(--bg);border-color:transparent}.sw input:focus{background:var(--card)}.sw svg{position:absolute;right:16px;top:11px;color:var(--mute);transition:transform .3s var(--spring)}.sw:focus-within svg{transform:scale(1.15) rotate(-12deg);color:var(--terra)}
-.us{display:flex;align-items:center;gap:16px;font-weight:700}.us>a{cursor:pointer;position:relative;padding:4px 0}.us>a:not(#ub):after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--terra);transform:scaleX(0);transform-origin:right;transition:transform .3s var(--out)}.us>a:not(#ub):hover:after{transform:scaleX(1);transform-origin:left}.av{width:34px;height:34px;border-radius:50%;background:var(--purple);color:#fff;display:grid;place-items:center;font-weight:800}
-.page{padding:18px 22px 40px;max-width:1280px}.ph{font-size:40px;margin:14px 0 18px}
-.home{display:grid;grid-template-columns:240px 1fr 200px;gap:16px}
-.box{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
-.cats a{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line);font-weight:700;cursor:pointer;transition:transform .25s var(--out),color .2s}.cats a:last-child{border:0}.cats a:hover,.cats a.on{color:var(--terra)}.cats a:hover{transform:translateX(6px)}.cats a svg{transition:transform .3s var(--spring)}.cats a:hover svg{transform:translateX(3px)}.cats svg{width:14px;height:14px;opacity:.5}.cats p{margin:0;padding:18px 16px;color:var(--mute)}
-.hero{min-height:300px;background:linear-gradient(120deg,var(--purple),color-mix(in srgb,var(--purple) 72%,#9b4fd0));border-radius:10px 10px 0 0;display:flex;align-items:center;padding:34px 36px;position:relative;overflow:hidden;color:#fff}
-.hc{position:relative;z-index:2}.hero small{font-size:17px;font-weight:500;display:block;margin-bottom:10px}.hero h1{font-family:var(--fw);font-weight:400;font-size:clamp(22px,2.9vw,36px);line-height:1.15;max-width:420px;text-transform:uppercase}.hero button{margin-top:26px;padding:12px 24px;font-size:16px}
-.bn{position:absolute;right:0;top:0;height:100%;width:66%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent,#000 38%);mask-image:linear-gradient(90deg,transparent,#000 38%);animation:kb 1.2s var(--out) backwards}@keyframes kb{from{transform:scale(1.08);opacity:0}}
-.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:0}.tl{min-height:130px;padding:16px;font-family:var(--fw);font-size:11px;text-transform:uppercase;position:relative;overflow:hidden;color:var(--purple);transition:filter .25s}.tl:hover{filter:brightness(.97)}.tl>*{position:relative;z-index:1}.tl span{font-family:var(--fb);font-size:14px;font-weight:500;text-transform:none;display:block;margin-top:4px;transition:transform .35s var(--out)}.tl:hover span{transform:translateX(4px)}
-.tl img{position:absolute;right:0;top:0;bottom:0;width:68%;height:100%;object-fit:cover;z-index:0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 35%);mask-image:linear-gradient(90deg,transparent,#000 35%);transition:transform .6s var(--out)}.tl:hover img{transform:scale(1.06)}
-.tl:nth-child(1){background:#fff}.tl:nth-child(2){background:var(--terra)}.tl:nth-child(3){background:color-mix(in srgb,var(--purple) 10%,#fff)}
-.side h3{font-size:18px;margin:0 0 10px}.side .box{margin-bottom:18px;padding:14px;height:200px;display:flex;flex-direction:column;transition:transform .3s var(--out)}.side .box:hover{transform:translateY(-3px)}.side .im{flex:1;display:grid;place-items:center;overflow:hidden}.side .im img{max-width:100%;max-height:100%;object-fit:contain}.side small{font-weight:700;font-size:12px}
-.sec{display:flex;align-items:baseline;gap:18px;margin:34px 0 14px;padding-top:22px;border-top:1px solid var(--line);flex-wrap:wrap}.sec h2{font-size:26px}.cd{font-family:var(--fw);color:var(--terra);font-size:15px;font-variant-numeric:tabular-nums}.sec a{margin-left:auto;font-weight:700;cursor:pointer}
-.rowx{display:flex;gap:16px;overflow-x:auto;padding:4px 2px 12px}.rowx>.pc{flex:0 0 190px}.gr{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
-.pc{border-radius:10px;background:var(--card);padding:14px 16px 16px;border:1px solid var(--line);box-shadow:0 1px 2px #0000000d;transition:transform .3s var(--out),box-shadow .3s var(--out);contain:content}.pc:hover{box-shadow:0 14px 30px #0000001a;transform:translateY(-4px)}
-.pi{position:relative;height:150px;display:grid;place-items:center;margin-bottom:12px;overflow:hidden}.pi img{max-width:100%;max-height:100%;object-fit:contain;transition:transform .5s var(--out)}.pc:hover .pi img{transform:scale(1.08)}
-.pc h4{font-size:16px}.pp{color:var(--mute);font-size:13px;margin:2px 0 10px;font-weight:600}.pp b{color:var(--ink)}.pp s{margin-left:8px}.pa{display:flex;gap:6px}.pa select{flex:1;min-width:0;padding:7px}.pa button{padding:7px 14px;min-width:70px}
-.pn{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;margin-bottom:16px}.pn h3{font-size:20px;margin-bottom:12px}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.row label,.lb{display:grid;gap:4px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}.row input[type=color]{height:42px;padding:3px;width:100%}.row input,.row select{width:100%;min-width:0}.row>*{min-width:0}
-.ln{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}.two{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start}.sum{position:sticky;top:90px}.tot{font-family:var(--fw);font-size:22px;color:var(--ink)}
-.qt{display:flex;align-items:center;gap:8px}.qt button{padding:2px 10px;font-size:16px}.qt b{min-width:20px;text-align:center;display:inline-block}.qt b.bp{animation:bump .4s var(--spring)}
-.seg{position:relative;display:grid;grid-template-columns:1fr 1fr;background:var(--bg);border-radius:10px;padding:4px}.seg i{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);background:var(--terra);border-radius:7px;transition:transform .4s var(--out)}.seg[data-v=pickup] i{transform:translateX(100%)}
-.seg button{position:relative;z-index:1;background:none;box-shadow:none;filter:none;transform:none;transition:color .25s}.seg button:hover{transform:none;box-shadow:none}.seg button:active{transform:scale(.97)}
-.od .it{color:var(--mute);font-size:14px;margin:4px 0 12px}.trk{height:6px;background:var(--line);border-radius:4px;overflow:hidden}.trk i{display:block;height:100%;background:var(--terra);transform-origin:left;transform:scaleX(var(--w));animation:grow .9s var(--out) .15s backwards}@keyframes grow{from{transform:scaleX(0)}}
-.stp{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--mute);margin-top:6px}.stp .on{color:var(--ink)}.cx{color:var(--plum);font-weight:800;margin:6px 0 0}
-.th{display:flex;align-items:center;gap:10px;margin-top:6px}.th img{height:46px;max-width:140px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:6px;padding:3px}.th.dk img{background:var(--purple)}
-a{color:var(--ink);cursor:pointer;font-weight:700;transition:color .2s}a:hover{color:var(--terra)}
-#foot{background:var(--purple);padding:30px 22px;text-align:center;color:#ffffffb3;font-family:var(--fh);font-weight:500}#foot img{height:44px;max-width:240px;object-fit:contain;display:block;margin:0 auto 10px}#foot b{display:block;font-family:var(--fh);font-size:20px;color:#fff;margin-bottom:4px}#foot a{color:#fff;display:inline-block;transition:transform .25s var(--out),color .2s}#foot a:hover{color:var(--terra);transform:translateY(-2px)}
-#toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,24px) scale(.96);background:var(--ink);color:#fff;padding:11px 20px;border-radius:8px;z-index:60;opacity:0;pointer-events:none;transition:opacity .3s,transform .4s var(--out);font-weight:700}#toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
-#cookie{position:fixed;left:78px;bottom:calc(14px + env(safe-area-inset-bottom,0px));max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;z-index:30;box-shadow:0 18px 44px #0003;animation:up .45s var(--out) .6s backwards;transition:opacity .2s,transform .2s}#cookie.out{opacity:0;transform:translateY(12px)}#cookie div{display:flex;gap:8px;margin-top:12px}
-.modal{position:fixed;inset:0;background:#14121a88;display:grid;place-items:center;z-index:50;animation:fi .25s}.modal>div{background:var(--card);border-radius:12px;padding:26px;max-width:360px;width:calc(100% - 28px);animation:pop .4s var(--spring)}.modal.out{opacity:0;transition:opacity .18s var(--in)}.modal.out>div{transform:scale(.94) translateY(6px);transition:transform .18s var(--in)}.modal.st,.modal.st>div{animation:none}
-@keyframes fi{from{opacity:0}}@keyframes pop{from{opacity:0;transform:scale(.9) translateY(10px)}}@keyframes up{from{opacity:0;transform:translateY(14px)}}
-.dots{display:flex;gap:6px;margin:10px 0}.dots i{height:4px;flex:1;border-radius:9px;background:var(--line);transition:background .3s}.dots i.on{background:var(--terra)}
-.skel{height:300px;border-radius:10px;background:linear-gradient(90deg,var(--line),transparent,var(--line));background-size:200%;animation:sk 1.1s infinite}@keyframes sk{to{background-position:-200%}}
-/* page transitions: View Transitions API with a fallback stagger */
-#app{view-transition-name:page}::view-transition-old(root),::view-transition-new(root){animation:none}
-::view-transition-old(page){animation:vo .2s var(--in) both}::view-transition-new(page){animation:vi .4s var(--out) both}
-@keyframes vo{to{opacity:0;transform:translateY(-10px) scale(.99)}}@keyframes vi{from{opacity:0;transform:translateY(18px) scale(.99)}}
-.fx .pc,.fx .pn,.fx .box,.fx .ph,.fx .ln,.fx .od{animation:up .5s var(--out) backwards;animation-delay:calc(min(var(--i,0),12)*40ms)}
-.fx .hc>*{animation:up .6s var(--out) backwards}.fx .hc>small{animation-delay:.05s}.fx .hc>h1{animation-delay:.12s}.fx .hc>button{animation-delay:.2s}
-.fx .box .pc{animation:none}.fx .tl{animation:up .5s var(--out) backwards;animation-delay:calc(var(--i,0)*80ms)}
-@media(max-width:1020px){.home{grid-template-columns:200px 1fr}.side{display:none}}
-@media(max-width:720px){.shell{grid-template-columns:1fr}.rail{position:fixed;bottom:0;left:0;right:0;top:auto;height:58px;flex-direction:row;z-index:20;border-top:1px solid var(--line);border-right:0;padding-bottom:env(safe-area-inset-bottom,0px)}.rail a{height:58px;border:0}.rail .lg{display:none}.home,.two{grid-template-columns:1fr}.top{padding:10px 14px;gap:10px}.br{min-width:0}.hl #brand,.us span{display:none}.hero{padding:24px}.bn{width:100%;opacity:.5}.page{padding:14px 14px 80px}.tiles{grid-template-columns:1fr}#cookie{left:12px;bottom:70px}.sum{position:static}.cats{display:flex;overflow-x:auto}.cats a{white-space:nowrap;border:0}.ph{font-size:30px}}
-.chg{position:absolute;top:8px;right:8px;z-index:3;background:#fff;color:#222;font-size:12px;font-weight:700;padding:5px 11px;border-radius:6px;box-shadow:0 2px 10px #0003;cursor:pointer;transition:transform .2s var(--out)}.chg:hover{background:#f3f3f3;transform:translateY(-1px)}.chg:active{transform:scale(.94)}.dz{position:absolute;right:36px;top:50%;transform:translateY(-50%);width:260px;height:220px;border:1.5px dashed #ffffff77;color:#fff;display:grid;place-items:center;font-weight:700;opacity:.7}@media(max-width:720px){.dz{display:none}}
-.geo-s{font-size:13px;color:var(--mute);margin-top:12px}
-.qr{margin-top:8px}
-@media(max-width:720px){.shell{grid-template-columns:minmax(0,1fr)}.col,.page,.home,.two,.top,.sw,.br{min-width:0;max-width:100%}.home>*,.two>*{min-width:0}.top{flex-wrap:wrap}.sw{order:3;flex-basis:100%;margin:0}.us{gap:10px;font-size:13px}.gr{grid-template-columns:repeat(2,minmax(0,1fr))}.rowx>.pc{flex-basis:160px}.hero h1{max-width:100%}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
-.page{max-width:none}
-@media(min-width:1021px){.home{grid-template-columns:240px 1fr 200px}.side{justify-self:end;width:200px}}
-@media(max-width:720px){.od{padding:14px}.od .ln{align-items:flex-start}.od .ln>span{overflow-wrap:anywhere}.od .it{overflow-wrap:anywhere}.stp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 10px;text-align:left}.stp span{min-width:0;overflow-wrap:anywhere}.od .btn-cancel{width:100%}}
-@media(max-width:720px){button,input,select,textarea{min-height:44px}input,select,textarea{font-size:16px}.pol{overflow-x:auto}.pol table{min-width:460px}.hero{min-height:240px}}
-.pol h2{font-size:1.1rem;font-weight:700;margin:20px 0 6px}.pol p{line-height:1.7;margin:6px 0}.pol table{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:8px}.pol th,.pol td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}.pol a{color:var(--terra)}
-.rmT{position:absolute;top:42px;right:8px;z-index:3;background:#fff;color:#222;font-size:12px;font-weight:700;padding:5px 11px;border-radius:6px;box-shadow:0 2px 10px #0003;cursor:pointer}.rmT:hover{background:#f3f3f3}
-svg{flex:none!important;flex-shrink:0!important;aspect-ratio:1/1;min-width:0}img{object-fit:contain}
-.br img,#lg img{flex:none!important;width:auto;max-width:150px;height:34px;object-fit:contain}.br img.wide{height:38px;max-width:240px}
-@media(max-width:720px){.top{padding:10px 12px;gap:8px 12px;align-items:center}.br{flex:0 0 auto;min-width:0;gap:0}.top .br img,.top .br img.wide{height:30px;max-width:120px!important}.us{gap:12px;margin-left:auto;white-space:nowrap}.us a{white-space:nowrap}.sw{order:3;flex:1 1 100%}#foot{padding:20px 16px}#foot img{height:36px}#foot b{font-size:17px}}
-.fv{position:absolute;top:8px;right:8px;left:auto;z-index:3;min-width:38px;height:38px;gap:5px;background:#ffffffeb;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--ink);box-shadow:0 2px 10px #0002,inset 0 0 0 1px var(--line);padding:0 11px;border-radius:999px;font-size:13px;font-weight:800}.fv svg{width:19px;height:19px;stroke-width:2;transition:transform .25s var(--spring),fill .2s}.fv.on{color:var(--plum)}.fv.on svg{fill:currentColor}.fv.pop svg{animation:hp .5s var(--spring)}@keyframes hp{30%{transform:scale(1.45)}}.fv:hover{filter:none;transform:scale(1.06)}.fv:active{transform:scale(.92)}
-.chg.ci{top:auto;bottom:8px;right:8px;width:38px;height:38px;padding:0;border-radius:50%;display:grid;place-items:center;background:#ffffffeb;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}.chg.ci svg{width:19px;height:19px}
-.tag{position:absolute;top:10px;left:8px;z-index:2;pointer-events:none;background:var(--plum);color:#fff;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;letter-spacing:.02em}.tag.no{background:var(--ink)}
-.pi{height:auto!important;aspect-ratio:1/1;border-radius:10px;background:color-mix(in srgb,var(--purple) 4%,#fff)}.pi img{padding:6px}
-.pc h4{line-height:1.25;text-wrap:balance;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}.pc .pp b{font-size:16px}
-.pc .sws{margin:0 0 4px}.pc .sws i{width:16px;height:16px;box-shadow:0 0 0 2px #fff,0 0 0 3px var(--line)}.pc .sws small{background:color-mix(in srgb,var(--purple) 8%,#fff);color:var(--ink);padding:2px 9px;border-radius:999px;font-size:12px}
-.pc>button svg{width:16px;height:16px;stroke-width:2.2}
-.rail a em{display:none;font-style:normal}
-/* ---- phones and tablets: touch first ---- */
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-a,button,label,select,summary,input[type=checkbox]{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.shell,.col{min-height:100vh;min-height:100dvh}.rail{height:100vh;height:100dvh}
-.rowx{scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}.rowx::-webkit-scrollbar{display:none}.rowx>.pc{scroll-snap-align:start}
-@media(hover:none){button:hover{transform:none;box-shadow:none;filter:none}.pc:hover{transform:none;box-shadow:0 1px 2px #0000000d}.pc:hover .pi img{transform:none}.cats a:hover{transform:none}.rail a:hover svg,.br:hover img,.side .box:hover{transform:none}.fv:hover{transform:none}.th2 button:hover,.opts button:hover{filter:none}}
-@media(max-width:720px){
-.rail{height:calc(62px + env(safe-area-inset-bottom,0px))!important;min-height:0!important;top:auto!important;padding:0 0 env(safe-area-inset-bottom,0px);background:color-mix(in srgb,var(--purple) 94%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);justify-content:space-around;align-items:stretch;box-shadow:0 -6px 24px #0000002e}
-.rail a{height:62px!important;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}.rail a svg{width:23px;height:23px}.rail a em{display:block;font-size:11px;font-weight:700;line-height:1}
-.rail a.on:before{left:24%;right:24%;top:0;bottom:auto;width:auto;height:3px;border-radius:0 0 3px 3px}
-.rail .bd{top:5px;right:calc(50% - 24px);min-width:18px;height:18px;line-height:18px;text-align:center;border-radius:9px;font-size:11px;box-shadow:0 0 0 2px var(--purple)}
-.dk{display:none!important}
-.page{padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))!important}
-#toast{bottom:calc(82px + env(safe-area-inset-bottom,0px));max-width:calc(100% - 32px);text-align:center}
-#cookie{left:12px;right:12px;max-width:none;bottom:calc(74px + env(safe-area-inset-bottom,0px))}
-.pc{padding:10px 10px 12px}.pc .pp{margin-bottom:6px}.gr{gap:12px}.rowx>.pc{flex-basis:164px}
-.pdi>button.add{position:sticky;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:6;box-shadow:0 10px 28px -8px #530c6c66}
-.opts button,.th2 button{min-height:44px}.th2 button{min-width:64px}
-.modal>div{max-height:calc(100dvh - 40px);overflow:auto}
-}
-@media(max-width:380px){.gr{gap:10px}.pc h4{font-size:15px}.us{gap:8px}}
-
-/* clickable product cards */
-.pc{position:relative}.pc .pl{color:inherit;text-decoration:none}.pc .pl:after{content:"";position:absolute;inset:0;z-index:1}.pc button,.pc label{z-index:2}.pc:hover h4 .pl,.pc .pl:focus-visible{color:var(--terra)}.pc:focus-within{box-shadow:0 0 0 3px #e7832d55}
-.sws{display:flex;gap:5px;align-items:center;margin:-4px 0 4px;min-height:16px}.sws i{width:14px;height:14px;border-radius:50%;background:var(--c,#ddd);box-shadow:inset 0 0 0 1px var(--line)}.sws small{color:var(--mute);font-weight:700;font-size:12px}
-.mute{color:var(--mute)}
-/* product detail page */
-.pd{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;align-items:start}.gal{position:sticky;top:90px}
-.gal .main{aspect-ratio:1/1;background:var(--card);border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;overflow:hidden}.gal .main img{width:100%;height:100%;object-fit:contain}.gal .main img.fade{animation:fi .35s}
-.th2{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding:2px 2px 6px}.th2 button{padding:0;width:64px;height:64px;flex:none;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}.th2 button.on{box-shadow:inset 0 0 0 2px var(--terra)}.th2 img{width:100%;height:100%;object-fit:contain;border-radius:8px}
-.pdi h1{font-size:clamp(24px,3vw,34px);margin:4px 0 10px}.pdp-price{font-family:var(--fw);font-size:24px}.pdp-price s{font-family:var(--fb);font-size:16px;color:var(--mute);margin-left:10px}
-.stk{margin:6px 0 0;font-weight:700;color:#2e9e5b}.stk.no{color:var(--plum)}
-.opt{margin:18px 0 0}.opt>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin-bottom:8px}.opt>b span{color:var(--ink);text-transform:none;letter-spacing:0;margin-left:6px;font-size:14px}
-.opts{display:flex;flex-wrap:wrap;gap:8px}.opts button{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line);padding:8px 14px;min-width:48px;min-height:44px}
-.opts button:hover{filter:none;box-shadow:inset 0 0 0 1px var(--terra)}.opts button[aria-pressed=true]{box-shadow:inset 0 0 0 2px var(--terra);background:color-mix(in srgb,var(--terra) 12%,#fff)}.opts button:disabled{text-decoration:line-through}
-.opts .vsw{padding:6px 14px 6px 6px}.opts small{color:var(--mute);font-weight:700}
-.dt{width:30px;height:30px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line);display:grid;place-items:center;font-style:normal;font-size:12px;background:var(--bg);object-fit:cover;flex:none}
-.opts.err{animation:shk .35s}@keyframes shk{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}.ferr{color:var(--plum);font-weight:800;margin:8px 0 0}
-.pdd{margin-top:26px;border-top:1px solid var(--line);padding-top:16px}.pdd h3{font-size:18px;margin-bottom:8px}.pdd p{line-height:1.7;margin:0 0 10px;overflow-wrap:anywhere;max-width:68ch}.pdd .clamp{max-height:11em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 60%,transparent);mask-image:linear-gradient(#000 60%,transparent)}.pdd .more{background:none;box-shadow:none;padding:4px 0;color:var(--plum);text-decoration:underline}.pdd .more:hover{box-shadow:none;transform:none}
-@media(max-width:720px){.pd{grid-template-columns:minmax(0,1fr)}.gal{position:static}}
-/* order tracking card */
-.ob{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
-.badge{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:800;background:var(--terra);color:var(--ink)}.badge.done{background:#2e9e5b;color:#fff}.badge.cx{background:var(--plum);color:#fff}
-.stepper{list-style:none;display:flex;margin:18px 0 6px;padding:0}.stepper li{flex:1;min-width:0;position:relative;text-align:center;font-size:12px;font-weight:700;color:var(--mute);overflow-wrap:anywhere;padding:0 2px}
-.stepper li:before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:3px;background:var(--line);z-index:0}.stepper li:first-child:before{display:none}.stepper li.done:before,.stepper li.cur:before{background:var(--terra)}
-.stepper .dot{position:relative;z-index:1;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;margin:0 auto 6px;background:var(--card);box-shadow:inset 0 0 0 3px var(--line);color:#fff}
-.stepper li.done .dot{background:var(--terra);box-shadow:none}.stepper li.cur .dot{background:var(--card);box-shadow:inset 0 0 0 3px var(--terra),0 0 0 4px #e7832d33}.stepper li.done,.stepper li.cur{color:var(--ink)}.stepper .dot svg{width:14px;height:14px;stroke-width:3}
-.ofacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:14px}.ofacts>div{background:var(--bg);border-radius:8px;padding:12px}.ofacts h4{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin-bottom:6px}.ofacts p{margin:0;overflow-wrap:anywhere}
-
-/* ================= ADMIN ================= */
-body.noscroll{overflow:hidden}
-.adhi{color:var(--mute);margin:-8px 0 18px;font-size:16px}.adhi a{color:var(--plum);font-weight:700}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:0 0 22px}
-.stat{display:block;text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:none;min-height:0}
-button.stat:hover{transform:none;filter:none;box-shadow:0 4px 14px #0000001a}.stat b{display:block;font-size:26px;line-height:1.2}.stat span{font-size:13px;color:var(--mute);font-weight:700}.stat.hot{border-color:var(--plum);background:color-mix(in srgb,var(--plum) 7%,#fff)}.stat.hot b{color:var(--plum)}
-.tabs{display:flex;gap:4px;overflow-x:auto;margin:0 0 20px;border-bottom:2px solid var(--line);scrollbar-width:none;-webkit-overflow-scrolling:touch}.tabs::-webkit-scrollbar{display:none}
-.tab{background:none;color:var(--ink);box-shadow:none;padding:12px 16px;border-radius:10px 10px 0 0;font-weight:800;white-space:nowrap;display:flex;align-items:center;gap:8px;min-height:48px;position:relative;opacity:.72}
-.tab:hover{transform:none;filter:none;box-shadow:none;opacity:1}.tab svg{width:19px;height:19px}.tab.on{opacity:1;color:var(--purple)}.tab.on:after{content:"";position:absolute;left:10px;right:10px;bottom:-2px;height:3px;border-radius:3px;background:var(--terra)}
-.tab .n{background:var(--plum);color:#fff;border-radius:999px;font-size:12px;padding:1px 8px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
-.chip{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line);padding:8px 15px;border-radius:999px;font-weight:700;min-height:42px}.chip:hover{transform:none;filter:none}.chip b{background:var(--line);border-radius:999px;padding:0 8px;margin-left:4px;font-size:12px}.chip.on{background:var(--purple);color:#fff;box-shadow:none}.chip.on b{background:#ffffff30}
-.sbar input{width:100%}.sbar{margin:0 0 14px}.tb{display:flex;gap:12px;align-items:flex-start}.tb .sbar{flex:1}
-.empty{text-align:center;padding:34px 16px;background:var(--card);border:1px dashed var(--line);border-radius:14px;color:var(--mute);line-height:1.6}.empty b{color:var(--ink)}
-.acard{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--terra);border-radius:14px;padding:16px;margin-bottom:14px}.acard.ok{border-left-color:#2e9e5b}.acard.cx{border-left-color:var(--plum);opacity:.8}
-.ah{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.ah strong{margin-left:auto;font-size:20px}.ah small{color:var(--mute)}
-.ag{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:14px 0;line-height:1.5}.ag h5{margin:0 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}.ag a{color:var(--plum);font-weight:700}
-.ai{list-style:none;margin:0;padding:10px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}.ai li{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
-.an{background:color-mix(in srgb,var(--terra) 14%,#fff);border-radius:10px;padding:8px 12px;margin:10px 0 0}
-.af{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;align-items:center}.stsel{margin-left:auto;min-height:44px}
-.arow{display:grid;grid-template-columns:76px minmax(0,1fr) auto auto;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}.arow.off{opacity:.65}
-.at{width:76px;height:76px;border-radius:12px;background:color-mix(in srgb,var(--purple) 5%,#fff);display:grid;place-items:center;overflow:hidden;color:var(--mute)}.at img{width:100%;height:100%;object-fit:cover}
-.am{display:grid;gap:3px;min-width:0}.am b{overflow-wrap:anywhere}.am small{color:var(--mute)}
-.qs{display:grid;gap:3px;font-size:12px;font-weight:800;color:var(--mute);text-transform:uppercase}.qs input{width:86px}
-.aa{display:grid;gap:10px;justify-items:stretch}
-.sw2{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px;cursor:pointer;position:relative}.sw2 input{position:absolute;opacity:0;width:1px;height:1px}.sw2 i{width:44px;height:26px;border-radius:999px;background:var(--line);position:relative;transition:.2s;flex:none}.sw2 i:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0004;transition:.2s}.sw2 input:checked+i{background:#2e9e5b}.sw2 input:checked+i:after{transform:translateX(18px)}.sw2 input:focus-visible+i{outline:3px solid #e7832d88}
-#sheet{position:fixed;inset:0;z-index:80;display:flex;justify-content:center;align-items:flex-end}.sh-bg{position:absolute;inset:0;background:#000a;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
-.sh{position:relative;background:var(--card);width:100%;max-width:900px;height:100%;display:flex;flex-direction:column;animation:shin .25s ease-out}@keyframes shin{from{transform:translateY(24px);opacity:0}}
-.sh-h{display:flex;justify-content:space-between;align-items:center;padding:calc(12px + env(safe-area-inset-top,0px)) 18px 12px;border-bottom:1px solid var(--line)}.sh-h h3{margin:0;font-size:20px}.ib{width:44px;height:44px;padding:0;display:grid;place-items:center;border-radius:50%}
-.sh-body{overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:18px;flex:1}
-.sh-f{border-top:1px solid var(--line);padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));background:var(--card)}.sh-f>div{display:flex;gap:10px;align-items:center}.sp1{flex:1}.dgr{color:#b00020}
-.sherr{color:#b00020;background:#fdecee;border-radius:10px;padding:10px 12px;margin:0 0 10px;font-weight:700}
-@media(min-width:900px){#sheet{align-items:center}.sh{height:min(92vh,920px);border-radius:18px;box-shadow:0 24px 80px #0008;overflow:hidden}}
-.sec2{margin-bottom:28px}.sec2 h4{font-size:18px;margin:0 0 6px}.sec2 h4 i{font-style:normal;font-weight:500;font-size:13px;color:var(--mute);margin-left:6px}.hint{color:var(--mute);margin:0 0 12px;font-size:14px;line-height:1.5}
-.fld{display:grid;gap:5px;font-weight:700;font-size:14px;margin-bottom:12px;align-content:start}.fld small{font-weight:500;color:var(--mute);font-size:12.5px}.fld input,.fld textarea,.fld select{width:100%}.fld input[type=color]{height:48px;padding:3px;cursor:pointer}
-.two2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:380px){.two2{grid-template-columns:1fr}}
-.utiles,.utiles2,.utiles3{display:flex;flex-wrap:wrap;gap:12px}.utiles3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}.utiles2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.colors{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}.regs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:12px}
-.sum2{cursor:pointer;font-weight:800;font-size:16px;min-height:44px;display:flex;align-items:center}
-.up{position:relative;width:100px;height:100px;flex:none}.up.lg{width:150px;height:150px}.up.sm{width:84px;height:84px}
-.up>label{display:grid;place-items:center;width:100%;height:100%;border:2px dashed var(--line);border-radius:14px;background:color-mix(in srgb,var(--purple) 4%,#fff);cursor:pointer;overflow:hidden;text-align:center;color:var(--mute)}.up>label:hover{border-color:var(--terra)}.up.has>label{border-style:solid}.up img{width:100%;height:100%;object-fit:cover;padding:0;border:0;border-radius:0;max-width:none;background:none}
-.up span{display:grid;gap:4px;justify-items:center;font-size:12px;font-weight:700;padding:4px}.up span svg{width:26px;height:26px}.up em{font-style:normal}
-.up .x{position:absolute;top:-9px;right:-9px;width:32px;height:32px;min-height:0;border-radius:50%;padding:0;display:grid;place-items:center;background:var(--ink);color:#fff;box-shadow:0 2px 6px #0005;z-index:2;font-size:18px;line-height:1}
-.vr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:start;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}.vf .fld{margin-bottom:8px}.vg{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.rmv{width:44px;height:44px;padding:0;display:grid;place-items:center;color:#b00020}
-.vbtns{display:flex;flex-wrap:wrap;gap:10px}.btnl{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:12px;font-weight:700;cursor:pointer;background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line);min-height:44px}.btnl svg,.vbtns .g svg,.tb svg{width:18px;height:18px}
-.addsz{display:flex;gap:8px}.addsz input{flex:1}
-@media(max-width:720px){.arow{grid-template-columns:64px minmax(0,1fr)}.at{width:64px;height:64px}.qs,.aa{grid-column:1/-1}.aa{grid-auto-flow:column;justify-content:space-between;align-items:center}.qs{grid-auto-flow:column;justify-content:space-between;align-items:center}.qs input{width:110px}.vr{grid-template-columns:auto minmax(0,1fr)}.stsel{margin-left:0;width:100%}.af button{flex:1}.tb{flex-wrap:wrap}.tb>button{width:100%}.up.lg{width:128px;height:128px}}
-#offline{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:90;background:var(--ink);color:#fff;text-align:center;padding:7px 12px;font-size:13px;font-weight:700}#offline[hidden]{display:none}
-
-/* ===== phone polish (fixes from real iPhone screenshots) ===== */
-.tab{flex:none}.tabs{scroll-snap-type:x proximity;padding-right:12px}.tab{scroll-snap-align:start}
-.szp{margin-top:14px}.szp h5{margin:0 0 4px;font-size:15px}.szp h5 i{font-style:normal;font-weight:500;font-size:13px;color:var(--mute);margin-left:6px}.szr{display:flex;align-items:center;gap:12px;margin-bottom:10px}.szr b{font-size:16px}
-.tl.nt img{width:100%;-webkit-mask-image:none;mask-image:none}
-@media(max-width:720px){
-.chips.scroll{flex-wrap:nowrap;overflow-x:auto;margin-left:-14px;margin-right:-14px;padding:2px 14px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.chips.scroll::-webkit-scrollbar{display:none}.chips.scroll .chip{flex:none;min-height:40px;padding:6px 14px}
-.stats{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}.stat{padding:12px 14px}.stat b{font-size:24px}.stat:last-child:nth-child(odd){grid-column:1/-1}
-.adhi{margin-top:-4px;font-size:15px}
-.rail{border-top:1px solid #ffffff22}.rail a.on{background:transparent}.rail a.on svg,.rail a.on em{color:var(--terra)}
-#foot{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
-.hero{display:flex;align-items:center;min-height:0!important;padding:26px 20px!important}.hero .hc{position:relative;z-index:2;max-width:62%}.hero h1{font-size:clamp(24px,8vw,34px)}.hero small{font-size:15px}.hero button{margin-top:16px;padding:10px 18px;font-size:15px}
-.hero .bn{position:absolute;right:0;top:0;height:100%;width:60%;object-fit:contain;object-position:right center;opacity:1;padding:14px}
-.tiles{gap:0}.tl{min-height:110px}.tl.nt img{object-fit:cover}
-.pc h4{font-size:15px}
-}
-
-.rail a{text-decoration:none}.addsz .g,.sh-f button:not(.ib){white-space:nowrap}.capw{display:grid;gap:6px;justify-items:center;font-weight:700;color:var(--mute);font-size:12px}
-.pi img{border-radius:10px}
-@media(max-width:720px){
-.stats{display:flex;overflow-x:auto;gap:10px;margin:0 -14px 14px;padding:2px 14px 6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}.stats::-webkit-scrollbar{display:none}.stats .stat{flex:none;min-width:136px}.stat:last-child:nth-child(odd){grid-column:auto}
-.af>button:first-child{flex:1 1 100%}.af>.g{flex:1 1 40%}.af>.stsel{flex:1 1 40%;width:auto;margin:0}
-.tb{margin-bottom:6px}.tb+.chips{margin-top:8px}
-}
-
-.szg{display:flex;flex-wrap:wrap;gap:16px 14px}.szr{display:grid!important;justify-items:center;gap:6px;margin:0!important}
-@media(max-width:720px){
-.vr{position:relative;grid-template-columns:auto minmax(0,1fr)}.rmv{position:absolute;top:8px;right:8px;grid-column:auto;width:38px;height:38px}.vf>.fld:first-child{margin-right:40px}
-.vg{grid-template-columns:1fr 1fr}.vg .fld:nth-child(3){grid-column:1/-1}.vg .fld small{font-size:11.5px}
-}
-
-/* ===== delivery area + map ===== */
-.area{display:flex;gap:10px;align-items:flex-start;background:color-mix(in srgb,var(--terra) 12%,#fff);border-radius:12px;padding:10px 12px;margin:0 0 12px;line-height:1.45}.area svg{width:20px;height:20px;flex:none;margin-top:2px;color:var(--terra)}
-.mapslot{margin:0 0 8px}#lmap{height:340px;border-radius:14px;border:1px solid var(--line);overflow:hidden;position:relative;z-index:0;isolation:isolate;background:color-mix(in srgb,var(--purple) 6%,#fff)}.leaflet-container{font:inherit}
-.pinhint{font-size:13px;color:var(--mute);margin:0 0 12px;line-height:1.5}.pinhint a{color:var(--plum);font-weight:700;cursor:pointer}.pinhint .bad{color:#b00020;font-weight:700}
-.pinic{background:none;border:0}.pinic svg{width:34px;height:44px;filter:drop-shadow(0 3px 4px #0005)}
-.mapfail{display:grid;place-content:center;justify-items:center;gap:12px;height:100%;text-align:center;padding:20px;color:var(--mute)}
-.locked select{background:color-mix(in srgb,var(--purple) 7%,#fff);color:var(--mute);cursor:not-allowed;opacity:.9}
-.side a.box{color:inherit;text-decoration:none;cursor:pointer}.side .box{overflow:hidden}.side .im{min-height:0}.side .box small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:8px;text-align:left;line-height:1.3}
-@media(max-width:720px){#lmap{height:280px}}
-/* ================= DESKTOP SIZING (tune the numbers here) =================
-   Phones are untouched (everything above 720px only). Two steps: laptops 1024px+, big monitors 1440px+. */
-@media(min-width:1024px){
-body{font-size:16px}
-.shell{grid-template-columns:76px 1fr}.rail a{height:72px}.rail .lg{height:72px}.rail a svg{width:25px;height:25px}.rail .lg img{width:46px;height:46px}.rail .bd{top:16px;right:16px;font-size:11px;padding:0 6px}
-.top{padding:14px 34px;gap:24px}.br img{height:42px;max-width:190px}.br img.wide{height:46px;max-width:290px}.sw{max-width:680px}.sw input{padding:14px 52px 14px 24px;font-size:16px}.sw svg{top:14px}.us{font-size:16px;gap:22px}.av{width:38px;height:38px}
-.page{padding:28px 40px 56px}.ph{font-size:46px;margin:18px 0 24px}
-.pn{padding:28px;margin-bottom:22px;border-radius:14px}.pn h3{font-size:23px;margin-bottom:16px}.box{border-radius:14px}
-.home{grid-template-columns:280px minmax(0,1fr) 240px;gap:22px}.side{width:240px}.side h3{font-size:20px}.side .box{height:250px;padding:18px}.side small{font-size:14px}
-.cats a{padding:17px 22px;font-size:16px}.cats svg{width:16px;height:16px}
-.hero{min-height:380px;padding:46px 52px;border-radius:14px 14px 0 0}.hero small{font-size:20px}.hero h1{font-size:clamp(28px,3vw,46px);max-width:560px}.hero button{font-size:18px;padding:15px 30px}
-.tl{min-height:170px;padding:22px;font-size:13px}.tl span{font-size:16px}
-.sec{margin:46px 0 20px;padding-top:28px}.sec h2{font-size:32px}.cd{font-size:18px}
-.gr{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}.rowx{gap:22px}.rowx>.pc{flex:0 0 260px}
-.pc{padding:18px 18px 20px;border-radius:14px}.pc h4{font-size:18px;margin-top:2px}.pc .pp{font-size:15px;margin:4px 0 12px}.pc .pp b{font-size:19px}.pc .sws small{font-size:13px}.pc>button{padding:12px 18px;font-size:16px}
-.fv{min-width:42px;height:42px}.fv svg{width:21px;height:21px}.chg.ci{width:42px;height:42px}.tag{font-size:13px;padding:4px 11px}
-button{padding:11px 20px;font-size:16px}input,select,textarea{padding:11px 14px;font-size:16px}
-.row{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}.row label,.lb{font-size:13px}
-.ln{padding:14px 0}.tot{font-size:28px}.two{gap:24px}.sum{top:110px}
-.od .it{font-size:15px}.badge{font-size:13px;padding:5px 14px}.ofacts{gap:16px}.ofacts>div{padding:16px}.ofacts h4{font-size:13px}.stepper li{font-size:14px}.stepper .dot{width:30px;height:30px}.stepper li:before{top:13px}
-.pd{gap:48px;max-width:1500px}.gal{top:110px}.th2 button{width:80px;height:80px}.pdi h1{font-size:clamp(30px,2.8vw,44px)}.pdp-price{font-size:30px}.pdp-price s{font-size:19px}.stk{font-size:16px}.opt>b{font-size:13px}.opt>b span{font-size:16px}.opts button{padding:10px 18px;font-size:16px}.pdd h3{font-size:22px}.pdd p{font-size:17px}.pdi>button.add{font-size:18px;padding:17px}
-.modal>div{max-width:440px;padding:32px}#cookie{left:96px;max-width:440px}#toast{font-size:16px;padding:13px 24px}
-#foot{padding:44px 34px;font-size:17px}#foot b{font-size:24px}
-}
-@media(min-width:1440px){
-body{font-size:17px}
-.shell{grid-template-columns:84px 1fr}.page{padding:34px 56px 72px}
-.home{grid-template-columns:320px minmax(0,1fr) 280px;gap:26px}.side{width:280px}.side .box{height:290px}
-.hero{min-height:440px;padding:58px 68px}.hero h1{font-size:clamp(34px,3vw,54px);max-width:680px}.tl{min-height:200px}
-.gr{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:26px}.rowx>.pc{flex-basis:290px}
-.pc h4{font-size:20px}.pc .pp b{font-size:21px}
-.sec h2{font-size:36px}.ph{font-size:52px}.pn{padding:32px}
-.pd{max-width:1700px}
-}
-</style></head><body>
-<div id="offline" hidden role="status">You’re offline. Showing saved items. Ordering needs a connection.</div>
-<div class="shell"><aside class="rail" id="rail"></aside><div class="col">
-<header class="top"><div class="br" onclick="go('')"><span id="lg" style="display:contents"></span><span id="brand"></span></div><div class="sw"><input id="q" placeholder="Search product" list="sg" oninput="S.q=this.value;draw()"><datalist id="sg"></datalist><svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"/></svg></div>
-<div class="us"><span id="uname"></span><a class="dk" onclick="go('cart')">Cart</a><a class="dk" onclick="go('orders')">Orders</a><a onclick="go('admin')" id="ad" style="display:none;color:var(--terra)">Admin panel</a><a onclick="auth()" id="ub" style="display:flex;align-items:center;gap:8px"></a></div></header>
-<main class="page" id="app"></main><footer id="foot"></footer></div></div>
-<div id="toast"></div><div id="m"></div>
-<div id="cookie" hidden><h4>Cookie preferences</h4><p style="margin:6px 0 0;font-size:14px;color:var(--mute)">Essential cookies keep the site working. Allow analytics cookies as well? You can change this at any time.</p><div><button onclick="ck(1)">Accept</button><button class="g" onclick="ck(0)">Reject</button></div></div>
-<script>
-const COL={"--cream":"#E8D7BE","--terra":"#E7832D","--plum":"#A73954","--purple":"#530C6C"};
-const PAY={delivery:["GCash QR","Maya","Cash on Delivery","Credit/Debit Card"],pickup:["GCash QR","Maya","Pay at Pickup","Credit/Debit Card"]};
-const STEPS={delivery:["Pending","Packed","Out for delivery","Delivered"],pickup:["Pending","Packed","Ready for pickup","Picked up"]};
-/* V = server data. P = this browser only (cart, address, session). G = Philippine location lists (PSGC). */
-let V={set:{promos:[{},{},{}],pickup:{},col:{...COL}},prods:[],orders:[],fees:{},defaultFee:100,views:0,gid:"",ol:0},S={q:"",cat:"",max:""};
-let P={recent:[],cart:[],user:null,token:"",addr:{},ck:null,toured:0,m:"delivery",ct:{},pk:"",note:""};
-const G={data:{},lists:{}};
-const PD={},PL={},D={id:0,vid:"",size:"",last:"v",qty:1,img:"",err:0,fade:0,more:0,imgs:[]},AO={}; /* PD/PL = full product details + in-flight loads, D = product page selection, AO = admin editors left open */
-try{const x=JSON.parse(localStorage.getItem("shop2")||"null");if(x)P=Object.assign(P,x)}catch(e){}
-const $=i=>document.getElementById(i),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const peso=n=>"₱"+Number(n).toLocaleString("en-PH",{minimumFractionDigits:2});
-const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const CK='<svg viewBox="0 0 24 24" style="stroke-dasharray:24;animation:dr .35s ease-out both"><path d="M5 13l4 4L19 7"/></svg>';
-const save=()=>{try{localStorage.setItem("shop2",JSON.stringify(P))}catch(e){}};
-let tt;function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("on"),2400)}
-async function api(u,o={}){const h={"content-type":"application/json"};if(P.token)h.authorization="Bearer "+P.token;
-let r,j;try{r=await fetch("/api"+u,{...o,headers:h,body:o.body&&JSON.stringify(o.body)});j=await r.json().catch(()=>({}))}catch(e){toast("No connection");throw e}
-if(r.status==401&&P.token){P.token="";P.user=null;save()}if(!r.ok){toast(j.error||"Error "+r.status);throw new Error(j.error)}return j}
-async function load(){const j=await api("/bootstrap");V.set=Object.assign({promos:[{},{},{}],pickup:{}},j.set);V.set.col=Object.assign({},COL,V.set.col);V.prods=j.prods;V.fees=j.fees||{};V.defaultFee=j.defaultFee??100;V.area=j.area||V.area;V.gid=j.gid||"";V.views=j.views||0;V.favs=j.favs||[];P.user=j.user;if(!j.user)P.token="";migrateAddr();Object.keys(PD).forEach(k=>delete PD[k]);Object.keys(PL).forEach(k=>delete PL[k]);fixCart();save()}
-/* Re-validate the saved cart against the live catalogue: drop lines whose product is gone, convert old name-based option keys to ids,
-   clear sizes/options the product no longer has, and merge lines that now collapse into the same key. */
-function fixCart(){const out=[];for(const c of P.cart||[]){const p=V.prods.find(x=>x.id==c.id);if(!p)continue;
-const v=vOf(p,c.vid??c.v??""),vid=v?v.id:"",size=p.hasSizes&&p.availableSizes.includes(c.size)?c.size:"",k=[c.id,vid,size].join("|"),n=Math.min(99,Math.max(1,c.n|0)),h=out.find(x=>x.k==k);
-h?h.n=Math.min(99,h.n+n):out.push({k,id:c.id,vid,size,n})}P.cart=out}
-/* offline + caching: the service worker keeps the shop usable without a connection (see sw.js) */
-const swClear=()=>{try{navigator.serviceWorker&&navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:"clear-private"})}catch(e){}};
-if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}));
-{const off=()=>{const b=$("offline");if(b)b.hidden=navigator.onLine};addEventListener("offline",off);addEventListener("online",()=>{off();load().then(()=>draw()).catch(()=>{});if(MP.failed)mountMap()});addEventListener("DOMContentLoaded",off)}
-const ek=k=>encodeURIComponent(k).replace(/'/g,"%27");
-/* locations: fetched once per list, cached by the server too */
-function fetchGeo(paths){const todo=paths.filter(p=>!G.lists[p]);if(!todo.length)return;
-Promise.all(todo.map(p=>G.lists[p]=api("/geo"+p).then(d=>{G.data[p]=d}).catch(()=>{G.data[p]=[]}))).then(()=>draw())}
-function setA(o){P.addr={...P.addr,...o};save();draw()}
-const IC={plus:"M12 5v14M5 12h14",check:"M5 12l5 5 10-10",x:"M6 6l12 12M18 6L6 18",trash:"M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13",dl:"M12 4v11m0 0l-4-4m4 4l4-4M5 20h14",heart:"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",cam:"M4 8h3l1.6-2.4h6.8L17 8h3v11H4zM12 16.5a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6z",chev:"M9 6l6 6-6 6",home:"M3 11l9-8 9 8v10H3zM9 21v-7h6v7",grid:"M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",bag:"M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0",rec:"M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",pin:"M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",set:"M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6"};
-const ic=n=>`<svg viewBox="0 0 24 24"><path d="${IC[n]}"/></svg>`;
-let lastN=0;
-function theme(){const h=location.hash.slice(1),A=isA(),s=V.set;for(const k in s.col)document.documentElement.style.setProperty(k,s.col[k]);
-const nm=esc(s.name||"Likha: Youth Craft");$("brand").textContent=s.name||"Likha: Youth Craft";$("brand").style.display=s.logoWide?"none":"";
-$("lg").innerHTML=s.logoWide?`<img class="wide" src="${esc(s.logoWide)}" alt="${nm}">`:s.logo?`<img src="${esc(s.logo)}" alt="">`:"";document.body.classList.toggle("hl",!!(s.logoWide||s.logo));
-function fav(u){const L=document.querySelector('link[rel=icon]');if(!u){L.href="data:,";return}const i=new Image();i.onload=()=>{const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d"),k=Math.min(64/i.width,64/i.height),w=i.width*k,h=i.height*k;x.drawImage(i,(64-w)/2,(64-h)/2,w,h);L.href=c.toDataURL("image/png")};i.onerror=()=>{L.href=u};i.src=u}
-fav(s.logo);
-const n=P.cart.reduce((a,c)=>a+c.n,0),bump=n>lastN;lastN=n;const lc=s.logoClear||s.logo;
-const it=(k,i,l)=>`<a href="#${k}" class="${h==k?"on":""}" title="${l}" aria-label="${l}"${h==k?' aria-current="page"':""}>${ic(i)}<em>${l}</em>${k=="cart"&&n?`<span class="bd${bump?" bump":""}">${n}</span>`:""}</a>`;
-$("rail").innerHTML=`<div class="lg">${lc?`<img src="${esc(lc)}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${A?it("admin","set","Admin"):""}`;
-$("ad").style.display=A?"":"none";
-$("foot").innerHTML=(lc?`<img src="${esc(lc)}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a> &nbsp;·&nbsp; <a onclick=\"go('support')\">Help &amp; Support</a></div>";
-$("uname").textContent=P.user?P.user.name:"";$("ub").innerHTML=P.user?`<span class="av">${esc(P.user.name[0].toUpperCase())}</span><span>Sign out</span>`:"Sign in";$("ub").style.cssText=P.user?"display:flex;align-items:center;gap:8px":"background:var(--terra);color:var(--ink);padding:9px 16px;border-radius:8px";
-document.title=s.name||"Likha: Youth Craft"}
-const go=h=>location.hash=h,isA=()=>P.user&&P.user.role=="admin";
-/* modals and sign-in */
-function closeM(){const m=document.querySelector("#m .modal");if(!m)return;m.classList.add("out");setTimeout(()=>$("m").innerHTML="",180)}
-function auth(){if(P.user)return signout();$("m").innerHTML=`<div class="modal" onclick="if(event.target==this)closeM()"><div><h3>Sign in</h3>${V.gid?'<p style="margin:0 0 14px;color:var(--mute)">Sign in or create an account with Google.</p><div id="gb"></div>':'<p>Google sign-in is not set up yet.</p>'}</div></div>`;if(V.gid)gis()}
-function gis(){const run=()=>{google.accounts.id.initialize({client_id:V.gid,callback:r=>login("/auth/google",{credential:r.credential})});google.accounts.id.renderButton($("gb"),{theme:"outline",size:"large",width:290})};if(window.google&&google.accounts)return run();const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.onload=run;document.head.appendChild(s)}
-async function login(u,b){try{const j=await api(u,{method:"POST",body:b});swClear();P.token=j.token;P.user=j.user;save();V.ol=0;V.orders=[];closeM();await load();toast("Signed in as "+j.user.name);draw()}catch(e){}}
-function signout(){swClear();P.user=null;P.token="";P.ct={};save();V.ol=0;V.orders=[];load().then(()=>{draw(1);if(location.hash=="#admin")go("")})}
-function ck(v){P.ck=v;save();const c=$("cookie");c.classList.add("out");setTimeout(()=>c.hidden=true,200)}
-/* delivery address: Region > Province > City/Municipality > Barangay, all official PSGC names */
-/* ---------- delivery area, fees per municipality, and the map ---------- */
-const AR=()=>V.area||{region:"MIMAROPA Region",province:"Oriental Mindoro",bounds:[[12.2,120.8],[13.7,121.7]],towns:[]};
-const normTown=x=>String(x||"").toLowerCase().replace(/\(.*?\)|\bcity of\b|\bmunicipality of\b|\bcity\b/g," ").replace(/[^a-z0-9]+/g," ").trim();
-const townOf=x=>AR().towns.find(t=>normTown(t.name)===normTown(x));
-const townFee=n=>{const f=(V.set.townFees||{})[n];return f===undefined||f===null||f===""?V.defaultFee:+f};
-const inArea=(lat,lng)=>{const b=AR().bounds;return lat>=b[0][0]&&lat<=b[1][0]&&lng>=b[0][1]&&lng<=b[1][1]};
-const km=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x))};
-const nearest=(lat,lng)=>AR().towns.reduce((m,t)=>{const d=km(lat,lng,t.lat,t.lng);return !m||d<m.d?{name:t.name,d}:m},null);
-/* saved addresses from before (PSGC names and codes) are mapped to the new municipality list, or cleared if they do not match */
-function migrateAddr(){const a=P.addr||{};if(!V.area)return;const t=a.city&&townOf(a.city);
-if(a.city&&!t)P.addr={...a,city:"",brgy:""};else if(t&&t.name!==a.city)P.addr={...a,city:t.name};
-if(P.addr.rc||P.addr.cityc||P.addr.brgyc){const{rc,provc,cityc,brgyc,...r}=P.addr;P.addr=r}save()}
-const setTown=n=>setA({city:n,region:AR().region,prov:AR().province,brgy:""});
-function pinHint(){const a=P.addr;if(!(a.lat&&a.lng)){if(MP.note)return `<span class="bad">That spot is outside ${esc(AR().province)}. We only deliver there. Tap the map inside the province to set your pin.</span>`;return "Optional: tap the map"+(LOCATE_OK?" or use your current location":"")+" to drop a pin. We’ll fill in your municipality and barangay from it.";}
-const lat=+a.lat,lng=+a.lng,rg=MP.rg||{},n=nearest(lat,lng),clr=` · <a onclick="clearPin()">Remove pin</a>`,acc=MP.acc>150?`<br><span class="bad">Your device found you only within about ${MP.acc>=1000?(MP.acc/1000).toFixed(1)+" km":Math.round(MP.acc)+" m"}, which is common on computers. Drag the pin to your exact spot.</span>`:"";
-if(rg.status=="outside")return `<span class="bad">That pin is in ${esc(rg.name)}. We only deliver within ${esc(AR().province)}.</span>${clr}`;
-if(!inArea(lat,lng))return `<span class="bad">That pin is outside ${esc(AR().province)}. We only deliver within the province.</span>${clr}`;
-if(rg.status=="loading")return `Pin saved · Looking up your address…${clr}${acc}`;
-if(rg.status=="ok")return `Pin saved · <b>${esc(rg.town)}</b>${rg.brgy?", "+esc(rg.brgy):""}${clr}${acc}<br><small>Not right? Drag the pin or choose your municipality below.</small>`;
-return `Pin saved · We couldn’t look up the address${n?`. Closest town centre (approximate): <b>${esc(n.name)}</b>${a.city==n.name?"":` (<a onclick="setTown('${esc(n.name)}')">use ${esc(n.name)}</a>)`}`:""}${clr}${acc}`}
-const showHint=()=>{const h=$("pinhint");if(h)h.innerHTML=pinHint()};
-/* barangay suggestions come from the PSGC list when it is reachable; typing always works when it is not */
-function brgyHints(a){const paths=["/regions"],reg=(G.data["/regions"]||[]).find(r=>/mimaropa/i.test(r.name));
-if(reg)paths.push("/regions/"+reg.code+"/provinces");const prv=reg&&(G.data["/regions/"+reg.code+"/provinces"]||[]).find(p=>/oriental mindoro/i.test(p.name));
-if(prv)paths.push("/provinces/"+prv.code+"/cities");const tw=prv&&a.city&&(G.data["/provinces/"+prv.code+"/cities"]||[]).find(c=>normTown(c.name)===normTown(a.city));
-if(tw)paths.push("/cities/"+tw.code+"/barangays");fetchGeo(paths);return tw?(G.data["/cities/"+tw.code+"/barangays"]||[]).map(b=>b.name):[]}
-function addr(){const a=P.addr,A=AR(),hints=brgyHints(a),fee=a.city?` · Delivery fee <b>${peso(townFee(a.city))}</b>`:"";
-return `<div class="pn"><h3>Delivery location</h3>
-<p class="area">${ic("pin")}<span>We deliver within <b>${esc(A.province)}</b> only. Choose your municipality to see the delivery fee.</span></p>
-<div id="mapslot" class="mapslot"></div><p class="pinhint" id="pinhint">${pinHint()}</p>
-${LOCATE_OK?`<button type="button" class="g" onclick="locate()">${ic("pin")}Use my current location</button>`:""}
-<div class="row" style="margin-top:12px">
-<label class="locked">Region<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.region)}</option></select></label>
-<label class="locked">Province<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.province)}</option></select></label>
-<label>City / Municipality<select onchange="setTown(this.value)"><option value="">Choose municipality</option>${A.towns.map(t=>`<option value="${esc(t.name)}" ${t.name==a.city?"selected":""}>${esc(t.name)} · ${peso(townFee(t.name))}</option>`).join("")}</select></label>
-<label>Barangay<input list="brgys" value="${esc(a.brgy)}" autocomplete="off" placeholder="${a.city?"Type or pick your barangay":"Choose municipality first"}" ${a.city?"":"disabled"} oninput="P.addr.brgy=this.value;delete P.addr.brgyAuto;save()"></label><datalist id="brgys">${hints.map(b=>`<option value="${esc(b)}">`).join("")}</datalist>
-<label>Street / house no.<input value="${esc(a.street)}" onchange="P.addr.street=this.value;save()"></label><label>Postal code<input inputmode="numeric" value="${esc(a.zip)}" onchange="P.addr.zip=this.value;save()"></label></div>
-<p class="geo-s">${a.city?`Delivering to ${esc(a.city)}${fee}`:"Choose your municipality to see the delivery fee."}</p></div>`}
-/* the map (Leaflet + OpenStreetMap) is downloaded only when an address form is on screen. The map element is kept alive between redraws. */
-/* the "use my current location" button is shown on phones and tablets only (touch screens); laptops and desktops get the map and the search instead */
-const LOCATE_OK=matchMedia("(pointer: coarse)").matches;
-const MP={el:null,map:null,mk:null,p:null,starting:0,failed:0,note:0};
-function loadLeaflet(){if(window.L&&window.L.map)return Promise.resolve();return MP.p||(MP.p=new Promise((ok,no)=>{const l=document.createElement("link");l.rel="stylesheet";l.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(l);
-const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>window.L&&window.L.map?ok():no(new Error("map"));s.onerror=()=>no(new Error("map"));document.head.appendChild(s)}).catch(e=>{MP.p=null;throw e}))}
-const pinIcon=()=>window.L.divIcon({className:"pinic",html:'<svg viewBox="0 0 34 44"><path d="M17 43S3 28 3 16a14 14 0 0 1 28 0c0 12-14 27-14 27z" style="fill:var(--plum)" stroke="#fff" stroke-width="2.5"/><circle cx="17" cy="16" r="5.5" fill="#fff"/></svg>',iconSize:[34,44],iconAnchor:[17,43]});
-function putMarker(lat,lng){const Lf=window.L;if(!MP.map)return;if(MP.mk)MP.mk.setLatLng([lat,lng]);else{MP.mk=Lf.marker([lat,lng],{draggable:true,icon:pinIcon(),keyboard:true,title:"Your delivery pin"}).addTo(MP.map);MP.mk.on("dragend",()=>{const p=MP.mk.getLatLng();setPin(p.lat,p.lng)})}}
-/* the address behind a pin comes from OpenStreetMap's Nominatim (OSM data, not our rough town centres). A short pause avoids hammering it while the pin is dragged. */
-const brgyOf=d=>d.suburb||d.village||d.neighbourhood||d.quarter||d.hamlet||"",townIn=d=>{for(const k of ["municipality","town","city","county","city_district","state_district"]){const t=d[k]&&townOf(d[k]);if(t)return t}return null};
-let rgTimer=0,rgSeq=0;
-function reverse(lat,lng){clearTimeout(rgTimer);const my=++rgSeq;MP.rg={status:"loading"};
-rgTimer=setTimeout(async()=>{let d=null;try{const r=await fetch("https://nominatim.openstreetmap.org/reverse?format=jsonv2&addressdetails=1&zoom=18&accept-language=en&lat="+lat+"&lon="+lng,{signal:AbortSignal.timeout(8000)});if(r.ok)d=(await r.json()).address||null}catch(e){}
-if(my!=rgSeq)return;const a=P.addr;
-if(!d){MP.rg={status:"fail"};return showHint()}
-const t=townIn(d),other=d.municipality||d.town||d.city||d.county||"";
-if(!t&&other){MP.rg={status:"outside",name:other};return showHint()}
-if(!t){MP.rg={status:"fail"};return showHint()}
-const b=brgyOf(d),next={...a,city:t.name,region:AR().region,prov:AR().province};
-if(b&&(!a.brgy||a.brgyAuto)){next.brgy=b;next.brgyAuto=1}if(d.road&&!a.street)next.street=d.road;if(/^\d{4}$/.test(d.postcode||"")&&!a.zip)next.zip=d.postcode;
-P.addr=next;save();MP.rg={status:"ok",town:t.name,brgy:next.brgy||""};draw()},700)}
-function setPin(lat,lng,zoom,acc){
-/* a spot outside the delivery province is never saved or shown: the map stays on the province and the customer is told why */
-if(!inArea(lat,lng)){rgSeq++;MP.rg=null;MP.note=1;MP.acc=0;const{lat:_x,lng:_y,...r}=P.addr;P.addr=r;save();
-  if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint();return}
-MP.note=0;MP.acc=acc||0;P.addr={...P.addr,lat:lat.toFixed(5),lng:lng.toFixed(5)};save();putMarker(lat,lng);
-if(MP.map){if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}if(acc>40)MP.circle=window.L.circle([lat,lng],{radius:acc,weight:1,color:"#4a7bd0",fillOpacity:.12}).addTo(MP.map);if(zoom)MP.map.setView([lat,lng],acc>600?14:zoom)}
-inArea(lat,lng)?reverse(lat,lng):(rgSeq++,MP.rg={status:"fail"});showHint()}
-function clearPin(){rgSeq++;MP.rg=null;MP.note=0;MP.acc=0;const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint()}
-function initMap(){const Lf=window.L,A=AR(),a=P.addr,has=a.lat&&a.lng,full=!!V.set.mapFull;
-/* default: the map stays on Oriental Mindoro (no panning or zooming past the province). The admin can turn on the full map. */
-const o=full?{minZoom:3}:{minZoom:8,maxBounds:Lf.latLngBounds(A.bounds),maxBoundsViscosity:1};
-MP.map=Lf.map(MP.el,o).setView(has?[+a.lat,+a.lng]:(full?[12.9,121.0]:[13.0,121.35]),has?15:(full?6:9));
-Lf.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(MP.map);
-MP.map.on("click",e=>setPin(e.latlng.lat,e.latlng.lng));if(has)putMarker(+a.lat,+a.lng)}
-/* admin switch: rebuild the map so the change shows at once */
-function setMapFull(v){V.set.mapFull=!!v;ss();if(MP.map){MP.map.remove();MP.map=null}MP.mk=null;MP.circle=null;if(MP.el&&MP.el.parentNode)MP.el.parentNode.removeChild(MP.el);MP.el=null;draw()}
-function mountMap(){const sl=$("mapslot");if(!sl)return;
-if(!MP.el){MP.el=document.createElement("div");MP.el.id="lmap";MP.el.setAttribute("role","application");MP.el.setAttribute("aria-label","Delivery map. Tap the map to place your pin.")}
-sl.appendChild(MP.el);
-if(MP.map){MP.map.invalidateSize();if(P.addr.lat&&P.addr.lng)putMarker(+P.addr.lat,+P.addr.lng);return}
-if(MP.starting)return;MP.starting=1;MP.failed=0;MP.el.innerHTML='<div class="mapfail">Loading map…</div>';
-loadLeaflet().then(()=>{MP.starting=0;MP.el.innerHTML="";initMap();const s2=$("mapslot");if(s2&&MP.el.parentNode!==s2)s2.appendChild(MP.el);MP.map.invalidateSize()})
-.catch(()=>{MP.starting=0;MP.failed=1;MP.el.innerHTML='<div class="mapfail"><span>The map couldn’t load. You can still choose your municipality below.</span><button type="button" class="g" onclick="mountMap()">Try again</button></div>'})}
-function locate(){
-if(!window.isSecureContext||!navigator.geolocation)return toast("Location needs an https page in a browser that supports it. You can still tap the map.");
-toast("Finding your location…");
-let best=null,wid=null,t=null,fin=false,high=true;
-const stopWatch=()=>{if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null};
-const finish=()=>{if(fin)return;fin=true;stopWatch();clearTimeout(t);
- if(!best)return toast("Couldn’t get your location. Check that location is on for this browser, or tap the map.");
- const{latitude:la,longitude:ln,accuracy:ac}=best.coords;
- toast(!inArea(la,ln)?"You seem to be outside "+AR().province+". We only deliver within the province.":ac<=60?"Location found.":"Location found, within about "+Math.round(ac)+" m. Drag the pin if it isn’t exact.")};
-const take=p=>{if(fin)return;const c=p.coords;if(!best||c.accuracy<best.coords.accuracy){best=p;setPin(c.latitude,c.longitude,17,c.accuracy)}if(c.accuracy<=30)finish()};
-const onErr=e=>{if(fin)return;
-  if(e&&e.code===1){fin=true;stopWatch();clearTimeout(t);return toast("Location access is blocked. Allow it in your browser or phone settings, or tap the map.")}
-  if(!best&&high){high=false;stopWatch();start()}};
-const start=()=>{wid=navigator.geolocation.watchPosition(take,onErr,{enableHighAccuracy:high,maximumAge:0,timeout:high?12000:20000})};
-/* 1) a quick, rough fix (last known or network location) so the pin appears at once */
-navigator.geolocation.getCurrentPosition(take,()=>{},{enableHighAccuracy:false,maximumAge:300000,timeout:5000});
-/* 2) keep refining with the best sensor for up to 20 seconds */
-start();
-t=setTimeout(finish,20000)}
-
-const chg=f=>`<label class="chg">Change image<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
-const chgI=f=>`<label class="chg ci" title="Change image" aria-label="Change image">${ic("cam")}<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
-const heart=p=>{const on=(V.favs||[]).includes(p.id);return `<button class="fv${on?" on":""}${V.popId==p.id?" pop":""}" onclick="tf(${p.id})" aria-pressed="${on}" aria-label="${on?"Remove from favorites":"Add to favorites"}">${ic("heart")}${p.favs>0?`<span>${p.favs}</span>`:""}</button>`};
-async function tf(id){if(!P.user)return auth();const on=(V.favs||[]).includes(id);try{await api("/favorites/"+id,{method:on?"DELETE":"POST"});V.favs=on?V.favs.filter(x=>x!=id):[...(V.favs||[]),id];V.popId=on?0:id;setTimeout(()=>V.popId=0,700);const p=V.prods.find(x=>x.id==id);if(p)p.favs=Math.max(0,(p.favs||0)+(on?-1:1));draw()}catch(e){toast("Could not update favorites")}}
-const card=(p,i)=>{const vs=p.variations||[],opt=vs.length>0||p.hasSizes,out=p.stock<=0,dots=vs.filter(v=>v.colorHex).slice(0,5),
-meta=[vs.length?vs.length+" option"+(vs.length>1?"s":""):"",p.hasSizes?p.availableSizes.length+(p.availableSizes.length>1?" sizes":" size"):""].filter(Boolean).join(" · ");
-return `<div class="pc" style="--i:${i||0}" ><div class="pi">${p.img?`<img loading="lazy" src="${esc(p.img)}" alt="${esc(p.name)}">`:""}${out?'<span class="tag no">Sold out</span>':p.was>p.price?`<span class="tag">−${Math.round((1-p.price/p.was)*100)}%</span>`:""}${isA()?chgI("imgP(this,"+p.id+")"):""}${heart(p)}</div><h4><a class="pl" href="#product/${p.id}">${esc(p.name)}</a></h4><div class="pp"><b>${peso(p.price)}</b>${p.was>p.price?`<s>${peso(p.was)}</s>`:""}</div>${meta?`<div class="sws">${dots.map(v=>`<i style="--c:${esc(v.colorHex)}" title="${esc(v.name)}"></i>`).join("")}<small>${meta}</small></div>`:""}${opt?`<button onclick="go('product/${p.id}')" style="width:100%;margin-top:8px">${out?"View":"Choose options"}${out?"":ic("chev")}</button>`:`<button ${out?"disabled":""} onclick="add(${p.id},this)" style="width:100%;margin-top:8px">${out?"Sold out":"Add to cart"}</button>`}</div>`};
-function cgroups(L){return [...new Set(L.map(p=>p.cat||"Other"))].map(c=>{const items=L.filter(p=>(p.cat||"Other")==c);return `<div class="sec" style="margin:26px 0 12px;padding-top:0;border:0"><h2 style="font-size:20px">${esc(c)}</h2><span style="color:var(--mute)">${items.length}</span></div><div class="gr">${items.map(card).join("")}</div>`}).join("")}
-function shop(){const q=S.q.toLowerCase(),A=V.prods.filter(p=>!p.arch),adm=isA(),s=V.set,grouped=!S.cat&&!q,
-L=A.filter(p=>(!q||(p.name+p.cat).toLowerCase().includes(q))&&(!S.cat||p.cat==S.cat)&&(!S.max||p.price<=+S.max)),
-cats=[...new Set(A.map(p=>p.cat).filter(Boolean))],deals=L.filter(p=>p.was>p.price),pick=A.filter(p=>(p.favs||0)+(p.sold||0)>0).sort((a,b)=>((b.sold||0)+(b.favs||0))-((a.sold||0)+(a.favs||0))).slice(0,8),rec=(P.recent||[]).map(id=>A.find(p=>p.id==id)).filter(Boolean)[0],
-side=(t,p)=>`<h3>${t}</h3>${p?`<a class="box" href="#product/${p.id}" aria-label="Open ${esc(p.name)}">`:'<div class="box">'}<div class="im">${p&&p.img?`<img loading="lazy" src="${esc(p.img)}" alt="">`:""}</div>${p?`<small>${esc(p.name)}</small>`:'<small class="mute">Items you view appear here</small>'}${p?"</a>":"</div>"}`;
-$("sg").innerHTML=A.map(p=>`<option value="${esc(p.name)}">`).join("");
-const pr=s.promos||[],hl=esc(s.headline||"Welcome"),faq=q&&/ship|deliver|pick|pay|gcash|maya|cod|return/.test(q)?'<div class="pn" style="margin-top:16px">Choose delivery or pickup at checkout. Pay with GCash, Maya, cash or card. Fees show before you order.</div>':"";
-return `<div class="home"><div class="box cats">${["",...cats].map(c=>`<a class="${S.cat==c?"on":""}" onclick="S.cat='${esc(c)}';draw()">${c?esc(c):"All products"}${ic("grid").replace(/<path[^>]*>/,'<path d="M9 6l6 6-6 6"/>')}</a>`).join("")}</div>
-<div><div class="hero"><div class="hc"><small>${esc(s.tagline)}</small><h1>${hl}</h1><button onclick="document.getElementById('all').scrollIntoView()">Shop now &nbsp;»</button></div>${s.banner?`<img class="bn" src="${esc(s.banner)}" alt="">`:(adm?'<div class="dz">Upload a banner image</div>':"")}${adm?chg("up(this,'banner',1600)"):""}</div>
-<div class="tiles box" style="border-top:0">${[0,1,2].map(i=>`<div class="tl${pr[i]&&(pr[i].t||pr[i].s)?"":" nt"}" style="--i:${i}">${esc(pr[i]&&pr[i].t)}<span>${esc(pr[i]&&pr[i].s)}</span>${pr[i]&&pr[i].img?`<img src="${esc(pr[i].img)}" alt="">`:""}${adm?chg("imgT(this,"+i+")")+(pr[i]&&pr[i].img?`<a class="rmT" onclick="rmT(${i})">Remove</a>`:""):""}</div>`).join("")}</div></div>
-<div class="side">${side("Recently Viewed",rec,"Items you view appear here")}</div></div>${faq}
-${grouped&&pick.length?`<div class="sec"><h2>Front page picks</h2><span style="color:var(--mute)">Most loved &amp; best sellers</span></div><div class="rowx">${pick.map(card).join("")}</div>`:""}
-${deals.length?`<div class="sec"><h2>Deals of the Day</h2><span class="cd" id="cd"></span><a onclick="S.max='';S.cat='';draw()">View All Deals</a></div><div class="rowx">${deals.map(card).join("")}</div>`:""}
-<div class="sec" id="all"><h2>${S.cat?esc(S.cat):"All products"}</h2><span style="color:var(--mute)">${L.length} item${L.length==1?"":"s"}</span><span style="margin-left:auto"><input type="number" placeholder="Max price (₱)" value="${esc(S.max)}" onchange="S.max=this.value;draw()" style="width:150px"></span></div>
-${grouped?cgroups(L):`<div class="gr">${L.map(card).join("")}</div>`}${L.length?"":`<div class="pn" style="text-align:center">${A.length?"No products match your filters.":adm?"No products yet. Add your first one in Admin.":"Products are coming soon."}</div>`}`}
-function tick(){const e=$("cd");if(!e)return;const n=new Date,m=new Date(n);m.setHours(24,0,0,0);let s=Math.floor((m-n)/1e3);const p=x=>String(x).padStart(2,"0");e.textContent=p(Math.floor(s/3600))+" : "+p(Math.floor(s%3600/60))+" : "+p(s%60)+" Left"}setInterval(tick,1000);
-/* product detail page: #product/<id> */
-const curP=()=>PD[D.id]||V.prods.find(x=>x.id==D.id);
-const left=(p,v)=>Math.min(p.stock,v&&v.stockCount!=null?v.stockCount:1e9);
-function pdpInner(p){const vs=p.variations||[];
-/* self-heal: the admin may have changed options or sizes since this selection was made */
-if(vs.length&&!vOf(p,D.vid))D.vid=(vs.find(x=>left(p,x)>0)||vs[0]).id;else if(!vs.length)D.vid="";
-if(D.size&&!(p.hasSizes&&p.availableSizes.includes(D.size)))D.size="";
-const v=vOf(p,D.vid),sizes=p.hasSizes&&p.availableSizes?p.availableSizes:[],lf=left(p,v),price=unit(p,D.vid),was=p.was>p.basePrice?p.was+(v?Number(v.priceModifier)||0:0):0;
-D.qty=Math.min(Math.max(1,D.qty),Math.max(1,Math.min(lf,99)));
-const imgs=[],put=x=>{if(x&&!imgs.includes(x))imgs.push(x)};put(p.img);(p.gallery||[]).forEach(put);vs.forEach(x=>put(x.imageUrl));Object.values(p.sizeImages||{}).forEach(put);D.imgs=imgs;
-/* photo rule: a thumbnail the shopper tapped wins, then the option picked most recently that has a photo (size or variation), then the other one, then the main photo */
-const sImg=D.size&&p.sizeImages&&p.sizeImages[D.size]||"",vImg=v&&v.imageUrl||"",src=D.img||(D.last=="s"?sImg||vImg:vImg||sImg)||p.img||"",wait=!D.img&&v&&v.hasImage&&!v.imageUrl&&!PD[p.id]&&PL[p.id],t=p.title||p.name,
-desc=String(p.description||"").replace(/\r\n?/g,"\n").trim(),long=desc.length>700,paras=desc?desc.split(/\n\s*\n/).map(x=>`<p>${esc(x.trim()).replace(/\n/g,"<br>")}</p>`).join(""):'<p class="mute">No description has been added for this product yet.</p>';
-const gal=`<div class="gal"><div class="main">${wait?'<div class="skel" style="width:100%;height:100%"></div>':src?`<img class="${D.fade?"fade":""}" src="${esc(src)}" alt="${esc(t)}${v?" – "+esc(v.name):""}">`:'<span class="mute">No image</span>'}</div>${imgs.length>1?`<div class="th2">${imgs.map((x,i)=>`<button type="button" data-f="g${i}" class="${x==src?"on":""}" aria-label="Show image ${i+1}" onclick="pdpImg(${i})"><img src="${esc(x)}" alt=""></button>`).join("")}</div>`:""}</div>`;
-const vb=vs.length?`<div class="opt"><b>Option<span>${v?esc(v.name):""}</span></b><div class="opts">${vs.map((x,i)=>{const out=left(p,x)<=0,m=Number(x.priceModifier)||0,dot=x.colorHex?`<i class="dt" style="background:${esc(x.colorHex)}"></i>`:x.imageUrl?`<img class="dt" src="${esc(x.imageUrl)}" alt="">`:`<i class="dt">${esc(x.name[0]||"?")}</i>`;
-return `<button type="button" class="vsw" data-f="v${i}" aria-pressed="${x.id==D.vid}" ${out?"disabled":""} onclick="pdpV(${i})">${dot}${esc(x.name)}${m?` <small>${m>0?"+":"−"}${peso(Math.abs(m))}</small>`:""}</button>`}).join("")}</div></div>`:"";
-const sb=sizes.length?`<div class="opt" id="szb"><b>Size<span>${esc(D.size)}</span></b><div class="opts${D.err?" err":""}" role="group" aria-label="Size">${sizes.map((x,i)=>`<button type="button" data-f="s${i}" aria-pressed="${x==D.size}" onclick="pdpS(${i})">${esc(x)}</button>`).join("")}</div>${D.err?'<p class="ferr" role="alert">Please select a size</p>':""}</div>`:"";
-return gal+`<div class="pdi">${p.cat?`<small class="mute">${esc(p.cat)}</small>`:""}<h1>${esc(t)}</h1><div class="pdp-price">${peso(price)}${was?`<s>${peso(was)}</s>`:""}</div><p class="stk${lf<=0?" no":""}">${lf<=0?"Out of stock":lf<=5?"Only "+lf+" left":"In stock"}</p>${vb}${sb}
-<div class="opt"><b>Quantity</b><span class="qt"><button type="button" class="g" data-f="q-" aria-label="Decrease quantity" onclick="pdpQ(-1)">−</button><b>${D.qty}</b><button type="button" class="g" data-f="q+" aria-label="Increase quantity" onclick="pdpQ(1)">+</button></span></div>
-<button type="button" class="add" ${lf<=0?"disabled":""} onclick="pdpAdd(this)" style="width:100%;margin-top:20px;padding:14px">${lf<=0?"Sold out":"Add to cart · "+peso(price*D.qty)}</button>
-<div class="pdd"><h3>About this product</h3><div class="${long&&!D.more?"clamp":""}">${paras}</div>${long?`<button type="button" class="more" data-f="more" onclick="pdpMore()">${D.more?"Show less":"Read more"}</button>`:""}</div></div>`}
-function pdpRefresh(){const e=$("pdp");if(!e)return;const f=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.f;e.innerHTML=pdpInner(curP());D.fade=0;if(f){const n=e.querySelector(`[data-f="${f}"]`);if(n&&!n.disabled)n.focus()}}
-const pdpV=i=>{const v=((curP()||{}).variations||[])[i];if(!v)return;D.vid=v.id;D.last="v";D.img="";D.fade=1;pdpRefresh()};
-const pdpS=i=>{const p=curP();if(!p||!p.availableSizes)return;D.size=p.availableSizes[i];D.last="s";D.img="";D.fade=1;D.err=0;pdpRefresh()};
-const pdpQ=d=>{D.qty+=d;pdpRefresh()};
-/* a thumbnail that belongs to a variation or a size selects it too, so image, label, price and stock never disagree */
-const pdpImg=i=>{const x=D.imgs[i],p=curP();if(!x||!p)return;const v=x!==p.img&&(p.variations||[]).find(y=>y.imageUrl===x&&left(p,y)>0),
-z=x!==p.img&&!v&&Object.keys(p.sizeImages||{}).find(k=>p.sizeImages[k]===x&&(p.availableSizes||[]).includes(k));
-if(v){D.vid=v.id;D.last="v";D.img=""}else if(z){D.size=z;D.err=0;D.last="s";D.img=""}else D.img=x;D.fade=1;pdpRefresh()};
-const pdpMore=()=>{D.more=D.more?0:1;pdpRefresh()};
-function pdpAdd(b){const p=curP();if(!p)return;
-if(p.hasSizes&&!(p.availableSizes||[]).includes(D.size)){D.size="";D.err=1;pdpRefresh();const e=document.querySelector("#szb .opts button");if(e){e.focus({preventScroll:true});e.scrollIntoView({block:"center",behavior:RM?"auto":"smooth"})}return}
-if((p.variations||[]).length&&!vOf(p,D.vid))return toast("Please choose an option");
-if(left(p,vOf(p,D.vid))<=0)return toast("Sorry, that option is sold out");
-cartAdd(p.id,D.vid,D.size,D.qty,b)}
-function pdp(id){const lp=V.prods.find(x=>x.id==id),p=PD[id]||lp;
-if(!p)return '<div class="pn" style="text-align:center">We could not find that product.<br><br><button onclick="go(\'\')">Back to shop</button></div>';
-if(D.id!=id){const vs=p.variations||[],f=vs.find(x=>left(p,x)>0)||vs[0];Object.assign(D,{id,vid:f?f.id:"",size:"",last:"v",qty:1,img:"",err:0,fade:0,more:0});P.recent=[id,...(P.recent||[]).filter(x=>x!=id)].slice(0,5);save()}
-if(!PD[id]&&!PL[id]){PL[id]=1;api("/products/"+id).then(d=>{PD[id]=d;if(location.hash=="#product/"+id)draw()}).catch(()=>{delete PL[id]})}
-return `<p style="margin:0 0 12px"><a href="#">‹ All products</a></p><div class="pd" id="pdp">${pdpInner(p)}</div>`}
-/* orders */
-const CKS='<svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>';
-const fmtDate=x=>{const d=new Date(x);return isNaN(d)?"":d.toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"})};
-const addrLine=a=>a?[a.street,a.barangay,a.city,a.province].filter(Boolean).join(", ")||"Address not recorded":"Address not recorded";
-const addrHtml=a=>a?[a.street,[a.barangay,a.city].filter(Boolean).join(", "),[a.province,a.postalCode].filter(Boolean).join(" "),a.country].filter(Boolean).map(esc).join("<br>"):"";
-const ord=o=>{const st=o.orderStatus||o.status,s=STEPS[o.method],last=s.length-1,k=st=="Awaiting payment"?-1:s.indexOf(st),cx=st=="Cancelled",pk=V.set.pickup||{},pay=o.paymentMethod||o.pay,
-badge=cx?"cx":k==last?"done":"",
-track=cx?'<p class="cx">This order was cancelled.</p>':`<ol class="stepper" aria-label="Order progress">${s.map((t,j)=>{const c=j<k||(j==k&&k==last)?"done":j==k?"cur":"";return `<li class="${c}"${j==k?' aria-current="step"':""}><span class="dot">${c=="done"?CKS:""}</span>${t}</li>`}).join("")}</ol>${st=="Awaiting payment"?'<p class="cx">Waiting for our team to confirm your payment</p>':""}`,
-where=o.method=="pickup"?`<h4>Pickup</h4><p><b>${esc(pk.name||"Our store")}</b>${pk.addr?"<br>"+esc(pk.addr):""}<br>${o.pickup?esc(o.pickup):'<span class="mute">Pickup time to be confirmed</span>'}</p>`:`<h4>Delivery address</h4><p><b>${[o.name,o.phone].filter(Boolean).map(esc).join(" · ")||"Recipient"}</b><br>${addrHtml(o.shippingAddress)||'<span class="mute">Address not recorded</span>'}</p>`,
-cash=/^(Cash on Delivery|Pay at Pickup)$/.test(pay||""),payState=cx?"Order cancelled":cash?(k==last?"Paid in cash":o.method=="pickup"?"To be paid at pickup":"To be paid on delivery"):st=="Awaiting payment"?"Awaiting payment confirmation":"Payment confirmed",
-lines=(o.items||[]).map(i=>`<div class="ln"><span>${esc(i.name)}${i.v?` <small class="mute">· ${esc(i.v)}</small>`:""}${i.size?` <small class="mute">· Size ${esc(i.size)}</small>`:""}</span><span>× ${i.n}${i.price!=null?" · "+peso(i.price*i.n):""}</span></div>`).join(""),
-cancel=["Awaiting payment","Pending"].includes(st)?`<button class="g btn-cancel" onclick="cancelO(${o.id})" style="margin-top:10px">Cancel order</button>`:"";
-return `<div class="pn od"><div class="ob"><div><b>Order #${o.id}</b><br><small class="mute">${fmtDate(o.created)} · ${o.method=="pickup"?"Pickup":"Delivery"}</small></div><span class="badge ${badge}">${esc(st)}</span></div>${track}
-<div class="ofacts"><div>${where}</div><div><h4>Mode of payment</h4><p><b>${esc(pay||"Not recorded")}</b><br><small class="mute">${payState}</small></p></div></div>
-<div style="margin-top:12px">${lines}<div class="ln"><span>Subtotal</span><span>${peso(o.subtotal)}</span></div>${o.method=="delivery"?`<div class="ln"><span>Delivery fee</span><span>${peso(o.fee)}</span></div>`:""}<div class="ln" style="border:0"><b>Total</b><b>${peso(o.total)}</b></div></div>${cancel}</div>`};
-/* V.ol: 0 = needs loading, 1 = loading, 2 = loaded, 3 = failed. V.oScope: "mine" (Orders page) or "all" (Admin, admins only). */
-function orders(){if(!P.user)return '<div class="pn" style="text-align:center">Sign in to see your orders.</div>';
-const body=V.ol==2&&V.oScope=="mine"?(V.orders.map(ord).join("")||'<div class="pn" style="text-align:center">No orders yet.<br><br><button onclick="go(\'\')">Start shopping</button></div>'):V.ol==3&&V.oScope=="mine"?'<div class="pn" style="text-align:center">Could not load your orders.<br><br><button onclick="V.ol=0;draw()">Try again</button></div>':'<div class="pn">Loading…</div>';
-return `<h2 class="ph">Your orders</h2>`+body}
-/* cart */
-const vOf=(p,id)=>(p.variations||[]).find(x=>x.id==id||x.name==id);
-const unit=(p,id)=>{const v=vOf(p,id);return Math.max(0,p.basePrice+(v?Number(v.priceModifier)||0:0))};
-const sizeOk=(p,s)=>!p.hasSizes||(!!s&&p.availableSizes.includes(s));
-const needsOpt=c=>{const p=V.prods.find(x=>x.id==c.id);return !!p&&(!sizeOk(p,c.size)||((p.variations||[]).length>0&&!vOf(p,c.vid)))};
-/* how many of this cart line can exist: capped by product stock and by variation stock, both shared with the product's other cart lines */
-const room=(p,vid,k)=>{const v=vOf(p,vid),used=f=>P.cart.filter(x=>x.id==p.id&&x.k!=k&&f(x)).reduce((a,x)=>a+x.n,0);
-return Math.max(0,Math.min(99,p.stock-used(()=>true),v&&v.stockCount!=null?v.stockCount-used(x=>vOf(p,x.vid)===v):1e9))};
-function cartAdd(id,vid,size,n,b){const p=V.prods.find(x=>x.id==id);if(!p)return toast("That product is no longer available");
-const v=vOf(p,vid),vid2=v?v.id:"",size2=p.hasSizes?size||"":"";
-if(!sizeOk(p,size2))return toast("Please select a size");
-if((p.variations||[]).length&&!v)return toast("Please choose an option");
-const k=[id,vid2,size2].join("|"),c=P.cart.find(x=>x.k==k),cap=room(p,vid2,k),add=Math.min(n,cap-(c?c.n:0));
-if(add<=0)return toast(cap?"You already have all "+cap+" available in your cart":"Sorry, that item is sold out");
-P.recent=[id,...(P.recent||[]).filter(x=>x!=id)].slice(0,5);c?c.n+=add:P.cart.push({k,id,vid:vid2,size:size2,n:add});save();theme();
-if(add<n)toast("Only "+cap+" available, added "+add);else if(b&&!b.classList.contains("ok")){const t=b.innerHTML;b.classList.add("ok");b.innerHTML=CK;setTimeout(()=>{b.classList.remove("ok");b.innerHTML=t},1100)}else toast("Added to cart")}
-const add=(id,b)=>cartAdd(id,"","",1,b);
-function qty(k,d){k=decodeURIComponent(k);const c=P.cart.find(x=>x.k==k);if(!c)return;if(d>0){const p=V.prods.find(x=>x.id==c.id);if(p&&c.n+d>room(p,c.vid,k))return toast("No more stock available")}c.n+=d;if(c.n<=0)P.cart=P.cart.filter(x=>x!=c);save();theme();draw()}
-const fee=()=>P.m=="delivery"&&P.addr.city?townFee(P.addr.city):0;
-function slots(){const o=[],n=new Date;for(let d=0;d<4;d++)for(const h of[10,13,16]){const t=new Date(n);t.setDate(n.getDate()+d);t.setHours(h,0,0,0);if(t-n<36e5)continue;o.push(t.toLocaleDateString("en-PH",{weekday:"short",month:"short",day:"numeric"})+" · "+t.toLocaleTimeString("en-PH",{hour:"numeric",minute:"2-digit"}))}return o.slice(0,9)}
-function setM(m){P.m=m;save();const s=document.querySelector(".seg");if(s)s.dataset.v=m;setTimeout(draw,RM?0:280)}
-function cart(){const L=P.cart.map(c=>({...c,p:V.prods.find(p=>p.id==c.id)})).filter(c=>c.p),sub=L.reduce((a,c)=>a+unit(c.p,c.vid)*c.n,0);
-if(!L.length)return '<div class="pn" style="text-align:center">Your cart is empty.</div>';
-const dl=P.m=="delivery",pk=V.set.pickup||{},sl=slots();if(!sl.includes(P.pk))P.pk=sl[0]||"";const ct=P.ct;if(!ct.name&&P.user)ct.name=P.user.name;
-return `<h2 class="ph">Your cart</h2><div class="two"><div><div class="pn">${L.map((c,i)=>`<div class="ln" style="--i:${i}"><span>${esc(c.p.name)}${vOf(c.p,c.vid)?" · "+esc(vOf(c.p,c.vid).name):""}${c.size?" · Size "+esc(c.size):""}${needsOpt(c)?`<br><a href="#product/${c.id}" style="color:var(--plum)">Choose options →</a>`:""}${c.n>room(c.p,c.vid,c.k)?`<br><small style="color:var(--plum)">Only ${room(c.p,c.vid,c.k)} available. Lower the quantity.</small>`:""}</span><span class="qt"><button class="g" onclick="qty('${ek(c.k)}',-1)">−</button><b class="bp">${c.n}</b><button class="g" onclick="qty('${ek(c.k)}',1)">+</button> <b>${peso(unit(c.p,c.vid)*c.n)}</b> <a onclick="qty('${ek(c.k)}',-999)">remove</a></span></div>`).join("")}</div>
-<div class="pn"><h3>Delivery or pickup?</h3><div class="seg" data-v="${P.m}"><i></i><button onclick="setM('delivery')">Delivery</button><button onclick="setM('pickup')">Pickup</button></div>
-<div class="row" style="margin-top:12px"><label>Full name<input value="${esc(ct.name)}" onchange="P.ct.name=this.value;save()"></label><label>Mobile number<input type="tel" value="${esc(ct.phone)}" onchange="P.ct.phone=this.value;save()"></label></div></div>
-${dl?addr():`<div class="pn"><h3>Pickup</h3><p style="margin:0 0 12px"><b>${esc(pk.name||"Our store")}</b><br>${esc(pk.addr||"Address coming soon")}<br><small>${esc(pk.hours)}</small></p><label class="lb">Pickup time<select id="pk" onchange="P.pk=this.value;save()">${sl.map(s=>`<option ${s==P.pk?"selected":""}>${s}</option>`).join("")}</select></label></div>`}
-<label class="lb pn" style="display:grid">Note to seller (optional)<textarea style="width:100%" onchange="P.note=this.value;save()">${esc(P.note)}</textarea></label></div>
-<div class="pn sum"><h3>Payment</h3><select id="pay" style="width:100%" onchange="payHint()">${PAY[P.m].map(x=>`<option>${x}</option>`).join("")}</select><div id="ph">${payHtml(PAY[P.m][0])}</div>
-<p>Subtotal ${peso(sub)}<br>${dl?"Delivery "+(P.addr.city?peso(fee()):"choose a municipality"):"Pickup · Free"}<br><span class="tot">${peso(sub+fee())}</span></p><button id="po" onclick="order()" style="width:100%">Place order</button></div></div>`}
-function payHtml(v){
-if(/GCash/.test(v))return '<div style="margin-top:12px;text-align:center"><img src="/gcash-qr.svg" alt="GCash QR code" style="width:180px;max-width:100%"><p style="margin:8px 0 0"><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p></div>';
-if(v=="Cash on Delivery")return '<div style="margin-top:12px;text-align:center"><img src="/cod.svg" alt="" style="width:72px"><p style="margin:6px 0 0"><small>Pay the rider in cash when your order arrives.</small></p></div>';
-return "";}
-function payHint(){const e=$("ph");if(e)e.innerHTML=payHtml($("pay").value)}
-async function order(){if(!P.user)return auth();if(!navigator.onLine)return toast("You’re offline. Connect to the internet to place your order.");const b=$("po"),dl=P.m=="delivery",a=P.addr,ct=P.ct;
-if(!ct.name||!ct.phone)return toast("Add your name and mobile number");
-const nb=P.cart.find(needsOpt);if(nb){toast("Choose a size or option first");return go("product/"+nb.id)}
-const ov=P.cart.find(c=>{const p=V.prods.find(x=>x.id==c.id);return p&&c.n>room(p,c.vid,c.k)});if(ov)return toast("Please lower the quantity of items that are low on stock")
-if(dl&&(!a.city||!a.brgy||!a.street))return toast("Complete your delivery address");
-if(dl&&a.lat&&a.lng&&(!inArea(+a.lat,+a.lng)||(MP.rg&&MP.rg.status=="outside")))return toast("Your map pin is outside "+AR().province+". Move it or remove it.");
-const body={items:P.cart.map(c=>({id:c.id,vid:c.vid,size:c.size,n:c.n})),method:P.m,pay:$("pay").value,name:ct.name,phone:ct.phone,note:P.note,addr:dl?a:null,pickup:dl?"":($("pk")?$("pk").value:"")};
-const t=b.innerHTML;b.disabled=true;b.innerHTML='<span class="sp"></span>';
-try{const o=await api("/orders",{method:"POST",body});b.disabled=false;b.classList.add("ok");b.innerHTML=CK+" Order #"+o.id;P.cart=[];P.note="";save();V.ol=0;await load();theme();setTimeout(()=>go("orders"),RM?0:800)}
-catch(e){b.disabled=false;b.innerHTML=t}}
-async function cancelO(id){if(!confirm("Cancel this order?"))return;try{await api("/orders/"+id+"/cancel",{method:"POST"});V.ol=0;await load();draw()}catch(e){toast(e.message||"Could not cancel")}}
-/* admin */
-let st;function ss(){clearTimeout(st);st=setTimeout(()=>api("/admin/settings",{method:"PUT",body:V.set}).then(()=>toast("Saved")).catch(()=>{}),500)}
-const shrink=(f,m)=>new Promise(res=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,m/Math.max(i.width,i.height)),c=document.createElement("canvas");c.width=Math.round(i.width*k);c.height=Math.round(i.height*k);c.getContext("2d").drawImage(i,0,0,c.width,c.height);res(c.toDataURL("image/webp",.88))};i.src=r.result};r.readAsDataURL(f)});
-async function up(el,key,m){const f=el.files[0];if(!f)return;V.set[key]=await shrink(f,m);ss();theme();draw()}
-async function imgT(el,i){const f=el.files[0];if(!f)return;V.set.promos=V.set.promos||[{},{},{}];V.set.promos[i]=V.set.promos[i]||{};V.set.promos[i].img=await shrink(f,900);ss();draw()}
-const pp=(id,b)=>api("/admin/products/"+id,{method:"PATCH",body:b}).then(p=>{delete PD[id];delete PL[id];return Object.assign(V.prods.find(x=>x.id==id),p)}).catch(()=>{});
-async function imgP(el,id){const f=el.files[0];if(!f)return;await pp(id,{img:await shrink(f,800)});draw()}
-const rm=k=>{V.set[k]="";ss();theme();draw()};
-function rmT(i){if(V.set.promos&&V.set.promos[i]){V.set.promos[i].img="";ss();draw()}}
-function pm(i,k,v){V.set.promos=V.set.promos||[{},{},{}];V.set.promos[i]=V.set.promos[i]||{};V.set.promos[i][k]=v;ss();draw()}
-async function delp(id){if(!confirm("Delete this product?"))return;try{await api("/admin/products/"+id,{method:"DELETE"});V.prods=V.prods.filter(x=>x.id!=id);draw()}catch(e){}}
-async function setSt(id,s){try{const o=await api("/admin/orders/"+id,{method:"PATCH",body:{status:s}});const t=V.orders.find(x=>x.id==id);if(t)Object.assign(t,o);await load();draw()}catch(e){draw()}}
-async function bk(){const r=await fetch("/api/admin/export",{headers:{authorization:"Bearer "+P.token}}),a=document.createElement("a");a.href=URL.createObjectURL(await r.blob());a.download="storefront-backup-"+new Date().toISOString().slice(0,10)+".json";a.click()}
-/* ================= ADMIN: Orders · Products · Store look · Delivery · Backup =================
-   Everything here is plain, labelled and tap-friendly. Products are edited in one sheet with an explicit Save button. */
-const AD={tab:"orders",of:"todo",oq:"",pq:"",pf:"all"},LOW=5,SIZES=["XS","S","M","L","XL","2XL","3XL"];
-let AE=null; /* the product being edited in the sheet (null = sheet closed) */
-const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"],["support","Support","rec"]];
-const adGo=(tab,of,pf)=>{AD.tab=tab;if(of)AD.of=of;if(pf)AD.pf=pf;draw()};
-
-/* ---------- orders ---------- */
-const ACTION=["Awaiting payment","Pending"],DONE=["Delivered","Picked up"];
-const grp=o=>o.status=="Cancelled"?"cancelled":ACTION.includes(o.status)?"todo":DONE.includes(o.status)?"done":"going";
-const GL={todo:"Needs action",going:"In progress",done:"Completed",cancelled:"Cancelled",all:"All"};
-const STEP_BTN={"Pending":"Payment received","Packed":"Mark as packed","Out for delivery":"Out for delivery","Ready for pickup":"Ready for pickup","Delivered":"Mark as delivered","Picked up":"Mark as picked up"};
-const nextStatus=o=>{const f=["Awaiting payment",...STEPS[o.method]],i=f.indexOf(o.status);return i>=0&&i<f.length-1?f[i+1]:null};
-const cashPay=o=>/^(Cash on Delivery|Pay at Pickup)$/.test(o.pay||"");
-const payNote=o=>o.status=="Cancelled"?"Order cancelled":cashPay(o)?(o.status==STEPS[o.method].slice(-1)[0]?"Paid in cash":o.method=="pickup"?"Collect payment at pickup":"Collect payment on delivery"):o.status=="Awaiting payment"?"Waiting for payment. Check your account, then press “Payment received”.":"Payment confirmed";
-const adReady=()=>V.ol==2&&V.oScope=="all";
-const pinLink=o=>{const a=o.addr||{},la=Number(a.lat),ln=Number(a.lng);return a.lat&&a.lng&&Number.isFinite(la)&&Number.isFinite(ln)?`<br><a href="https://www.openstreetmap.org/?mlat=${la}&mlon=${ln}#map=17/${la}/${ln}" target="_blank" rel="noopener">View map pin</a>`:""};
-const adOrder=o=>{const nx=nextStatus(o),cx=o.status=="Cancelled",done=DONE.includes(o.status),
-items=(o.items||[]).map(i=>`<li><span>${esc(i.name)}${i.v?" · "+esc(i.v):""}${i.size?" · Size "+esc(i.size):""}</span><b>× ${i.n}</b></li>`).join("");
-return `<article class="acard ${cx?"cx":done?"ok":""}"><div class="ah"><b>#${o.id}</b><span class="badge ${cx?"cx":done?"done":""}">${esc(o.status)}</span><small>${fmtDate(o.created)}</small><strong>${peso(o.total)}</strong></div>
-<div class="ag"><div><h5>Customer</h5><b>${esc(o.name)}</b><br><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></div>
-<div><h5>${o.method=="pickup"?"Pickup":"Deliver to"}</h5>${o.method=="pickup"?(o.pickup?esc(o.pickup):'<span class="mute">Time not set</span>'):(addrHtml(o.shippingAddress)||'<span class="mute">Address not recorded</span>')+pinLink(o)}</div>
-<div><h5>Payment</h5><b>${esc(o.pay||"Not recorded")}</b><br><small>${payNote(o)}</small></div></div>
-<ul class="ai">${items||'<li class="mute">No items</li>'}</ul>${o.note?`<p class="an">Note from customer: ${esc(o.note)}</p>`:""}
-<div class="af">${nx?`<button type="button" onclick="adSet(${o.id},'${nx}',this)">${ic("check")}${STEP_BTN[nx]}</button>`:""}${cx||done?"":`<button type="button" class="g" onclick="adCancel(${o.id},this)">Cancel order</button>`}
-<select class="stsel" aria-label="Set status manually" onchange="adSet(${o.id},this.value,this)"><option value="" selected disabled>Other status…</option>${["Awaiting payment",...STEPS[o.method],"Cancelled"].filter(x=>x!=o.status).map(x=>`<option>${x}</option>`).join("")}</select></div></article>`};
-function adOrderList(){
-if(V.ol==3&&V.oScope=="all")return '<div class="empty">Could not load orders.<br><br><button type="button" onclick="V.ol=0;draw()">Try again</button></div>';
-if(!adReady())return '<div class="empty">Loading orders…</div>';
-const q=AD.oq.trim().toLowerCase(),list=V.orders.filter(o=>(AD.of=="all"||grp(o)==AD.of)&&(!q||("#"+o.id+" "+o.name+" "+o.phone).toLowerCase().includes(q)));
-if(!list.length)return `<div class="empty">${q?"No orders match your search.":AD.of=="todo"?"All caught up. Nothing needs action right now.":"No orders here yet."}</div>`;
-return list.map(adOrder).join("")}
-const adOrders=()=>{const cnt=k=>!adReady()?"":k=="all"?V.orders.length:V.orders.filter(o=>grp(o)==k).length;
-return `<div class="chips scroll">${Object.keys(GL).map(k=>`<button type="button" class="chip${AD.of==k?" on":""}" onclick="AD.of='${k}';draw()">${GL[k]} <b>${cnt(k)}</b></button>`).join("")}</div>
-<div class="sbar"><input type="search" placeholder="Search by order number, name or phone" value="${esc(AD.oq)}" oninput="AD.oq=this.value;$('alist').innerHTML=adOrderList()"></div><div id="alist">${adOrderList()}</div>`};
-async function adSet(id,s,b){if(b&&b.tagName=="BUTTON"){b.disabled=true;b.innerHTML='<span class="sp"></span>'}await setSt(id,s)}
-function adCancel(id,b){if(confirm("Cancel order #"+id+"? The items go back into stock."))adSet(id,"Cancelled",b)}
-
-/* ---------- products ---------- */
-const cntP=k=>k=="all"?V.prods.length:k=="low"?V.prods.filter(p=>!p.arch&&p.stock<=LOW).length:V.prods.filter(p=>p.arch).length;
-const adRow=p=>{const nv=(p.variations||[]).length,ns=(p.sizes||[]).length;
-return `<article class="arow${p.arch?" off":""}"><div class="at">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy">`:ic("cam")}</div>
-<div class="am"><b>${esc(p.name)}</b><small>${esc(p.cat||"No category")} · ${peso(p.price)}${p.was>p.price?` <s>${peso(p.was)}</s>`:""}</small><small>${nv?nv+(nv>1?" variations":" variation"):"No variations"} · ${ns?ns+(ns>1?" sizes":" size"):"No sizes"}</small>
-<span>${p.stock<=0?'<span class="badge cx">Sold out</span>':p.stock<=LOW?`<span class="badge">Only ${p.stock} left</span>`:""}${p.arch?' <span class="badge">Hidden from shop</span>':""}</span></div>
-<label class="qs">Stock<input type="number" inputmode="numeric" min="0" value="${p.stock}" onchange="adStock(${p.id},this)"></label>
-<div class="aa"><button type="button" onclick="edOpen(${p.id})">Edit</button><label class="sw2" title="Show this product in the shop"><input type="checkbox" ${p.arch?"":"checked"} onchange="adShow(${p.id},this.checked)"><i></i><span>${p.arch?"Hidden":"Visible"}</span></label></div></article>`};
-function adProdList(){const q=AD.pq.trim().toLowerCase(),list=V.prods.filter(p=>(AD.pf=="all"||(AD.pf=="low"?!p.arch&&p.stock<=LOW:p.arch))&&(!q||(p.name+" "+(p.cat||"")).toLowerCase().includes(q)));
-if(!V.prods.length)return `<div class="empty"><b>No products yet.</b><br>Add your first product — it only takes a minute.<br><br><button type="button" onclick="edOpen(0)">${ic("plus")}Add product</button></div>`;
-return list.map(adRow).join("")||'<div class="empty">No products match.</div>'}
-const adProducts=()=>`<div class="tb"><div class="sbar"><input type="search" placeholder="Search products" value="${esc(AD.pq)}" oninput="AD.pq=this.value;$('plist').innerHTML=adProdList()"></div><button type="button" onclick="edOpen(0)">${ic("plus")}Add product</button></div>
-<div class="chips scroll">${[["all","All"],["low","Low stock"],["hidden","Hidden"]].map(([k,l])=>`<button type="button" class="chip${AD.pf==k?" on":""}" onclick="AD.pf='${k}';draw()">${l} <b>${cntP(k)}</b></button>`).join("")}</div><div id="plist">${adProdList()}</div>`;
-const adStock=(id,el)=>pp(id,{stock:Math.max(0,Math.floor(+el.value||0))}).then(p=>{if(p)toast("Stock saved");draw()});
-const adShow=(id,on)=>pp(id,{arch:!on}).then(p=>{if(p)toast(on?"Now visible in the shop":"Hidden from the shop");draw()});
-
-/* ---------- the product editor sheet ---------- */
-const tile=(src,pick,clear,txt,cls="",multi)=>`<div class="up ${cls}${src?" has":""}"><label>${src?`<img src="${esc(src)}" alt="">`:`<span>${ic("cam")}<em>${txt}</em></span>`}<input type="file" accept="image/*" ${multi?"multiple":""} hidden onchange="${pick}"></label>${src&&clear?`<button type="button" class="x" aria-label="Remove photo" onclick="${clear}">×</button>`:""}</div>`;
-const sortSizes=a=>[...a].sort((x,y)=>{const i=SIZES.indexOf(x),j=SIZES.indexOf(y);return i<0&&j<0?0:i<0?1:j<0?-1:i-j});
-function edOpen(id){const p=id&&V.prods.find(x=>x.id==id);
-AE=p?{id:p.id,name:p.name,cat:p.cat||"",price:p.basePrice??p.price,was:p.was||"",stock:p.stock,desc:p.description||"",img:p.img||"",gallery:[...(p.gallery||[])],sizes:[...(p.sizes||[])],sizeImages:{...(p.sizeImages||{})},
-vars:(p.variations||[]).map(v=>({id:v.id,name:v.name,colorHex:v.colorHex||"",imageUrl:v.imageUrl||"",priceModifier:Number(v.priceModifier)||0,stockCount:v.stockCount??""}))}
-:{id:0,name:"",cat:"",price:"",was:"",stock:"",desc:"",img:"",gallery:[],sizes:[],sizeImages:{},vars:[]};
-AE.err="";AE.busy=0;AE.dirty=0;document.body.classList.add("noscroll");renderEd();setTimeout(()=>{const sh=$("sheet"),n=sh&&sh.querySelector("[data-first]");if(n&&AE&&!AE.id)n.focus()},50)}
-function renderEd(){if(!AE)return;let el=$("sheet");if(!el){el=document.createElement("div");el.id="sheet";document.body.appendChild(el)}
-const b=el.querySelector(".sh-body"),y=b?b.scrollTop:0;el.innerHTML=edHtml();el.querySelector(".sh-body").scrollTop=y}
-const edVRow=(v,i)=>`<div class="vr">${tile(v.imageUrl,`edVImg(this,${i})`,`edV(${i},'imageUrl','');renderEd()`,"Add photo","sm")}
-<div class="vf"><label class="fld">Name *<input data-n value="${esc(v.name)}" maxlength="40" placeholder="e.g. Red, Blue, Limited edition" oninput="edV(${i},'name',this.value)"></label>
-<div class="vg"><label class="fld">Price change<input type="number" inputmode="decimal" step="0.01" value="${v.priceModifier}" oninput="edV(${i},'priceModifier',this.value)"><small>In ₱. Use − for cheaper.</small></label>
-<label class="fld">Stock<input type="number" inputmode="numeric" min="0" value="${v.stockCount}" placeholder="Shared" oninput="edV(${i},'stockCount',this.value)"><small>Blank = use product stock</small></label>
-${v.imageUrl?"":`<label class="fld">Color dot<input type="color" value="${esc(v.colorHex||"#cccccc")}" oninput="edV(${i},'colorHex',this.value)"><small>Used when there’s no photo</small></label>`}</div></div>
-<button type="button" class="g rmv" onclick="edVDel(${i})" aria-label="Remove variation">${ic("trash")}</button></div>`;
-function edHtml(){const a=AE,cats=[...new Set(V.prods.map(p=>p.cat).filter(Boolean))],custom=a.sizes.map((z,i)=>[z,i]).filter(([z])=>!SIZES.includes(z));
-return `<div class="sh-bg" onclick="edClose()"></div><div class="sh" role="dialog" aria-modal="true" aria-label="${a.id?"Edit product":"Add product"}">
-<div class="sh-h"><h3>${a.id?"Edit product":"Add a product"}</h3><button type="button" class="g ib" aria-label="Close" onclick="edClose()">${ic("x")}</button></div>
-<div class="sh-body"><datalist id="cats">${cats.map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
-<section class="sec2"><h4>1. Photos</h4><p class="hint">The main photo is what shoppers see in the shop. Tap a box to take a photo or pick one from your phone or computer.</p>
-<div class="utiles"><div class="capw">${tile(a.img,"edImg(this)","edSet('img','');renderEd()","Main photo","lg")}<small>Main photo</small></div>${a.gallery.map((g,i)=>tile(g,`edGalSet(this,${i})`,`edGalDel(${i})`,"")).join("")}${a.gallery.length<8?tile("","edGalAdd(this)","","More photos","",1):""}</div></section>
-<section class="sec2"><h4>2. Details</h4>
-<label class="fld">Product name *<input data-first value="${esc(a.name)}" maxlength="120" placeholder="e.g. Faith over Fear T-shirt" oninput="edSet('name',this.value)"></label>
-<div class="two2"><label class="fld">Price (₱) *<input type="number" inputmode="decimal" min="0" step="0.01" value="${a.price}" oninput="edSet('price',this.value)"></label>
-<label class="fld">Old price (₱)<input type="number" inputmode="decimal" min="0" step="0.01" value="${a.was}" oninput="edSet('was',this.value)"><small>Optional. Shows a sale badge.</small></label></div>
-<div class="two2"><label class="fld">In stock *<input type="number" inputmode="numeric" min="0" value="${a.stock}" oninput="edSet('stock',this.value)"><small>Orders reduce this automatically.</small></label>
-<label class="fld">Category<input list="cats" value="${esc(a.cat)}" maxlength="60" placeholder="Pick or type a new one" oninput="edSet('cat',this.value)"></label></div>
-<label class="fld">Description<textarea rows="5" maxlength="2000" placeholder="Tell shoppers about the product. Leave a blank line to start a new paragraph." oninput="edSet('desc',this.value);$('dcnt').textContent=this.value.length+' / 2000'">${esc(a.desc)}</textarea><small id="dcnt">${a.desc.length} / 2000</small></label></section>
-<section class="sec2"><h4>3. Sizes <i>optional</i></h4><p class="hint">Only for products that come in sizes. Pick none and shoppers won’t see a size picker.</p>
-<div class="chips">${SIZES.map(z=>`<button type="button" class="chip${a.sizes.includes(z)?" on":""}" onclick="edSize('${z}')">${z}</button>`).join("")}${custom.map(([z,i])=>`<button type="button" class="chip on" onclick="edSizeAt(${i})">${esc(z)} ×</button>`).join("")}</div>
-<div class="addsz"><input id="szin" maxlength="40" placeholder="Other size, e.g. 38 or Kids" onkeydown="if(event.key=='Enter'){event.preventDefault();edSizeAdd()}"><button type="button" class="g" onclick="edSizeAdd()">Add size</button></div>
-${a.sizes.length?`<div class="szp"><h5>Photo for each size <i>optional</i></h5><p class="hint">If a size has its own photo, shoppers see it when they pick that size. Sizes without one keep showing the variation’s photo.</p><div class="szg">${sortSizes(a.sizes).map(z=>{const i=a.sizes.indexOf(z);return `<div class="szr">${tile(a.sizeImages[z],`edSzImg(this,${i})`,`edSzDel(${i})`,"Add photo","sm")}<b>${esc(z)}</b></div>`}).join("")}</div></div>`:""}</section>
-<section class="sec2"><h4>4. Variations <i>optional</i></h4><p class="hint">Colors, designs or editions. Give each its own photo: shoppers see that photo when they choose it. You can also change the price or count stock per variation.</p>
-${a.vars.map(edVRow).join("")}<div class="vbtns"><button type="button" class="g" onclick="edVAdd()">${ic("plus")}Add a variation</button><label class="btnl">${ic("cam")}Add from several photos<input type="file" accept="image/*" multiple hidden onchange="edVMany(this)"></label></div></section></div>
-<div class="sh-f">${a.err?`<p class="sherr" role="alert">${esc(a.err)}</p>`:""}<div>${a.id?`<button type="button" class="g dgr ib" aria-label="Delete product" title="Delete product" onclick="edDelete()">${ic("trash")}</button>`:""}<span class="sp1"></span><button type="button" class="g" onclick="edClose()">Cancel</button><button type="button" onclick="edSave()" ${a.busy?"disabled":""}>${a.busy?'<span class="sp"></span>':ic("check")}${a.id?"Save changes":"Add product"}</button></div></div></div>`}
-const edSet=(k,v)=>{AE[k]=v;AE.dirty=1},edV=(i,k,v)=>{AE.vars[i][k]=v;AE.dirty=1},edRe=()=>{AE.dirty=1;renderEd()};
-const edImg=async el=>{const f=el.files[0];if(!f)return;AE.img=await shrink(f,1000);edRe()};
-const edGalAdd=async el=>{for(const f of [...el.files].slice(0,8-AE.gallery.length))AE.gallery.push(await shrink(f,1200));edRe()};
-const edGalSet=async(el,i)=>{const f=el.files[0];if(!f)return;AE.gallery[i]=await shrink(f,1200);edRe()};
-const edGalDel=i=>{AE.gallery.splice(i,1);edRe()};
-const edVImg=async(el,i)=>{const f=el.files[0];if(!f)return;AE.vars[i].imageUrl=await shrink(f,1200);edRe()};
-const blankV=(name="",imageUrl="")=>({id:"",name,colorHex:"",imageUrl,priceModifier:0,stockCount:""});
-const edVAdd=()=>{AE.vars.push(blankV());edRe();const n=[...$("sheet").querySelectorAll("input[data-n]")].pop();if(n){n.scrollIntoView({block:"center"});n.focus()}};
-const edVMany=async el=>{for(const f of [...el.files]){const nm=f.name.replace(/\.[^.]+$/,"").replace(/[-_]+/g," ").trim().slice(0,40);AE.vars.push(blankV(nm.charAt(0).toUpperCase()+nm.slice(1),await shrink(f,1200)))}edRe()};
-const edVDel=i=>{if(!AE.vars[i].name&&!AE.vars[i].imageUrl||confirm("Remove this variation?")){AE.vars.splice(i,1);edRe()}};
-const edSize=z=>{const i=AE.sizes.indexOf(z);if(i<0)AE.sizes.push(z);else{AE.sizes.splice(i,1);delete AE.sizeImages[z]}edRe()};
-const edSizeAt=i=>{delete AE.sizeImages[AE.sizes[i]];AE.sizes.splice(i,1);edRe()};
-const edSzImg=async(el,i)=>{const f=el.files[0];if(!f)return;AE.sizeImages[AE.sizes[i]]=await shrink(f,1200);edRe()};
-const edSzDel=i=>{delete AE.sizeImages[AE.sizes[i]];edRe()};
-const edSizeAdd=()=>{const el=$("szin"),v=el.value.trim().slice(0,40);if(v&&!AE.sizes.some(x=>x.toLowerCase()==v.toLowerCase()))AE.sizes.push(v);edRe();$("szin").focus()};
-function edValidate(){const a=AE;if(!a.name.trim())return"Please give the product a name.";if(!(+a.price>0))return"Please enter a price above 0.";
-if(a.stock===""||isNaN(+a.stock)||+a.stock<0)return"Please enter how many are in stock (0 if sold out).";
-const seen=new Set();for(const [i,v] of a.vars.entries()){const n=v.name.trim().toLowerCase();if(!n)return`Variation ${i+1} needs a name.`;if(seen.has(n))return`Two variations are called “${v.name.trim()}”. Give each its own name.`;seen.add(n)}return""}
-async function edSave(){const e=edValidate();if(e){AE.err=e;renderEd();return}
-AE.err="";AE.busy=1;renderEd();const a=AE,body={name:a.name.trim(),cat:a.cat.trim(),price:+a.price,was:+a.was||0,stock:Math.max(0,Math.floor(+a.stock)),desc:a.desc,img:a.img,gallery:a.gallery,sizes:sortSizes(a.sizes),sizeImages:Object.fromEntries(Object.entries(a.sizeImages).filter(([k,v])=>v&&a.sizes.includes(k))),
-variations:a.vars.map(v=>({id:v.id,name:v.name.trim(),colorHex:v.imageUrl?"":v.colorHex||"",imageUrl:v.imageUrl,priceModifier:+v.priceModifier||0,stockCount:v.stockCount===""||v.stockCount==null?null:Math.max(0,Math.floor(+v.stockCount))}))};
-try{if(a.id){const p=await api("/admin/products/"+a.id,{method:"PATCH",body});delete PD[a.id];delete PL[a.id];const t=V.prods.find(x=>x.id==a.id);t?Object.assign(t,p):V.prods.unshift(p)}else V.prods.unshift(await api("/admin/products",{method:"POST",body}));
-edClose(1);draw();toast("Product saved")}catch(err){if(AE){AE.busy=0;AE.err=err.message||"Could not save. Please try again.";renderEd()}}}
-function edClose(force){if(AE&&AE.dirty&&!force&&!confirm("Close without saving your changes?"))return;AE=null;const s=$("sheet");s&&s.remove();document.body.classList.remove("noscroll")}
-async function edDelete(){if(!confirm("Delete “"+AE.name+"” for good? This can’t be undone.\n\nTip: to just take it off the shop for now, use the Visible switch instead."))return;
-try{await api("/admin/products/"+AE.id,{method:"DELETE"});V.prods=V.prods.filter(x=>x.id!=AE.id);edClose(1);draw();toast("Product deleted")}catch(e){}}
-addEventListener("keydown",e=>{if(e.key=="Escape"&&AE)edClose()});
-
-/* ---------- store look, delivery, backup ---------- */
-function adLook(){const s=V.set,f=(k,l,h)=>`<label class="fld">${l}<input value="${esc(s[k])}" onchange="V.set['${k}']=this.value;ss();theme()">${h?`<small>${h}</small>`:""}</label>`,
-im=(k,l,m,h)=>`<div class="fld">${l}${tile(s[k],`up(this,'${k}',${m})`,`rm('${k}')`,"Add image","lg")}<small>${h}</small></div>`;
-return `<div class="pn"><h3>Name and words</h3><div class="two2">${f("name","Shop name")}${f("tagline","Tagline","Small line under the name")}</div>${f("headline","Homepage headline","Big text on the banner")}${f("footer","Footer text")}</div>
-<div class="pn"><h3>Colors</h3><div class="colors">${[["--purple","Main color","Header, side bar and headings"],["--terra","Button color","Buttons and highlights"],["--plum","Accent color","Sale badges, hearts and prices"],["--cream","Soft background","Warm background areas"]].map(([k,l,h])=>`<label class="fld">${l}<input type="color" value="${esc(s.col[k])}" oninput="V.set.col['${k}']=this.value;ss();theme()"><small>${h}</small></label>`).join("")}</div></div>
-<div class="pn"><h3>Logos and banner</h3><p class="hint">Tip: you can also tap “Change image” right on the homepage.</p><div class="utiles2">${im("logo","Square logo",600,"Icon in the side bar")}${im("logoWide","Wide logo",900,"Shown in the top bar")}${im("logoClear","Transparent logo",600,"For purple areas")}${im("banner","Banner picture",1600,"Right side of the homepage banner")}</div></div>
-<div class="pn"><h3>Homepage tiles</h3><div class="utiles3">${[0,1,2].map(i=>{const p=(s.promos||[])[i]||{};return `<div class="fld"><b>Tile ${i+1}</b>${tile(p.img,`imgT(this,${i})`,`rmT(${i})`,"Add image","")}<input placeholder="Title" value="${esc(p.t)}" onchange="pm(${i},'t',this.value)"><input placeholder="Subtitle" value="${esc(p.s)}" onchange="pm(${i},'s',this.value)"></div>`}).join("")}</div></div>
-<div class="pn"><details><summary class="sum2">Terms &amp; Privacy pages</summary><label class="fld" style="margin-top:12px">Terms &amp; Conditions<textarea rows="8" onchange="V.set.terms=this.value;ss()">${esc(s.terms)}</textarea></label><label class="fld">Privacy Policy<textarea rows="8" onchange="V.set.privacy=this.value;ss()">${esc(s.privacy)}</textarea></label></details></div>
-<p class="hint">Changes here save by themselves.</p>`}
-const setTownFee=(n,v)=>{V.set.townFees={...(V.set.townFees||{})};v===""?delete V.set.townFees[n]:V.set.townFees[n]=Math.max(0,+v||0);ss()};
-/* admin: support contact details and the customer messages inbox */
-function adSupport(){const s=V.set,inp=(k,l,h)=>`<label class="fld">${l}<input value="${esc(s[k]||"")}" onchange="V.set.${k}=this.value;ss()">${h?`<small>${h}</small>`:""}</label>`;
-if(!V.sup&&!V.supLoad){V.supLoad=1;api("/admin/support").then(d=>{V.sup=d;V.supLoad=0;draw()}).catch(()=>{V.supLoad=0})}
-const items=V.sup?V.sup.map(m=>`<article class="acard ${m.status=="Resolved"?"ok":""}"><div class="ah"><b>#${m.id}</b><span class="badge ${m.status=="Resolved"?"done":""}">${esc(m.status)}</span><small>${fmtDate(m.created)}</small></div><div class="ag"><div><h5>From</h5><b>${esc(m.name)}</b><br>${esc(m.contact)}</div><div><h5>Topic</h5>${esc(m.topic)}</div></div><p class="an">${esc(m.message)}</p><div class="af">${m.status=="Open"?`<button type="button" onclick="supSet(${m.id},'Resolved',this)">${ic("check")}Mark resolved</button>`:`<button type="button" class="g" onclick="supSet(${m.id},'Open',this)">Reopen</button>`}</div></article>`).join(""):'<div class="empty">Loading messages…</div>';
-return `<div class="pn"><h3>Support contact</h3><p class="hint">Shown on the Help &amp; Support page.</p>${inp("supportPhone","Phone")}${inp("supportEmail","Email")}${inp("supportHours","Opening hours","e.g. Mon–Sat, 9am–6pm")}</div>
-<div class="pn"><h3>Customer messages</h3><button type="button" class="g" onclick="V.sup=null;draw()">Refresh</button>${V.sup&&!V.sup.length?'<p class="hint">No messages yet.</p>':""}${items}</div>`}
-async function supSet(id,st,b){try{if(b)b.disabled=true;const m=await api("/admin/support/"+id,{method:"PATCH",body:{status:st}});V.sup=(V.sup||[]).map(x=>x.id==id?m:x);draw()}catch(e){if(b)b.disabled=false}}
-/* customer: Help & Support page */
-const TOPICS_C=["Order or delivery","Payment","Product question","Returns or cancellation","Other"];
-function support(){const s=V.set,lines=[s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("");
-return `<h2 class="ph">Help &amp; Support</h2><div class="two"><div class="pn"><h3>Send us a message</h3><p class="hint">We reply by the phone or email you give us.</p>
-<label class="fld">Your name<input id="sn" value="${esc(P.user?P.user.name:"")}" autocomplete="name"></label>
-<label class="fld">Mobile number or email<input id="sc" autocomplete="tel"></label>
-<label class="fld">Topic<select id="st">${TOPICS_C.map(t=>`<option>${esc(t)}</option>`).join("")}</select></label>
-<label class="fld">Message<textarea id="sm" rows="5" maxlength="2000"></textarea></label>
-<button type="button" id="sb" onclick="sendSupport()">Send message</button></div>
-<div><div class="pn"><h3>Contact us</h3>${lines||'<p class="mute">Contact details coming soon. Send us a message.</p>'}</div></div></div>`}
-async function sendSupport(){const v=id=>$(id).value.trim(),b=$("sb"),body={name:v("sn"),contact:v("sc"),topic:$("st").value,message:v("sm")};
-if(body.name.length<2)return toast("Enter your name");if(body.contact.length<5)return toast("Enter a mobile number or email we can reach you on");if(body.message.length<10)return toast("Tell us a little more (at least 10 characters)");
-b.disabled=true;try{await api("/support",{method:"POST",body});toast("Thanks! We’ve got your message.");$("sm").value=""}catch(e){}finally{b.disabled=false}}
-function adShip(){const s=V.set,pk=s.pickup||{},A=AR(),
-pt=(k,l,h)=>`<label class="fld">${l}<input value="${esc(pk[k])}" onchange="V.set.pickup={...V.set.pickup,${k}:this.value};ss()">${h?`<small>${h}</small>`:""}</label>`;
-return `<div class="pn"><h3>Delivery fees</h3><label class="fld" style="margin:0 0 12px"><input type="checkbox" ${s.mapFull?"checked":""} onchange="setMapFull(this.checked)"> Show the full map to customers (off = Oriental Mindoro only)</label><p class="hint">Delivery is limited to <b>${esc(A.province)}</b> (${esc(A.region)}). Region and province are fixed on the shop page. Set the fee for each municipality. Leave a box empty to use the standard fee.</p>
-<label class="fld" style="max-width:280px">Standard fee (₱)<input type="number" inputmode="decimal" min="0" value="${V.defaultFee}" onchange="V.defaultFee=+this.value;V.set.defaultFee=V.defaultFee;ss();draw()"><small>Used for any municipality without its own fee.</small></label>
-<div class="regs">${A.towns.map(t=>`<label class="fld">${esc(t.name)} (₱)<input type="number" inputmode="decimal" min="0" placeholder="${V.defaultFee}" value="${(s.townFees||{})[t.name]??""}" onchange="setTownFee('${esc(t.name)}',this.value)"></label>`).join("")}</div></div>
-<div class="pn"><h3>Pickup</h3><div class="two2">${pt("name","Pickup place","e.g. Our school booth")}${pt("hours","Pickup hours","e.g. Mon–Fri, 12–1 PM")}</div>${pt("addr","Pickup address")}</div><p class="hint">Changes here save by themselves.</p>`}
-const adBackup=()=>`<div class="pn"><h3>Backup</h3><p class="hint">Download a copy of your products, orders and settings. Keep it somewhere safe, like your email or a drive.</p><button type="button" onclick="bk()">${ic("dl")}Download backup</button></div>`;
-
-/* ---------- the page ---------- */
-function admin(){if(!isA())return '<div class="pn" style="text-align:center">Admin access only. Use Sign in with a Google account listed as admin.</div>';
-const AL=adReady()?V.orders:[],todo=AL.filter(o=>grp(o)=="todo").length,going=AL.filter(o=>grp(o)=="going").length,low=cntP("low"),sales=AL.filter(o=>o.status!="Cancelled").reduce((a,o)=>a+o.total,0),
-c=(n,l,cls,on)=>on?`<button type="button" class="stat ${cls}" onclick="${on}"><b>${n}</b><span>${l}</span></button>`:`<div class="stat"><b>${n}</b><span>${l}</span></div>`,
-body=AD.tab=="products"?adProducts():AD.tab=="look"?adLook():AD.tab=="ship"?adShip():AD.tab=="backup"?adBackup():AD.tab=="support"?adSupport():adOrders();
-return `<h2 class="ph">Shop admin</h2><p class="adhi">Hi ${esc(P.user.name)}! Manage your orders, products and how your shop looks. <a onclick="go('')">View shop →</a></p>
-<div class="stats">${c(adReady()?todo:"…","Orders need action",todo?"hot":"","adGo('orders','todo')")}${c(adReady()?going:"…","Orders in progress","","adGo('orders','going')")}${c(low,"Low or sold out",low?"hot":"","adGo('products','','low')")}${c(adReady()?peso(sales):"…","Total sales")}${c(V.views??"–","Shop visits")}</div>
-<nav class="tabs" role="tablist">${TABS.map(([k,l,i])=>`<button type="button" role="tab" aria-selected="${AD.tab==k}" class="tab${AD.tab==k?" on":""}" onclick="AD.tab='${k}';draw()">${ic(i)}${l}${k=="orders"&&todo?`<span class="n">${todo}</span>`:""}</button>`).join("")}</nav><section>${body}</section>`}
-const loc=()=>addr()+'<button onclick="go(\'\')">Done</button>';
-const POL={terms:"<p><i>Last updated: October 17, 2026</i></p>\n\n<h2>1. Who we are</h2>\n<p>This website is run by CYF Likha group (\"we\", \"us\"). You can contact us at omcyffinance@gmail.com. Our address is Pakyas, Victoria, Oriental Mindoro, Philippines.</p>\n\n<h2>2. Using the site</h2>\n<p>You must be able to form a binding contract to place orders. If you are under 18, use the site only with a parent or guardian. You agree to give accurate information and to keep your password private. Tell us if you think someone else has used your account.</p>\n\n<h2>3. Orders and payment</h2>\n<p>Prices are shown in Philippine pesos and include any discounts that apply when you check out. Orders are paid in cash when they are handed to you, unless we tell you that another payment method is available. An order is confirmed when it is placed. We may refuse or cancel an order if an item is out of stock, a price was shown in error, or we suspect misuse. If that happens, we will tell you and refund any payment already made.</p>\n\n<h2>4. Delivery</h2>\n<p>We deliver within the areas and time windows shown in the shop. Delivery times are estimates. If we cannot deliver, we will tell you the reason and cancel the order. Please give correct delivery details and be available to receive the order.</p>\n\n<h2>5. Cancellations and changes</h2>\n<p>You can cancel an order yourself only while it is still pending or awaiting payment confirmation. Once it has been packed, please contact the shop team. Cancelled orders return their stock to the shop. Some orders can be changed for a short time after they are placed, as shown on the order.</p>\n\n<h2>6. Returns and problems</h2>\n<p>If an item is missing, damaged, or wrong, contact the shop team through the chat within 24 hours of delivery. We will replace it or refund it when we can confirm the problem. Food that has been opened or consumed cannot be returned for hygiene reasons, except where the law requires otherwise.</p>\n\n<h2>7. Loyalty points, promo codes and offers</h2>\n<p>Loyalty points are earned on delivered orders, as shown on your dashboard. Points have no cash value and cannot be transferred. We may change the earning rate, redemption rules or expiry, and we may end the programme with reasonable notice. Promo codes and offers are limited to the terms shown with them and cannot be combined unless stated.</p>\n\n<h2>8. Custom requests</h2>\n<p>A custom request is a request, not an order. We will reply with a quote, and nothing is charged until you accept it.</p>\n\n<h2>9. AI assistant and messages</h2>\n<p>The CYF Likha group AI assistant can answer questions, show information and propose actions. It can make mistakes, so check anything important before you confirm it. Actions it proposes only happen after you press Confirm. Messages you send to the shop team may be read by our staff. Please read our Privacy Policy to learn how this information is handled.</p>\n\n<h2>10. Acceptable use</h2>\n<p>Do not place fake orders, abuse promo codes, harass staff or other customers, try to access accounts or data that are not yours, interfere with the site, or use the site for anything illegal. We may block accounts that break these rules.</p>\n\n<h2>11. Intellectual property</h2>\n<p>The site, its design and its content belong to us or our licensors. You may use it for your own shopping, but not copy or resell it.</p>\n\n<h2>12. Liability</h2>\n<p>To the extent the law allows, we are not liable for indirect or consequential losses, or for interruptions to the site. Nothing in these terms limits any right you have under the consumer protection laws of the Philippines.</p>\n\n<h2>13. Changes</h2>\n<p>We may update these terms. The date at the top shows the latest version. Continuing to use the site after a change means you accept the new terms.</p>\n\n<h2>14. Governing law</h2>\n<p>These terms are governed by the laws of the Republic of the Philippines. Disputes will be handled by the courts of Victoria, Oriental Mindoro, Philippines.</p>",privacy:"<p><i>Last updated: October 17, 2026</i></p>\n\n<h2>1. Who is responsible</h2>\n<p>CYF Likha group is the personal information controller for this site. Our data protection contact is CYF Likha group, omcyffinance@gmail.com.</p>\n\n<h2>2. What we collect</h2>\n<table>\n  <tr><th>What</th><th>Why</th></tr>\n  <tr><td>Account details: username, a password stored only in scrambled form, and your role (customer, seller or admin)</td><td>To let you sign in and place orders</td></tr>\n  <tr><td>Orders: items, quantities, prices, totals, status, cash on delivery, and any delivery notes you write</td><td>To prepare, deliver and record your order, and for our accounts</td></tr>\n  <tr><td>Messages to the shop team, and messages with other customers or sellers</td><td>To answer your questions and handle problems</td></tr>\n  <tr><td>Custom requests and your favorites</td><td>To handle the request and show your saved items</td></tr>\n  <tr><td>Loyalty points: earned points and history</td><td>To run the loyalty programme</td></tr>\n  <tr><td>Order alerts: the push subscription your browser or phone gives us</td><td>To send order updates, only if you turn them on</td></tr>\n  <tr><td>Security records: sign-in attempts, blocked requests and IP addresses</td><td>To keep accounts and the site safe</td></tr>\n  <tr><td>Device settings stored on your phone or computer: your sign-in session, cart, favorites and display options</td><td>So the site works the way you left it</td></tr>\n</table>\n\n<h2>3. AI assistant</h2>\n<p>When you use the CYF Likha group AI assistant, the words you type, and the part of the screen you are looking at (for example the page name, your cart, and an open product), are sent to the AI provider that powers it, which may be Google, Groq, OpenRouter, NVIDIA or another provider we have chosen. Voice reading uses Google's text-to-speech. Do not type passwords, card numbers or other secrets into the assistant. Assistant conversations are not used to train AI models by us, but the providers have their own policies, which you can read on their websites.</p>\n\n<h2>4. Why we use it and the legal basis</h2>\n<p>We use your information to take and deliver orders, keep your account secure, answer your messages, run loyalty and alerts you asked for, and meet our legal duties (for example tax and consumer records). Where we ask for consent, such as for order alerts, you can withdraw it at any time.</p>\n\n<h2>5. Who we share it with</h2>\n<p>We share only what is needed with: delivery staff (name, items, delivery notes and payment due), our hosting and database provider Render (hosting and database), the AI and voice providers described above, and the push service run by your browser or phone maker. We do not sell your personal information.</p>\n\n<h2>6. How long we keep it</h2>\n<p>Account and order records: 5 years, to meet tax and record rules. Chat messages: 1 year. Security records: 90 days. When you ask us to delete your account, we delete or anonymize what we no longer need to keep. Some records may be kept longer where the law requires it.</p>\n\n<h2>7. Cookies and similar technology</h2>\n<p>We do not use advertising cookies. The site uses your browser's local storage to keep your sign-in session, cart, favorites and display settings on your device. You can clear them at any time from your browser settings, which will sign you out.</p>\n\n<h2>8. Your rights</h2>\n<p>Under the Data Privacy Act you can ask to see your information, correct it, object to some uses, ask us to delete it or move it, withdraw consent, and complain to the National Privacy Commission. To use these rights, contact omcyffinance@gmail.com. We may ask you to confirm who you are first. You can also turn off order alerts and clear your loyalty history from your dashboard, or ask us to do so.</p>\n\n<h2>9. Keeping it safe</h2>\n<p>We use encryption in transit, scrambled passwords, role-based access for staff, audit logs, and limits on repeated sign-in attempts. No system is perfectly secure, so please keep your password private. If we learn of a breach that affects you, we will tell you and the National Privacy Commission as the law requires.</p>\n\n<h2>10. Children</h2>\n<p>The site is not intended for children under 13. If you believe a child has given us information, contact us and we will delete it.</p>\n\n<h2>11. Changes</h2>\n<p>We may update this policy. The date at the top shows the latest version. For major changes we will tell you on the site.</p>"};
-const page=k=>`<div class="pn"><h3>${k=="terms"?"Terms &amp; Conditions":"Privacy Policy"}</h3>${V.set[k]?`<p style="white-space:pre-wrap">${esc(V.set[k])}</p>`:`<div class="pol">${POL[k]}</div>`}</div>`;
-/* render + transitions */
-function qrView(){return `<h2 class="ph">Payment methods</h2><div class="pn" style="text-align:center"><h3>GCash</h3><img src="/gcash-qr.svg" alt="GCash QR code" style="width:240px;max-width:100%"><p><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p><h3 style="margin-top:18px">Cash on Delivery</h3><img src="/cod.svg" alt="" style="width:72px"><p><small>Pay the rider in cash when your order arrives.</small></p></div>`}
-function render(fx){const y=scrollY,h=location.hash.slice(1),a=$("app");theme();if(!h.startsWith("product/"))D.id=0;
-a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h=="support"?support():h=="terms"||h=="privacy"?page(h):shop();
-mountMap();const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
-a.classList.toggle("fx",!!fx);if(fx){scrollTo(0,0);setTimeout(()=>a.classList.remove("fx"),1100)}else scrollTo(0,y);
-const sc=h=="admin"?"all":"mine";if((h=="orders"||h=="admin")&&P.user&&(!V.ol||V.oScope!=sc)){const tk=V.ot=(V.ot||0)+1;V.ol=1;V.oScope=sc;api("/orders"+(sc=="all"?"?all=1":"")).then(o=>{if(tk!=V.ot)return;V.orders=o;V.ol=2;draw()}).catch(()=>{if(tk!=V.ot)return;V.ol=3;draw()})}}
-function draw(nav){if(nav&&!RM&&document.startViewTransition)document.startViewTransition(()=>render(1));else render(nav)}
-/* press ripple on every button */
-document.addEventListener("pointerdown",e=>{const b=e.target.closest("button");if(!b||b.disabled||RM)return;const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height),s=document.createElement("span");s.className="ripple";s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;b.appendChild(s);setTimeout(()=>s.remove(),650)});
-const TS=["Pick delivery or pickup in your cart.","Search for items with the search bar (press /).","Pick a variation, then add to cart.","Review your cart and check out."];
-function tour(i=0){if(i>=TS.length){closeM();P.toured=1;save();return}$("m").innerHTML=`<div class="modal${i?" st":""}"><div><h3>Quick tour</h3><div class="dots">${TS.map((_,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div><p>${TS[i]}</p><button onclick="tour(${i+1})" style="margin-top:6px">${i==TS.length-1?"Finish":"Next"}</button> <button class="g" onclick="tour(9)" style="margin-top:6px">Skip</button></div></div>`}
-addEventListener("hashchange",()=>draw(1));addEventListener("keydown",e=>{if(e.key=="/"&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$("q").focus()}});
-$("cookie").hidden=P.ck!==null&&P.ck!==undefined;
-$("app").innerHTML='<div class="skel"></div>';
-load().catch(()=>{}).finally(()=>{render(1);if(!P.toured)tour()});
-</script></body></html>
+diff -ruN orig_zip/storefront-main/public/index.html sf/storefront-main/public/index.html
+--- orig_zip/storefront-main/public/index.html	2026-11-26 10:34:53.000000000 +0000
++++ sf/storefront-main/public/index.html	2026-11-26 11:21:31.454436000 +0000
+@@ -305,21 +305,21 @@
+ function fetchGeo(paths){const todo=paths.filter(p=>!G.lists[p]);if(!todo.length)return;
+ Promise.all(todo.map(p=>G.lists[p]=api("/geo"+p).then(d=>{G.data[p]=d}).catch(()=>{G.data[p]=[]}))).then(()=>draw())}
+ function setA(o){P.addr={...P.addr,...o};save();draw()}
+-const IC={plus:"M12 5v14M5 12h14",check:"M5 12l5 5 10-10",x:"M6 6l12 12M18 6L6 18",trash:"M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13",dl:"M12 4v11m0 0l-4-4m4 4l4-4M5 20h14",heart:"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",cam:"M4 8h3l1.6-2.4h6.8L17 8h3v11H4zM12 16.5a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6z",chev:"M9 6l6 6-6 6",home:"M3 11l9-8 9 8v10H3zM9 21v-7h6v7",grid:"M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",bag:"M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0",rec:"M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",pin:"M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",set:"M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6"};
++const IC={plus:"M12 5v14M5 12h14",check:"M5 12l5 5 10-10",x:"M6 6l12 12M18 6L6 18",trash:"M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13",dl:"M12 4v11m0 0l-4-4m4 4l4-4M5 20h14",heart:"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",cam:"M4 8h3l1.6-2.4h6.8L17 8h3v11H4zM12 16.5a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6z",chev:"M9 6l6 6-6 6",home:"M3 11l9-8 9 8v10H3zM9 21v-7h6v7",grid:"M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",bag:"M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0",rec:"M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",pin:"M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",set:"M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6",chat:"M4 5h16v11h-8l-5 4v-4H4z"};
+ const ic=n=>`<svg viewBox="0 0 24 24"><path d="${IC[n]}"/></svg>`;
+ let lastN=0;
+ function theme(){const h=location.hash.slice(1),A=isA(),s=V.set;for(const k in s.col)document.documentElement.style.setProperty(k,s.col[k]);
+ const nm=esc(s.name||"Likha: Youth Craft");$("brand").textContent=s.name||"Likha: Youth Craft";$("brand").style.display=s.logoWide?"none":"";
+-$("lg").innerHTML=s.logoWide?`<img class="wide" src="${s.logoWide}" alt="${nm}">`:s.logo?`<img src="${s.logo}" alt="">`:"";document.body.classList.toggle("hl",!!(s.logoWide||s.logo));
++$("lg").innerHTML=s.logoWide?`<img class="wide" src="${esc(s.logoWide)}" alt="${nm}">`:s.logo?`<img src="${esc(s.logo)}" alt="">`:"";document.body.classList.toggle("hl",!!(s.logoWide||s.logo));
+ function fav(u){const L=document.querySelector('link[rel=icon]');if(!u){L.href="data:,";return}const i=new Image();i.onload=()=>{const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d"),k=Math.min(64/i.width,64/i.height),w=i.width*k,h=i.height*k;x.drawImage(i,(64-w)/2,(64-h)/2,w,h);L.href=c.toDataURL("image/png")};i.onerror=()=>{L.href=u};i.src=u}
+ fav(s.logo);
+ const n=P.cart.reduce((a,c)=>a+c.n,0),bump=n>lastN;lastN=n;const lc=s.logoClear||s.logo;
+ const it=(k,i,l)=>`<a href="#${k}" class="${h==k?"on":""}" title="${l}" aria-label="${l}"${h==k?' aria-current="page"':""}>${ic(i)}<em>${l}</em>${k=="cart"&&n?`<span class="bd${bump?" bump":""}">${n}</span>`:""}</a>`;
+-$("rail").innerHTML=`<div class="lg">${lc?`<img src="${lc}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${A?it("admin","set","Admin"):""}`;
++$("rail").innerHTML=`<div class="lg">${lc?`<img src="${esc(lc)}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${it("support","chat","Support")}${A?it("admin","set","Admin"):""}`;
+ $("ad").style.display=A?"":"none";
+-$("foot").innerHTML=(lc?`<img src="${lc}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a></div>";
++$("foot").innerHTML=(lc?`<img src="${esc(lc)}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a></div>";
+ $("uname").textContent=P.user?P.user.name:"";$("ub").innerHTML=P.user?`<span class="av">${esc(P.user.name[0].toUpperCase())}</span><span>Sign out</span>`:"Sign in";$("ub").style.cssText=P.user?"display:flex;align-items:center;gap:8px":"background:var(--terra);color:var(--ink);padding:9px 16px;border-radius:8px";
+-document.title=s.name||"CYF: Youth Craft"}
++document.title=s.name||"Likha: Youth Craft"}
+ const go=h=>location.hash=h,isA=()=>P.user&&P.user.role=="admin";
+ /* modals and sign-in */
+ function closeM(){const m=document.querySelector("#m .modal");if(!m)return;m.classList.add("out");setTimeout(()=>$("m").innerHTML="",180)}
+@@ -342,7 +342,7 @@
+ if(a.city&&!t)P.addr={...a,city:"",brgy:""};else if(t&&t.name!==a.city)P.addr={...a,city:t.name};
+ if(P.addr.rc||P.addr.cityc||P.addr.brgyc){const{rc,provc,cityc,brgyc,...r}=P.addr;P.addr=r}save()}
+ const setTown=n=>setA({city:n,region:AR().region,prov:AR().province,brgy:""});
+-function pinHint(){const a=P.addr;if(!(a.lat&&a.lng))return "Optional: tap the map or use your current location to drop a pin. We’ll fill in your municipality and barangay from it.";
++function pinHint(){const a=P.addr;if(!(a.lat&&a.lng)){if(MP.note)return `<span class="bad">That spot is outside ${esc(AR().province)}. We only deliver there. Tap the map inside the province to set your pin.</span>`;return "Optional: tap the map"+(LOCATE_OK?" or use your current location":"")+" to drop a pin. We’ll fill in your municipality and barangay from it.";}
+ const lat=+a.lat,lng=+a.lng,rg=MP.rg||{},n=nearest(lat,lng),clr=` · <a onclick="clearPin()">Remove pin</a>`,acc=MP.acc>150?`<br><span class="bad">Your device found you only within about ${MP.acc>=1000?(MP.acc/1000).toFixed(1)+" km":Math.round(MP.acc)+" m"}, which is common on computers. Drag the pin to your exact spot.</span>`:"";
+ if(rg.status=="outside")return `<span class="bad">That pin is in ${esc(rg.name)}. We only deliver within ${esc(AR().province)}.</span>${clr}`;
+ if(!inArea(lat,lng))return `<span class="bad">That pin is outside ${esc(AR().province)}. We only deliver within the province.</span>${clr}`;
+@@ -359,7 +359,7 @@
+ return `<div class="pn"><h3>Delivery location</h3>
+ <p class="area">${ic("pin")}<span>We deliver within <b>${esc(A.province)}</b> only. Choose your municipality to see the delivery fee.</span></p>
+ <div id="mapslot" class="mapslot"></div><p class="pinhint" id="pinhint">${pinHint()}</p>
+-<button type="button" class="g" onclick="locate()">${ic("pin")}Use my current location</button>
++${LOCATE_OK?`<button type="button" class="g" onclick="locate()">${ic("pin")}Use my current location</button>`:""}
+ <div class="row" style="margin-top:12px">
+ <label class="locked">Region<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.region)}</option></select></label>
+ <label class="locked">Province<select disabled aria-disabled="true" title="Fixed: we only deliver here"><option>${esc(A.province)}</option></select></label>
+@@ -368,7 +368,9 @@
+ <label>Street / house no.<input value="${esc(a.street)}" onchange="P.addr.street=this.value;save()"></label><label>Postal code<input inputmode="numeric" value="${esc(a.zip)}" onchange="P.addr.zip=this.value;save()"></label></div>
+ <p class="geo-s">${a.city?`Delivering to ${esc(a.city)}${fee}`:"Choose your municipality to see the delivery fee."}</p></div>`}
+ /* the map (Leaflet + OpenStreetMap) is downloaded only when an address form is on screen. The map element is kept alive between redraws. */
+-const MP={el:null,map:null,mk:null,p:null,starting:0,failed:0};
++/* the "use my current location" button is shown on phones and tablets only (touch screens); laptops and desktops get the map and the search instead */
++const LOCATE_OK=matchMedia("(pointer: coarse)").matches;
++const MP={el:null,map:null,mk:null,p:null,starting:0,failed:0,note:0};
+ function loadLeaflet(){if(window.L&&window.L.map)return Promise.resolve();return MP.p||(MP.p=new Promise((ok,no)=>{const l=document.createElement("link");l.rel="stylesheet";l.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";document.head.appendChild(l);
+ const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";s.onload=()=>window.L&&window.L.map?ok():no(new Error("map"));s.onerror=()=>no(new Error("map"));document.head.appendChild(s)}).catch(e=>{MP.p=null;throw e}))}
+ const pinIcon=()=>window.L.divIcon({className:"pinic",html:'<svg viewBox="0 0 34 44"><path d="M17 43S3 28 3 16a14 14 0 0 1 28 0c0 12-14 27-14 27z" style="fill:var(--plum)" stroke="#fff" stroke-width="2.5"/><circle cx="17" cy="16" r="5.5" fill="#fff"/></svg>',iconSize:[34,44],iconAnchor:[17,43]});
+@@ -386,14 +388,22 @@
+ const b=brgyOf(d),next={...a,city:t.name,region:AR().region,prov:AR().province};
+ if(b&&(!a.brgy||a.brgyAuto)){next.brgy=b;next.brgyAuto=1}if(d.road&&!a.street)next.street=d.road;if(/^\d{4}$/.test(d.postcode||"")&&!a.zip)next.zip=d.postcode;
+ P.addr=next;save();MP.rg={status:"ok",town:t.name,brgy:next.brgy||""};draw()},700)}
+-function setPin(lat,lng,zoom,acc){MP.acc=acc||0;P.addr={...P.addr,lat:lat.toFixed(5),lng:lng.toFixed(5)};save();putMarker(lat,lng);
++function setPin(lat,lng,zoom,acc){
++/* a spot outside the delivery province is never saved or shown: the map stays on the province and the customer is told why */
++if(!inArea(lat,lng)){rgSeq++;MP.rg=null;MP.note=1;MP.acc=0;const{lat:_x,lng:_y,...r}=P.addr;P.addr=r;save();
++  if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint();return}
++MP.note=0;MP.acc=acc||0;P.addr={...P.addr,lat:lat.toFixed(5),lng:lng.toFixed(5)};save();putMarker(lat,lng);
+ if(MP.map){if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}if(acc>40)MP.circle=window.L.circle([lat,lng],{radius:acc,weight:1,color:"#4a7bd0",fillOpacity:.12}).addTo(MP.map);if(zoom)MP.map.setView([lat,lng],acc>600?14:zoom)}
+ inArea(lat,lng)?reverse(lat,lng):(rgSeq++,MP.rg={status:"fail"});showHint()}
+-function clearPin(){rgSeq++;MP.rg=null;MP.acc=0;const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint()}
+-function initMap(){const Lf=window.L,A=AR(),a=P.addr,has=a.lat&&a.lng;
+-MP.map=Lf.map(MP.el,{minZoom:8,maxBounds:Lf.latLngBounds(A.bounds).pad(.3),maxBoundsViscosity:.8}).setView(has?[+a.lat,+a.lng]:[13.0,121.35],has?15:9);
++function clearPin(){rgSeq++;MP.rg=null;MP.note=0;MP.acc=0;const{lat,lng,...r}=P.addr;P.addr=r;save();if(MP.map){if(MP.mk){MP.map.removeLayer(MP.mk);MP.mk=null}if(MP.circle){MP.map.removeLayer(MP.circle);MP.circle=null}}showHint()}
++function initMap(){const Lf=window.L,A=AR(),a=P.addr,has=a.lat&&a.lng,full=!!V.set.mapFull;
++/* default: the map stays on Oriental Mindoro (no panning or zooming past the province). The admin can turn on the full map. */
++const o=full?{minZoom:3}:{minZoom:8,maxBounds:Lf.latLngBounds(A.bounds),maxBoundsViscosity:1};
++MP.map=Lf.map(MP.el,o).setView(has?[+a.lat,+a.lng]:(full?[12.9,121.0]:[13.0,121.35]),has?15:(full?6:9));
+ Lf.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(MP.map);
+ MP.map.on("click",e=>setPin(e.latlng.lat,e.latlng.lng));if(has)putMarker(+a.lat,+a.lng)}
++/* admin switch: rebuild the map so the change shows at once */
++function setMapFull(v){V.set.mapFull=!!v;ss();if(MP.map){MP.map.remove();MP.map=null}MP.mk=null;MP.circle=null;if(MP.el&&MP.el.parentNode)MP.el.parentNode.removeChild(MP.el);MP.el=null;draw()}
+ function mountMap(){const sl=$("mapslot");if(!sl)return;
+ if(!MP.el){MP.el=document.createElement("div");MP.el.id="lmap";MP.el.setAttribute("role","application");MP.el.setAttribute("aria-label","Delivery map. Tap the map to place your pin.")}
+ sl.appendChild(MP.el);
+@@ -401,10 +411,25 @@
+ if(MP.starting)return;MP.starting=1;MP.failed=0;MP.el.innerHTML='<div class="mapfail">Loading map…</div>';
+ loadLeaflet().then(()=>{MP.starting=0;MP.el.innerHTML="";initMap();const s2=$("mapslot");if(s2&&MP.el.parentNode!==s2)s2.appendChild(MP.el);MP.map.invalidateSize()})
+ .catch(()=>{MP.starting=0;MP.failed=1;MP.el.innerHTML='<div class="mapfail"><span>The map couldn’t load. You can still choose your municipality below.</span><button type="button" class="g" onclick="mountMap()">Try again</button></div>'})}
+-function locate(){if(!navigator.geolocation)return toast("Location isn’t available on this device");toast("Finding your location…");let best=null,wid=null,t=0;
+-const done=()=>{clearTimeout(t);if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null;if(!best)return;const{latitude:la,longitude:ln,accuracy:ac}=best.coords;if(!inArea(la,ln))toast("You seem to be outside "+AR().province+". We only deliver within the province.");setPin(la,ln,17,ac)};
+-wid=navigator.geolocation.watchPosition(p=>{if(!best||p.coords.accuracy<best.coords.accuracy){best=p;const c=p.coords;setPin(c.latitude,c.longitude,17,c.accuracy)}if(p.coords.accuracy<=25)done()},()=>{if(best)done();else{clearTimeout(t);if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null;toast("We couldn’t get your location. Check that location access is allowed, or tap the map instead.")}},{enableHighAccuracy:true,maximumAge:0,timeout:20000});
+-t=setTimeout(done,9000)}
++function locate(){
++if(!window.isSecureContext||!navigator.geolocation)return toast("Location needs an https page in a browser that supports it. You can still tap the map.");
++toast("Finding your location…");
++let best=null,wid=null,t=null,fin=false,high=true;
++const stopWatch=()=>{if(wid!==null)navigator.geolocation.clearWatch(wid);wid=null};
++const finish=()=>{if(fin)return;fin=true;stopWatch();clearTimeout(t);
++ if(!best)return toast("Couldn’t get your location. Check that location is on for this browser, or tap the map.");
++ const{latitude:la,longitude:ln,accuracy:ac}=best.coords;
++ toast(!inArea(la,ln)?"You seem to be outside "+AR().province+". We only deliver within the province.":ac<=60?"Location found.":"Location found, within about "+Math.round(ac)+" m. Drag the pin if it isn’t exact.")};
++const take=p=>{if(fin)return;const c=p.coords;if(!best||c.accuracy<best.coords.accuracy){best=p;setPin(c.latitude,c.longitude,17,c.accuracy)}if(c.accuracy<=30)finish()};
++const onErr=e=>{if(fin)return;
++  if(e&&e.code===1){fin=true;stopWatch();clearTimeout(t);return toast("Location access is blocked. Allow it in your browser or phone settings, or tap the map.")}
++  if(!best&&high){high=false;stopWatch();start()}};
++const start=()=>{wid=navigator.geolocation.watchPosition(take,onErr,{enableHighAccuracy:high,maximumAge:0,timeout:high?12000:20000})};
++/* 1) a quick, rough fix (last known or network location) so the pin appears at once */
++navigator.geolocation.getCurrentPosition(take,()=>{},{enableHighAccuracy:false,maximumAge:300000,timeout:5000});
++/* 2) keep refining with the best sensor for up to 20 seconds */
++start();
++t=setTimeout(finish,20000)}
+ 
+ const chg=f=>`<label class="chg">Change image<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
+ const chgI=f=>`<label class="chg ci" title="Change image" aria-label="Change image">${ic("cam")}<input type="file" accept="image/*" hidden onchange="${f}"></label>`;
+@@ -412,7 +437,7 @@
+ async function tf(id){if(!P.user)return auth();const on=(V.favs||[]).includes(id);try{await api("/favorites/"+id,{method:on?"DELETE":"POST"});V.favs=on?V.favs.filter(x=>x!=id):[...(V.favs||[]),id];V.popId=on?0:id;setTimeout(()=>V.popId=0,700);const p=V.prods.find(x=>x.id==id);if(p)p.favs=Math.max(0,(p.favs||0)+(on?-1:1));draw()}catch(e){toast("Could not update favorites")}}
+ const card=(p,i)=>{const vs=p.variations||[],opt=vs.length>0||p.hasSizes,out=p.stock<=0,dots=vs.filter(v=>v.colorHex).slice(0,5),
+ meta=[vs.length?vs.length+" option"+(vs.length>1?"s":""):"",p.hasSizes?p.availableSizes.length+(p.availableSizes.length>1?" sizes":" size"):""].filter(Boolean).join(" · ");
+-return `<div class="pc" style="--i:${i||0}" ><div class="pi">${p.img?`<img loading="lazy" src="${p.img}" alt="${esc(p.name)}">`:""}${out?'<span class="tag no">Sold out</span>':p.was>p.price?`<span class="tag">−${Math.round((1-p.price/p.was)*100)}%</span>`:""}${isA()?chgI("imgP(this,"+p.id+")"):""}${heart(p)}</div><h4><a class="pl" href="#product/${p.id}">${esc(p.name)}</a></h4><div class="pp"><b>${peso(p.price)}</b>${p.was>p.price?`<s>${peso(p.was)}</s>`:""}</div>${meta?`<div class="sws">${dots.map(v=>`<i style="--c:${esc(v.colorHex)}" title="${esc(v.name)}"></i>`).join("")}<small>${meta}</small></div>`:""}${opt?`<button onclick="go('product/${p.id}')" style="width:100%;margin-top:8px">${out?"View":"Choose options"}${out?"":ic("chev")}</button>`:`<button ${out?"disabled":""} onclick="add(${p.id},this)" style="width:100%;margin-top:8px">${out?"Sold out":"Add to cart"}</button>`}</div>`};
++return `<div class="pc" style="--i:${i||0}" ><div class="pi">${p.img?`<img loading="lazy" src="${esc(p.img)}" alt="${esc(p.name)}">`:""}${out?'<span class="tag no">Sold out</span>':p.was>p.price?`<span class="tag">−${Math.round((1-p.price/p.was)*100)}%</span>`:""}${isA()?chgI("imgP(this,"+p.id+")"):""}${heart(p)}</div><h4><a class="pl" href="#product/${p.id}">${esc(p.name)}</a></h4><div class="pp"><b>${peso(p.price)}</b>${p.was>p.price?`<s>${peso(p.was)}</s>`:""}</div>${meta?`<div class="sws">${dots.map(v=>`<i style="--c:${esc(v.colorHex)}" title="${esc(v.name)}"></i>`).join("")}<small>${meta}</small></div>`:""}${opt?`<button onclick="go('product/${p.id}')" style="width:100%;margin-top:8px">${out?"View":"Choose options"}${out?"":ic("chev")}</button>`:`<button ${out?"disabled":""} onclick="add(${p.id},this)" style="width:100%;margin-top:8px">${out?"Sold out":"Add to cart"}</button>`}</div>`};
+ function cgroups(L){return [...new Set(L.map(p=>p.cat||"Other"))].map(c=>{const items=L.filter(p=>(p.cat||"Other")==c);return `<div class="sec" style="margin:26px 0 12px;padding-top:0;border:0"><h2 style="font-size:20px">${esc(c)}</h2><span style="color:var(--mute)">${items.length}</span></div><div class="gr">${items.map(card).join("")}</div>`}).join("")}
+ function shop(){const q=S.q.toLowerCase(),A=V.prods.filter(p=>!p.arch),adm=isA(),s=V.set,grouped=!S.cat&&!q,
+ L=A.filter(p=>(!q||(p.name+p.cat).toLowerCase().includes(q))&&(!S.cat||p.cat==S.cat)&&(!S.max||p.price<=+S.max)),
+@@ -421,8 +446,8 @@
+ $("sg").innerHTML=A.map(p=>`<option value="${esc(p.name)}">`).join("");
+ const pr=s.promos||[],hl=esc(s.headline||"Welcome"),faq=q&&/ship|deliver|pick|pay|gcash|maya|cod|return/.test(q)?'<div class="pn" style="margin-top:16px">Choose delivery or pickup at checkout. Pay with GCash, Maya, cash or card. Fees show before you order.</div>':"";
+ return `<div class="home"><div class="box cats">${["",...cats].map(c=>`<a class="${S.cat==c?"on":""}" onclick="S.cat='${esc(c)}';draw()">${c?esc(c):"All products"}${ic("grid").replace(/<path[^>]*>/,'<path d="M9 6l6 6-6 6"/>')}</a>`).join("")}</div>
+-<div><div class="hero"><div class="hc"><small>${esc(s.tagline)}</small><h1>${hl}</h1><button onclick="document.getElementById('all').scrollIntoView()">Shop now &nbsp;»</button></div>${s.banner?`<img class="bn" src="${s.banner}" alt="">`:(adm?'<div class="dz">Upload a banner image</div>':"")}${adm?chg("up(this,'banner',1600)"):""}</div>
+-<div class="tiles box" style="border-top:0">${[0,1,2].map(i=>`<div class="tl${pr[i]&&(pr[i].t||pr[i].s)?"":" nt"}" style="--i:${i}">${esc(pr[i]&&pr[i].t)}<span>${esc(pr[i]&&pr[i].s)}</span>${pr[i]&&pr[i].img?`<img src="${pr[i].img}" alt="">`:""}${adm?chg("imgT(this,"+i+")")+(pr[i]&&pr[i].img?`<a class="rmT" onclick="rmT(${i})">Remove</a>`:""):""}</div>`).join("")}</div></div>
++<div><div class="hero"><div class="hc"><small>${esc(s.tagline)}</small><h1>${hl}</h1><button onclick="document.getElementById('all').scrollIntoView()">Shop now &nbsp;»</button></div>${s.banner?`<img class="bn" src="${esc(s.banner)}" alt="">`:(adm?'<div class="dz">Upload a banner image</div>':"")}${adm?chg("up(this,'banner',1600)"):""}</div>
++<div class="tiles box" style="border-top:0">${[0,1,2].map(i=>`<div class="tl${pr[i]&&(pr[i].t||pr[i].s)?"":" nt"}" style="--i:${i}">${esc(pr[i]&&pr[i].t)}<span>${esc(pr[i]&&pr[i].s)}</span>${pr[i]&&pr[i].img?`<img src="${esc(pr[i].img)}" alt="">`:""}${adm?chg("imgT(this,"+i+")")+(pr[i]&&pr[i].img?`<a class="rmT" onclick="rmT(${i})">Remove</a>`:""):""}</div>`).join("")}</div></div>
+ <div class="side">${side("Recently Viewed",rec,"Items you view appear here")}</div></div>${faq}
+ ${grouped&&pick.length?`<div class="sec"><h2>Front page picks</h2><span style="color:var(--mute)">Most loved &amp; best sellers</span></div><div class="rowx">${pick.map(card).join("")}</div>`:""}
+ ${deals.length?`<div class="sec"><h2>Deals of the Day</h2><span class="cd" id="cd"></span><a onclick="S.max='';S.cat='';draw()">View All Deals</a></div><div class="rowx">${deals.map(card).join("")}</div>`:""}
+@@ -552,7 +577,7 @@
+    Everything here is plain, labelled and tap-friendly. Products are edited in one sheet with an explicit Save button. */
+ const AD={tab:"orders",of:"todo",oq:"",pq:"",pf:"all"},LOW=5,SIZES=["XS","S","M","L","XL","2XL","3XL"];
+ let AE=null; /* the product being edited in the sheet (null = sheet closed) */
+-const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"]];
++const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"],["support","Support","rec"]];
+ const adGo=(tab,of,pf)=>{AD.tab=tab;if(of)AD.of=of;if(pf)AD.pf=pf;draw()};
+ 
+ /* ---------- orders ---------- */
+@@ -676,9 +701,29 @@
+ <div class="pn"><details><summary class="sum2">Terms &amp; Privacy pages</summary><label class="fld" style="margin-top:12px">Terms &amp; Conditions<textarea rows="8" onchange="V.set.terms=this.value;ss()">${esc(s.terms)}</textarea></label><label class="fld">Privacy Policy<textarea rows="8" onchange="V.set.privacy=this.value;ss()">${esc(s.privacy)}</textarea></label></details></div>
+ <p class="hint">Changes here save by themselves.</p>`}
+ const setTownFee=(n,v)=>{V.set.townFees={...(V.set.townFees||{})};v===""?delete V.set.townFees[n]:V.set.townFees[n]=Math.max(0,+v||0);ss()};
++/* admin: support contact details and the customer messages inbox */
++function adSupport(){const s=V.set,inp=(k,l,h)=>`<label class="fld">${l}<input value="${esc(s[k]||"")}" onchange="V.set.${k}=this.value;ss()">${h?`<small>${h}</small>`:""}</label>`;
++if(!V.sup&&!V.supLoad){V.supLoad=1;api("/admin/support").then(d=>{V.sup=d;V.supLoad=0;draw()}).catch(()=>{V.supLoad=0})}
++const items=V.sup?V.sup.map(m=>`<article class="acard ${m.status=="Resolved"?"ok":""}"><div class="ah"><b>#${m.id}</b><span class="badge ${m.status=="Resolved"?"done":""}">${esc(m.status)}</span><small>${fmtDate(m.created)}</small></div><div class="ag"><div><h5>From</h5><b>${esc(m.name)}</b><br>${esc(m.contact)}</div><div><h5>Topic</h5>${esc(m.topic)}</div></div><p class="an">${esc(m.message)}</p><div class="af">${m.status=="Open"?`<button type="button" onclick="supSet(${m.id},'Resolved',this)">${ic("check")}Mark resolved</button>`:`<button type="button" class="g" onclick="supSet(${m.id},'Open',this)">Reopen</button>`}</div></article>`).join(""):'<div class="empty">Loading messages…</div>';
++return `<div class="pn"><h3>Support contact</h3><p class="hint">Shown on the Help &amp; Support page.</p>${inp("supportPhone","Phone")}${inp("supportEmail","Email")}${inp("supportHours","Opening hours","e.g. Mon–Sat, 9am–6pm")}</div>
++<div class="pn"><h3>Customer messages</h3><button type="button" class="g" onclick="V.sup=null;draw()">Refresh</button>${V.sup&&!V.sup.length?'<p class="hint">No messages yet.</p>':""}${items}</div>`}
++async function supSet(id,st,b){try{if(b)b.disabled=true;const m=await api("/admin/support/"+id,{method:"PATCH",body:{status:st}});V.sup=(V.sup||[]).map(x=>x.id==id?m:x);draw()}catch(e){if(b)b.disabled=false}}
++/* customer: Help & Support page */
++const TOPICS_C=["Order or delivery","Payment","Product question","Returns or cancellation","Other"];
++function support(){const s=V.set,lines=[s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("");
++return `<h2 class="ph">Help &amp; Support</h2><div class="two"><div class="pn"><h3>Send us a message</h3><p class="hint">We reply by the phone or email you give us.</p>
++<label class="fld">Your name<input id="sn" value="${esc(P.user?P.user.name:"")}" autocomplete="name"></label>
++<label class="fld">Mobile number or email<input id="sc" autocomplete="tel"></label>
++<label class="fld">Topic<select id="st">${TOPICS_C.map(t=>`<option>${esc(t)}</option>`).join("")}</select></label>
++<label class="fld">Message<textarea id="sm" rows="5" maxlength="2000"></textarea></label>
++<button type="button" id="sb" onclick="sendSupport()">Send message</button></div>
++<div><div class="pn"><h3>Contact us</h3>${lines||'<p class="mute">Contact details coming soon. Send us a message.</p>'}</div></div></div>`}
++async function sendSupport(){const v=id=>$(id).value.trim(),b=$("sb"),body={name:v("sn"),contact:v("sc"),topic:$("st").value,message:v("sm")};
++if(body.name.length<2)return toast("Enter your name");if(body.contact.length<5)return toast("Enter a mobile number or email we can reach you on");if(body.message.length<10)return toast("Tell us a little more (at least 10 characters)");
++b.disabled=true;try{await api("/support",{method:"POST",body});toast("Thanks! We’ve got your message.");$("sm").value=""}catch(e){}finally{b.disabled=false}}
+ function adShip(){const s=V.set,pk=s.pickup||{},A=AR(),
+ pt=(k,l,h)=>`<label class="fld">${l}<input value="${esc(pk[k])}" onchange="V.set.pickup={...V.set.pickup,${k}:this.value};ss()">${h?`<small>${h}</small>`:""}</label>`;
+-return `<div class="pn"><h3>Delivery fees</h3><p class="hint">Delivery is limited to <b>${esc(A.province)}</b> (${esc(A.region)}). Region and province are fixed on the shop page. Set the fee for each municipality. Leave a box empty to use the standard fee.</p>
++return `<div class="pn"><h3>Delivery fees</h3><label class="fld" style="margin:0 0 12px"><input type="checkbox" ${s.mapFull?"checked":""} onchange="setMapFull(this.checked)"> Show the full map to customers (off = Oriental Mindoro only)</label><p class="hint">Delivery is limited to <b>${esc(A.province)}</b> (${esc(A.region)}). Region and province are fixed on the shop page. Set the fee for each municipality. Leave a box empty to use the standard fee.</p>
+ <label class="fld" style="max-width:280px">Standard fee (₱)<input type="number" inputmode="decimal" min="0" value="${V.defaultFee}" onchange="V.defaultFee=+this.value;V.set.defaultFee=V.defaultFee;ss();draw()"><small>Used for any municipality without its own fee.</small></label>
+ <div class="regs">${A.towns.map(t=>`<label class="fld">${esc(t.name)} (₱)<input type="number" inputmode="decimal" min="0" placeholder="${V.defaultFee}" value="${(s.townFees||{})[t.name]??""}" onchange="setTownFee('${esc(t.name)}',this.value)"></label>`).join("")}</div></div>
+ <div class="pn"><h3>Pickup</h3><div class="two2">${pt("name","Pickup place","e.g. Our school booth")}${pt("hours","Pickup hours","e.g. Mon–Fri, 12–1 PM")}</div>${pt("addr","Pickup address")}</div><p class="hint">Changes here save by themselves.</p>`}
+@@ -688,7 +733,7 @@
+ function admin(){if(!isA())return '<div class="pn" style="text-align:center">Admin access only. Use Sign in with a Google account listed as admin.</div>';
+ const AL=adReady()?V.orders:[],todo=AL.filter(o=>grp(o)=="todo").length,going=AL.filter(o=>grp(o)=="going").length,low=cntP("low"),sales=AL.filter(o=>o.status!="Cancelled").reduce((a,o)=>a+o.total,0),
+ c=(n,l,cls,on)=>on?`<button type="button" class="stat ${cls}" onclick="${on}"><b>${n}</b><span>${l}</span></button>`:`<div class="stat"><b>${n}</b><span>${l}</span></div>`,
+-body=AD.tab=="products"?adProducts():AD.tab=="look"?adLook():AD.tab=="ship"?adShip():AD.tab=="backup"?adBackup():adOrders();
++body=AD.tab=="products"?adProducts():AD.tab=="look"?adLook():AD.tab=="ship"?adShip():AD.tab=="backup"?adBackup():AD.tab=="support"?adSupport():adOrders();
+ return `<h2 class="ph">Shop admin</h2><p class="adhi">Hi ${esc(P.user.name)}! Manage your orders, products and how your shop looks. <a onclick="go('')">View shop →</a></p>
+ <div class="stats">${c(adReady()?todo:"…","Orders need action",todo?"hot":"","adGo('orders','todo')")}${c(adReady()?going:"…","Orders in progress","","adGo('orders','going')")}${c(low,"Low or sold out",low?"hot":"","adGo('products','','low')")}${c(adReady()?peso(sales):"…","Total sales")}${c(V.views??"–","Shop visits")}</div>
+ <nav class="tabs" role="tablist">${TABS.map(([k,l,i])=>`<button type="button" role="tab" aria-selected="${AD.tab==k}" class="tab${AD.tab==k?" on":""}" onclick="AD.tab='${k}';draw()">${ic(i)}${l}${k=="orders"&&todo?`<span class="n">${todo}</span>`:""}</button>`).join("")}</nav><section>${body}</section>`}
+@@ -698,7 +743,7 @@
+ /* render + transitions */
+ function qrView(){return `<h2 class="ph">Payment methods</h2><div class="pn" style="text-align:center"><h3>GCash</h3><img src="/gcash-qr.svg" alt="GCash QR code" style="width:240px;max-width:100%"><p><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p><h3 style="margin-top:18px">Cash on Delivery</h3><img src="/cod.svg" alt="" style="width:72px"><p><small>Pay the rider in cash when your order arrives.</small></p></div>`}
+ function render(fx){const y=scrollY,h=location.hash.slice(1),a=$("app");theme();if(!h.startsWith("product/"))D.id=0;
+-a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h=="terms"||h=="privacy"?page(h):shop();
++a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h=="support"?support():h=="terms"||h=="privacy"?page(h):shop();
+ mountMap();const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
+ a.classList.toggle("fx",!!fx);if(fx){scrollTo(0,0);setTimeout(()=>a.classList.remove("fx"),1100)}else scrollTo(0,y);
+ const sc=h=="admin"?"all":"mine";if((h=="orders"||h=="admin")&&P.user&&(!V.ol||V.oScope!=sc)){const tk=V.ot=(V.ot||0)+1;V.ol=1;V.oScope=sc;api("/orders"+(sc=="all"?"?all=1":"")).then(o=>{if(tk!=V.ot)return;V.orders=o;V.ol=2;draw()}).catch(()=>{if(tk!=V.ot)return;V.ol=3;draw()})}}
+diff -ruN orig_zip/storefront-main/public/sw.js sf/storefront-main/public/sw.js
+--- orig_zip/storefront-main/public/sw.js	2026-11-26 10:34:53.000000000 +0000
++++ sf/storefront-main/public/sw.js	2026-11-26 10:56:19.385063444 +0000
+@@ -8,7 +8,7 @@
+    - catalogue (/api/bootstrap, /api/products/:id)
+                                network first (3 s), saved copy when offline or slow; kept separately per signed-in person
+    - everything else (orders, checkout, admin writes, sign-in)  never cached */
+-const VERSION = "v9";
++const VERSION = "v11";
+ const SHELL = "shell-" + VERSION, ASSETS = "assets-" + VERSION, API = "api-" + VERSION;
+ const KEEP = [SHELL, ASSETS, API];
+ const SHELL_URLS = ["/", "/brand/emblem.png", "/brand/wide.png", "/gcash-qr.svg", "/cod.svg"];
+@@ -28,7 +28,8 @@
+   if (e.data && e.data.type === "clear-private") e.waitUntil(caches.delete(API));
+ });
+ 
+-const hash = s => { let h = 5381; for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
++/* two 32-bit hashes, so two different sign-ins are very unlikely to share a saved catalogue */
++const hash = s => { let a = 5381, b = 52711; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); a = (((a << 5) + a) ^ c) | 0; b = (((b << 5) + b) ^ c) | 0; } return (a >>> 0).toString(36) + (b >>> 0).toString(36); };
+ const trim = async name => {
+   const max = LIMITS[name]; if (!max) return;
+   const c = await caches.open(name), ks = await c.keys();
+diff -ruN orig_zip/storefront-main/server.js sf/storefront-main/server.js
+--- orig_zip/storefront-main/server.js	2026-11-26 10:34:53.000000000 +0000
++++ sf/storefront-main/server.js	2026-11-26 11:11:50.901730866 +0000
+@@ -122,6 +122,7 @@
+ const GEO = new Map();
+ function geo(p) {
+   if (!GEO.has(p)) {
++    if (GEO.size >= 500) GEO.clear(); /* bounded: random codes from visitors can not grow memory forever */
+     const pr = fetch("https://psgc.gitlab.io/api" + p, { signal: AbortSignal.timeout(8000) })
+       .then(r => { if (!r.ok) throw new Error("PSGC " + r.status); return r.json(); })
+       .catch(() => { GEO.delete(p); throw bad("Location list unavailable, try again shortly", 502); });
+@@ -144,6 +145,24 @@
+ const townOf = x => AREA.towns.find(t => normTown(t.name) === normTown(x));
+ const coord = v => /^-?\d{1,3}(\.\d{1,7})?$/.test(String(v || "")) ? String(v) : "";
+ 
++/* admin settings: whitelist the keys the storefront uses and check every value, so nothing unchecked reaches the shop page */
++const HEXC = /^#[0-9a-f]{6}$/i;
++const TEXT = { name: 80, tagline: 120, headline: 160, footer: 300, terms: 20000, privacy: 20000, supportPhone: 40, supportEmail: 120, supportHours: 120 };
++const plainObj = (o, n) => { const out = {}; if (!o || typeof o != "object" || Array.isArray(o)) return out;
++  for (const [k, v] of Object.entries(o).slice(0, 20)) { const key = str(k, 40); if (!key) continue; if (typeof v == "number") out[key] = num(v); else if (typeof v == "string") out[key] = str(v, n); } return out; };
++function cleanSettings(b) {
++  const out = {};
++  for (const [k, n] of Object.entries(TEXT)) if (b[k] != null) out[k] = str(b[k], n);
++  for (const k of ["logo", "logoWide", "logoClear", "banner"]) if (b[k]) out[k] = IMG(b[k], "Image");
++  if (Array.isArray(b.promos)) out.promos = b.promos.slice(0, 3).map(p => { const x = p && typeof p == "object" ? p : {}; return { t: str(x.t, 80), s: str(x.s, 160), img: x.img ? IMG(x.img, "Tile image") : "" }; });
++  if (b.pickup && typeof b.pickup == "object") out.pickup = plainObj(b.pickup, 300);
++  if (b.col && typeof b.col == "object" && !Array.isArray(b.col)) { out.col = {}; for (const [k, v] of Object.entries(b.col).slice(0, 10)) if (/^--[a-z-]{1,30}$/.test(k) && HEXC.test(String(v))) out.col[k] = v; }
++  if (b.townFees && typeof b.townFees == "object" && !Array.isArray(b.townFees)) { out.townFees = {}; for (const [t, f] of Object.entries(b.townFees).slice(0, 40)) { const tw = townOf(t); if (tw) out.townFees[tw.name] = num(f); } }
++  if (b.defaultFee != null) out.defaultFee = num(b.defaultFee);
++  out.mapFull = !!b.mapFull; /* false = map limited to Oriental Mindoro */
++  return out;
++}
++
+ const app = express();
+ app.set("trust proxy", 1);
+ app.disable("x-powered-by");
+@@ -190,8 +209,8 @@
+ const done = (s, u) => s.json({ token: mk(u.id), user: { name: u.name, role: u.role } });
+ app.post("/api/auth/google", lim(20), wrap(async (q, s) => {
+   if (!GID) throw bad("Google sign-in is not set up");
+-  const r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(q.body.credential || "")), t = await r.json();
+-  if (!r.ok || t.aud !== GID || (t.email_verified !== "true" && t.email_verified !== true)) throw bad("Google sign-in failed", 401);
++  const r = await fetch("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodeURIComponent(q.body.credential || ""), { signal: AbortSignal.timeout(8000) }), t = await r.json().catch(() => ({}));
++  if (!r.ok || t.aud !== GID || !t.email || (t.email_verified !== "true" && t.email_verified !== true)) throw bad("Google sign-in failed", 401);
+   const em = String(t.email).toLowerCase(), role = ADMINS.includes(em) ? "admin" : "customer";
+   const u = (await db.query(
+     "insert into users(name,email,role) values($1,$2,$3) on conflict(email) do update set name=excluded.name, role=excluded.role returning id,name,role",
+@@ -202,7 +221,7 @@
+ /* admin: settings + products */
+ app.put("/api/admin/settings", need(1), wrap(async (q, s) => {
+   const b = q.body; if (!b || typeof b != "object" || Array.isArray(b)) throw bad("Bad settings");
+-  await db.query("insert into settings(k,v) values('site',$1) on conflict(k) do update set v=excluded.v", [JSON.stringify(b)]);
++  await db.query("insert into settings(k,v) values('site',$1) on conflict(k) do update set v=excluded.v", [JSON.stringify(cleanSettings(b))]);
+   s.json({ ok: 1 });
+ }));
+ app.post("/api/admin/products", need(1), wrap(async (q, s) => {
+@@ -213,7 +232,7 @@
+     [str(b.name, 120), num(b.price), num(b.was), str(b.cat, 60), int(b.stock), JSON.stringify(names), IMG(keepOwn(b.img, null), "Image"), JSON.stringify(sizeList(b.sizes)), JSON.stringify(vars), str(b.desc, 2000), JSON.stringify(gal), JSON.stringify(sizeImgsFrom(b.sizeImages, null, szs))]);
+   s.json(P(r.rows[0], true));
+ }));
+-const F = { size_images: v => JSON.stringify(v), name: v => str(v, 120), price: num, was: num, cat: v => str(v, 60), stock: int, vars: v => JSON.stringify(arr(v)), img: v => IMG(v, "Image"), arch: v => !!v, descr: v => str(v, 2000), sizes: v => JSON.stringify(sizeList(v)), variations: v => JSON.stringify(cleanVars(v)), gallery: v => JSON.stringify((Array.isArray(v) ? v : []).slice(0, 8).map(x => IMG(x, "Gallery image")).filter(Boolean)) };
++const F = { size_images: v => JSON.stringify(v && typeof v == "object" && !Array.isArray(v) ? cleanSizeImages(v) : {}), name: v => str(v, 120), price: num, was: num, cat: v => str(v, 60), stock: int, vars: v => JSON.stringify(arr(v)), img: v => IMG(v, "Image"), arch: v => !!v, descr: v => str(v, 2000), sizes: v => JSON.stringify(sizeList(v)), variations: v => JSON.stringify(cleanVars(v)), gallery: v => JSON.stringify((Array.isArray(v) ? v : []).slice(0, 8).map(x => IMG(x, "Gallery image")).filter(Boolean)) };
+ app.patch("/api/admin/products/:id", need(1), wrap(async (q, s) => {
+   const b = { ...q.body }; if ("desc" in b) b.descr = b.desc;
+   if (["img", "variations", "gallery", "sizeImages", "sizes"].some(k => k in b)) {
+@@ -287,7 +306,9 @@
+       if (sizes.length) { size = str(it.size, 40); if (!sizes.includes(size)) throw bad("Pick a size for " + p.name); }
+       const upd = v && v.stockCount != null ? vs.map(x => x === v ? { ...x, stockCount: x.stockCount - n } : x) : null;
+       await c.query("update products set stock=stock-$2" + (upd ? ",variations=$3" : "") + " where id=$1", upd ? [id, n, JSON.stringify(upd)] : [id, n]);
+-      const price = num(p.price + (v ? v.priceModifier : 0)); /* price always comes from the database, never from the browser */
++      const rawPrice = Number(p.price) + (v ? v.priceModifier : 0); /* price always comes from the database, never from the browser */
++      if (rawPrice < 0) throw bad(p.name + " has an invalid option price");
++      const price = num(rawPrice);
+       lines.push({ id, name: p.name, v: v ? v.name : "", vid: v ? v.id : "", size, n, price }); sub += price * n;
+     }
+     sub = num(sub);
+@@ -336,6 +357,29 @@
+   finally { c.release(); }
+ }));
+ 
++/* customer support: anyone can send a message (signed in or not); only the admin reads them */
++const TOPICS = ["Order or delivery", "Payment", "Product question", "Returns or cancellation", "Other"];
++const SUP = r => ({ id: r.id, name: r.name, contact: r.contact, topic: r.topic, message: r.message, status: r.status, created: r.created });
++app.post("/api/support", lim(10), wrap(async (q, s) => {
++  const u = await who(q), b = q.body || {};
++  const name = str(b.name, 80), contact = str(b.contact, 120), topic = str(b.topic, 60), message = str(b.message, 2000);
++  if (name.length < 2) throw bad("Enter your name");
++  if (contact.length < 5) throw bad("Enter a mobile number or email we can reach you on");
++  if (!TOPICS.includes(topic)) throw bad("Choose a topic");
++  if (message.length < 10) throw bad("Tell us a little more (at least 10 characters)");
++  await db.query("insert into support(user_id,name,contact,topic,message) values($1,$2,$3,$4,$5)", [u ? u.id : null, name, contact, topic, message]);
++  s.json({ ok: 1 });
++}));
++app.get("/api/admin/support", need(1), wrap(async (q, s) => {
++  s.json((await db.query("select * from support order by id desc limit 300")).rows.map(SUP));
++}));
++app.patch("/api/admin/support/:id", need(1), wrap(async (q, s) => {
++  const st = q.body && q.body.status; if (!["Open", "Resolved"].includes(st)) throw bad("Bad status");
++  const r = await db.query("update support set status=$2 where id=$1 returning *", [q.params.id | 0, st]);
++  if (!r.rows[0]) throw bad("Not found", 404);
++  s.json(SUP(r.rows[0]));
++}));
++
+ /* backup (free Render DB is not forever: download this often) */
+ app.get("/api/admin/export", need(1), wrap(async (q, s) => {
+   const out = {
+@@ -363,6 +407,7 @@
+ app.use(express.static(path.join(__dirname, "public"), { setHeaders: (r, p) => {
+   const sw = /[\\/]sw\.js$/.test(p);
+   r.setHeader("Cache-Control", sw || /\.html$/.test(p) ? "no-cache" : "public, max-age=86400, stale-while-revalidate=604800");
++  if (/\.html$/.test(p)) r.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://nominatim.openstreetmap.org https://accounts.google.com; frame-src https://accounts.google.com; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
+   if (sw) r.setHeader("Service-Worker-Allowed", "/");
+ } }));
+ app.use((e, q, s, n) => { if (!e.status) console.error(e); s.status(e.status || 500).json({ error: e.status ? e.message : "Server error" }); });
+@@ -379,6 +424,7 @@
+     alter table products add column if not exists gallery jsonb not null default '[]';
+     alter table products add column if not exists rev int not null default 0;
+     alter table products add column if not exists size_images jsonb not null default '{}';
++    create table if not exists support(id serial primary key, user_id int references users(id) on delete set null, name text not null, contact text not null, topic text not null, message text not null, status text not null default 'Open', created timestamptz default now());
+   `);
+ }
+ init().then(() => app.listen(process.env.PORT || 3000, () => console.log("storefront up"))).catch(e => { console.error(e); process.exit(1); });
