@@ -479,6 +479,34 @@ html{background:var(--bg)}
 .tab .lmx-av,.tab svg[viewBox="0 0 64 64"]{width:20px;height:20px;border-radius:6px}
 /* mobile: show the account avatar (it was hidden with the other header text) so people can sign out */
 @media(max-width:720px){.us #ub .av{display:grid;width:36px;height:36px}.us #ub{min-width:44px;min-height:44px;justify-content:center}}
+/* Lumix chat + keyboard (phones): chat fills the visible area while typing */
+@media(max-width:720px){
+html.kbd,html.kbd body{overflow:hidden;overscroll-behavior:none}
+html.kbd #app{view-transition-name:none}
+html.kbd #toast{z-index:90}
+html.kbd .chatfull{position:fixed;left:0;right:0;top:var(--vvt,0px);height:var(--vvh,100dvh);min-height:0;max-height:none;margin:0;border-radius:0;z-index:70}
+html.kbd .chatfull .chathead{padding-top:calc(12px + env(safe-area-inset-top,0px))}
+html.kbd .chatfull .chatbar{padding-bottom:10px}
+html.kbd .chatfull .chathead{padding:calc(6px + env(safe-area-inset-top,0px)) 12px 6px;gap:10px;min-height:0}
+html.kbd .chatfull .chathead small,html.kbd .chatfull .chathead .chatmore{display:none}
+html.kbd .chatfull .chathead b{font-size:16px}
+html.kbd .chatfull .lav.lmx-av{width:30px;height:30px;border-radius:10px;box-shadow:none}
+html.kbd .chatfull .lav.lmx-av svg{width:30px;height:30px}
+html.kbd .chatfull .chatlog{padding:10px 12px}
+html.kbd .chatfull .chatbar{padding:6px 10px;gap:8px}
+html.kbd .chatfull .chatbar input{min-height:44px}
+html.kbd .chatfull .chatbar button{width:44px;height:44px;min-height:44px}
+html.kbd .lmx{padding:calc(6px + env(safe-area-inset-top,0px)) 10px 6px;gap:6px}
+html.kbd .lmx .lmx-head{flex-direction:row;align-items:center;gap:8px}
+html.kbd .lmx .lmx-av{width:30px;height:30px;border-radius:10px;box-shadow:none}
+html.kbd .lmx .ph{font-size:17px;margin:0}
+html.kbd .lmx>button.g{display:none}
+html.kbd .lmx .lmx-log{padding:10px}
+html.kbd .lmx .lmx-bar input,html.kbd .lmx .lmx-bar button{min-height:44px}
+html.kbd .lmx{position:fixed;left:0;right:0;top:var(--vvt,0px);height:var(--vvh,100dvh);z-index:70;display:flex;flex-direction:column;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;background:var(--bg);box-sizing:border-box}
+html.kbd .lmx .lmx-head .hint,html.kbd .lmx .lmx-asks{display:none}
+html.kbd .lmx .lmx-log{flex:1 1 auto;height:auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important}
+}
 </style></head><body>
 <div id="offline" hidden role="status">You’re offline. Showing saved items. Ordering needs a connection.</div>
 <div class="shell"><aside class="rail" id="rail" style="view-transition-name:rail"></aside><div class="col">
@@ -938,7 +966,7 @@ V.achat.push({role:"user",text:t.slice(0,800)});if(i)i.value="";V.achatBusy=1;re
 try{const d=await api("/admin/ai",{method:"POST",body:{messages:V.achat.slice(-12).map(m=>({role:m.role,content:m.text}))}});
 V.achat.push({role:"assistant",text:(d.reply||"").trim()||"I didn’t get an answer. Try asking in a different way."})}
 catch(e){const m=e&&e.message||"";V.achat.push({role:"assistant",text:m&&!/fetch|load failed|network/i.test(m)?m:"I couldn’t reach the assistant just now. Check your connection and try again."})}
-finally{V.achatBusy=0;if(b)b.disabled=false;renderAdminChat();if(AD.tab=="lumix"&&!LOCATE_OK){const q=$("aq");q&&q.focus()}}}
+finally{V.achatBusy=0;if(b)b.disabled=false;renderAdminChat();if(AD.tab=="lumix"&&!LOCATE_OK){const q=$("aq");q&&q.focus({preventScroll:true})}}}
 function lmxClear(){V.achat=[];draw()}
 /* admin: support contact details and the customer messages inbox */
 function adSupport(){const s=V.set,inp=(k,l,h)=>`<label class="fld">${l}<input value="${esc(s[k]||"")}" onchange="V.set.${k}=this.value;ss()">${h?`<small>${h}</small>`:""}</label>`;
@@ -977,7 +1005,7 @@ async function askAI(text){const i=$("chatq"),t=((text!=null?text:(i&&i.value))|
   const b=$("chatgo");if(b)b.disabled=true;
   try{const d=await api("/support/chat",{method:"POST",body:{messages:V.chat.slice(-10).map(m=>({role:m.role,content:m.text}))}});V.chat.push({role:"assistant",text:d.reply,handoff:!d.handled})}
   catch(e){V.chat.push({role:"assistant",text:"I couldn’t answer just now.",handoff:true})}
-  finally{V.chatBusy=0;if(b)b.disabled=false;renderChat();const q=$("chatq");if(q&&!LOCATE_OK)q.focus()}}
+  finally{V.chatBusy=0;if(b)b.disabled=false;renderChat();const q=$("chatq");if(q&&!LOCATE_OK)q.focus({preventScroll:true})}}
 function support(h){if(h==="support/help")return supHelp();if(h==="support/contact")return supForm();if(h==="support/more")return supMore();return supChat()}
 /* page 1 */
 function supChat(){return `<div class="sup-head"><h2 class="ph">Help &amp; Support</h2></div>
@@ -1029,7 +1057,7 @@ const page=k=>`<div class="pn"><h3>${k=="terms"?"Terms &amp; Conditions":"Privac
 function qrView(){return `<h2 class="ph">Payment methods</h2><div class="pn" style="text-align:center"><h3>GCash</h3><img src="/gcash-qr.svg" alt="GCash QR code" style="width:240px;max-width:100%"><p><small>Scan to pay, then place your order. Our team confirms your payment before we prepare it.</small></p><h3 style="margin-top:18px">Cash on Delivery</h3><img src="/cod.svg" alt="" style="width:72px"><p><small>Pay the rider in cash when your order arrives.</small></p></div>`}
 function render(fx){const y=scrollY,h=location.hash.slice(1),a=$("app");theme();if(!h.startsWith("product/"))D.id=0;
 a.innerHTML=h.startsWith("product/")?pdp(+h.slice(8)):h=="cart"?cart():h=="qr"?qrView():h=="orders"?orders():h=="admin"?admin():h=="loc"?loc():h.split("/")[0]=="support"?support(h):h=="terms"||h=="privacy"?page(h):shop();if(h==="support")renderChat();if(h==="admin"&&AD.tab==="lumix")renderAdminChat();
-mountMap();const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
+mountMap();kbSync();const i=$("q");if(i&&i.value!=S.q)i.value=S.q;tick();
 a.classList.toggle("fx",!!fx);if(fx){scrollTo(0,0);setTimeout(()=>a.classList.remove("fx"),1100)}else scrollTo(0,y);
 const sc=h=="admin"?"all":"mine";if((h=="orders"||h=="admin")&&P.user&&(!V.ol||V.oScope!=sc)){const tk=V.ot=(V.ot||0)+1;V.ol=1;V.oScope=sc;api("/orders"+(sc=="all"?"?all=1":"")).then(o=>{if(tk!=V.ot)return;V.orders=o;V.ol=2;draw()}).catch(()=>{if(tk!=V.ot)return;V.ol=3;draw()})}}
 function draw(nav){if(nav&&!RM&&document.startViewTransition)document.startViewTransition(()=>render(1));else render(nav)}
@@ -1037,6 +1065,16 @@ function draw(nav){if(nav&&!RM&&document.startViewTransition)document.startViewT
 document.addEventListener("pointerdown",e=>{const b=e.target.closest("button");if(!b||b.disabled||RM)return;const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height),s=document.createElement("span");s.className="ripple";s.style.cssText=`width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;b.appendChild(s);setTimeout(()=>s.remove(),650)});
 const TS=["Pick delivery or pickup in your cart.","Search for items with the search bar (press /).","Pick a variation, then add to cart.","Review your cart and check out."];
 function tour(i=0){if(i>=TS.length){closeM();P.toured=1;save();return}$("m").innerHTML=`<div class="modal${i?" st":""}"><div><h3>Quick tour</h3><div class="dots">${TS.map((_,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div><p>${TS[i]}</p><button onclick="tour(${i+1})" style="margin-top:6px">${i==TS.length-1?"Finish":"Next"}</button> <button class="g" onclick="tour(9)" style="margin-top:6px">Skip</button></div></div>`}
+/* Lumix chats on phones: while the keyboard is open the chat fills the visible screen, so the page never scrolls away */
+let kbY;
+function kbSync(){const h=document.documentElement,a=document.activeElement;if(h.classList.contains("kbd")&&!(a&&a.matches&&a.matches("#chatq,#aq")))h.classList.remove("kbd")}
+{const vv=window.visualViewport,h=document.documentElement,mob=()=>matchMedia("(max-width:720px)").matches,chatIn=t=>t&&t.matches&&t.matches("#chatq,#aq");
+const vset=()=>{if(!vv)return;h.style.setProperty("--vvh",vv.height+"px");h.style.setProperty("--vvt",vv.offsetTop+"px")};
+if(vv){vv.addEventListener("resize",vset);vv.addEventListener("scroll",vset)}vset();
+document.addEventListener("pointerdown",e=>{if(chatIn(e.target))kbY=scrollY},true);
+document.addEventListener("mousedown",e=>{if(h.classList.contains("kbd")&&e.target.closest&&e.target.closest("#chatgo,#ago"))e.preventDefault()});
+document.addEventListener("focusin",e=>{if(chatIn(e.target)&&mob()){if(typeof kbY!="number")kbY=scrollY;vset();h.classList.add("kbd")}});
+document.addEventListener("focusout",e=>{if(!chatIn(e.target))return;setTimeout(()=>{if(chatIn(document.activeElement))return;if(!h.classList.contains("kbd"))return;h.classList.remove("kbd");const y=kbY;kbY=undefined;if(typeof y=="number")requestAnimationFrame(()=>scrollTo(0,y))},80)})}
 addEventListener("hashchange",()=>draw(1));addEventListener("keydown",e=>{if(e.key=="/"&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$("q").focus()}});
 $("cookie").hidden=P.ck!==null&&P.ck!==undefined;
 $("app").innerHTML='<div class="skel"></div>';
