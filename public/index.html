@@ -63,6 +63,7 @@ a{color:var(--ink);cursor:pointer;font-weight:700;transition:color .2s}a:hover{c
 .dots{display:flex;gap:6px;margin:10px 0}.dots i{height:4px;flex:1;border-radius:9px;background:var(--line);transition:background .3s}.dots i.on{background:var(--terra)}
 .skel{height:300px;border-radius:10px;background:linear-gradient(90deg,var(--line),transparent,var(--line));background-size:200%;animation:sk 1.1s infinite}@keyframes sk{to{background-position:-200%}}
 /* page transitions: View Transitions API with a fallback stagger */
+::view-transition-group(rail){z-index:50;animation-duration:0s}::view-transition-image-pair(rail){animation:none}::view-transition-old(rail),::view-transition-new(rail){animation:none;mix-blend-mode:normal}
 #app{view-transition-name:page}::view-transition-old(root),::view-transition-new(root){animation:none}
 ::view-transition-old(page){animation:vo .2s var(--in) both}::view-transition-new(page){animation:vi .4s var(--out) both}
 @keyframes vo{to{opacity:0;transform:translateY(-10px) scale(.99)}}@keyframes vi{from{opacity:0;transform:translateY(18px) scale(.99)}}
@@ -401,9 +402,73 @@ html{background:var(--bg)}
 .locked select{font-size:14px}
 }
 @media(max-width:380px){.pn{padding:14px 12px}#lmap{height:200px!important}.hero h1{font-size:24px!important}}
+
+/* ===== admin: Ask Lumix ===== */
+.lmx{display:flex;flex-direction:column;gap:12px}
+.lmx-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.lmx-head .hint{margin:0 0 4px;max-width:60ch}
+.lmx-log{height:50vh;min-height:280px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:#faf8fb;border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.lmx-m{margin:0;padding:10px 14px;border-radius:16px;max-width:86%;line-height:1.45;font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.lmx-m.u{align-self:flex-end;background:var(--terra);color:var(--ink);border-bottom-right-radius:5px}
+.lmx-m.a{align-self:flex-start;background:#fff;color:var(--purple);border:1px solid var(--line);border-bottom-left-radius:5px}
+.lmx-m.think{color:var(--mute);font-style:italic}
+.lmx-empty{margin:auto;color:var(--mute);text-align:center;line-height:1.5}
+.lmx-asks{display:flex;flex-wrap:wrap;gap:8px}.lmx-asks .chip{font-size:14px;min-height:40px;padding:7px 13px}
+.lmx-bar{display:flex;gap:8px;align-items:center}.lmx-bar input{flex:1;min-width:0;min-height:50px;border-radius:999px;padding:0 18px;font-size:16px}
+.lmx-bar button{flex:none;min-height:50px;padding:0 22px;border-radius:999px}.lmx-bar button:disabled{opacity:.55}
+@media(max-width:720px){.lmx-log{height:auto;min-height:320px;max-height:56vh}.lmx-m{max-width:92%}.lmx-head{flex-direction:column}.lmx-head .g{align-self:flex-start}}
+
+/* ===== admin: nothing hidden behind a horizontal scroll ===== */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;overflow:visible!important;border-bottom:0!important;margin:0 0 18px;padding:0!important}
+.tab{flex:0 1 auto;border:1px solid var(--line);background:var(--card);border-radius:12px;opacity:1;min-height:44px;padding:9px 14px;font-size:15px}
+.tab.on{background:var(--purple);color:#fff;border-color:var(--purple)}.tab.on svg{color:#fff}.tab.on:after{display:none}
+.tab .n{background:var(--terra);color:var(--ink)}
+.tab.on .n{background:#fff;color:var(--purple)}
+.chips.scroll{flex-wrap:wrap!important;overflow:visible!important;margin-left:0!important;margin-right:0!important;padding:0!important}
+.chips.scroll .chip{flex:0 0 auto}
+.stats{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important;overflow:visible!important;margin:0 0 18px!important;gap:10px}
+.lmx-log{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+.lmx-more{margin:0;text-align:center;font-size:13px;color:var(--mute)}
+@media(max-width:720px){
+.tabs{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}
+.tab{justify-content:center;width:100%;min-width:0;white-space:normal;text-align:center;line-height:1.2}
+.tab .n{position:static}
+.stats{grid-template-columns:1fr 1fr!important}
+.stat{padding:12px}.stat b{font-size:22px}
+.ah,.af{flex-wrap:wrap}
+.acard{padding:14px}
+.ag{grid-template-columns:1fr}
+.af>button,.af>.g{flex:1 1 100%}
+.arow{grid-template-columns:56px minmax(0,1fr);gap:10px}
+.arow .qs,.arow .aa{grid-column:1/-1}
+.aa{grid-auto-flow:column}
+.sbar input{min-height:46px}
+.tb{flex-direction:column}.tb>button{width:100%}
+.lmx-asks .chip{flex:1 1 auto}
+}
+
+/* ===== phone promo tiles: roomy like the desktop ones ===== */
+@media(max-width:720px){
+.tiles{padding:10px!important;gap:10px!important}
+.tiles .tl{height:176px!important;border-radius:14px!important;padding:14px 16px!important;font-size:12px!important}
+.tiles .tl::after{display:none!important}
+.tiles .tl>span{font-size:17px!important;display:block;margin-top:4px}
+.tiles .tl>img{object-fit:cover}
+.tiles .tl>.tlctl{top:10px!important;right:10px!important}
+}
+
+/* ===== phone promo tiles: three across, like the desktop row ===== */
+@media(max-width:720px){
+.tiles{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:0!important;padding:0!important;background:var(--card)!important;border-radius:0 0 14px 14px}
+.tiles .tl{height:150px!important;border-radius:0!important;padding:10px 8px!important;font-size:10px!important;min-width:0}
+.tiles .tl>span{font-size:13px!important;margin-top:2px}
+.tiles .tl::after{display:block!important;background:linear-gradient(180deg,#0000 45%,#0006)!important}
+.tiles .tl>.tlctl{top:6px!important;right:6px!important;left:6px!important;flex-direction:column;align-items:flex-end;gap:4px!important;max-width:none!important}
+.tiles .tl .chg{padding:3px 6px!important;font-size:9.5px!important;line-height:1.2}
+.tiles .rmT{padding:3px 6px!important;font-size:9.5px!important}
+}
 </style></head><body>
 <div id="offline" hidden role="status">You’re offline. Showing saved items. Ordering needs a connection.</div>
-<div class="shell"><aside class="rail" id="rail"></aside><div class="col">
+<div class="shell"><aside class="rail" id="rail" style="view-transition-name:rail"></aside><div class="col">
 <header class="top"><div class="br" onclick="go('')"><span id="lg" style="display:contents"></span><span id="brand"></span></div><div class="sw"><input id="q" placeholder="Search product" list="sg" oninput="S.q=this.value;draw()"><datalist id="sg"></datalist><svg viewBox="0 0 24 24"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-5-5"/></svg></div>
 <div class="us"><span id="uname"></span><a class="dk" onclick="go('cart')">Cart</a><a class="dk" onclick="go('orders')">Orders</a><a onclick="go('admin')" id="ad" style="display:none;color:var(--terra)">Admin panel</a><a onclick="auth()" id="ub" style="display:flex;align-items:center;gap:8px"></a></div></header>
 <main class="page" id="app"></main><footer id="foot"></footer></div></div>
@@ -453,7 +518,7 @@ function fav(u){const L=document.querySelector('link[rel=icon]');if(!u){L.href="
 fav(s.logo);
 const n=P.cart.reduce((a,c)=>a+c.n,0),bump=n>lastN;lastN=n;const lc=s.logoClear||s.logo;
 const it=(k,i,l)=>`<a href="#${k}" class="${h.split("/")[0]==k?"on":""}" title="${l}" aria-label="${l}"${h.split("/")[0]==k?' aria-current="page"':""}>${ic(i)}<em>${l}</em>${k=="cart"&&n?`<span class="bd${bump?" bump":""}">${n}</span>`:""}</a>`;
-$("rail").innerHTML=`<div class="lg">${lc?`<img src="${esc(lc)}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${it("support","chat","Support")}${A?it("admin","set","Admin"):""}`;
+$("rail").innerHTML=`<div class="lg">${lc?`<img src="${esc(lc)}" alt="">`:""}</div>${it("","home","Home")}${it("loc","pin","Location")}${it("cart","bag","Cart")}${it("orders","rec","Orders")}${A?it("admin","set","Admin"):it("support","chat","Support")}`;
 $("ad").style.display=A?"":"none";
 $("foot").innerHTML=(lc?`<img src="${esc(lc)}" alt="">`:"")+"<b>"+nm+"</b>"+esc(s.footer)+"<div style='margin-top:8px'><a onclick=\"go('terms')\">Terms and Conditions</a> &nbsp;·&nbsp; <a onclick=\"go('privacy')\">Privacy Policy</a></div>";
 $("uname").textContent=P.user?P.user.name:"";$("ub").innerHTML=P.user?`<span class="av">${esc(P.user.name[0].toUpperCase())}</span><span>Sign out</span>`:"Sign in";$("ub").style.cssText=P.user?"display:flex;align-items:center;gap:8px":"background:var(--terra);color:var(--ink);padding:9px 16px;border-radius:8px";
@@ -841,18 +906,26 @@ return `<div class="pn"><h3>Name and words</h3><div class="two2">${f("name","Sho
 const setTownFee=(n,v)=>{V.set.townFees={...(V.set.townFees||{})};v===""?delete V.set.townFees[n]:V.set.townFees[n]=Math.max(0,+v||0);ss()};
 /* admin: Lumix with full store data (read only) */
 V.achat=V.achat||[];
-function adLumix(){return `<h2 class="ph">Ask Lumix</h2><p class="hint">Lumix can read your orders and products to answer questions and suggest next steps. It can’t change anything. Customer names, phone numbers and addresses are not shared with it.</p>
-<div id="alog" class="chatlog" aria-live="polite" style="min-height:45vh;max-height:60vh;overflow:auto;margin:8px 0 14px"></div>
-<div class="chatbar"><input id="aq" maxlength="800" placeholder="e.g. Which orders need action today?" aria-label="Your question" onkeydown="if(event.key=='Enter')askAdmin()"><button type="button" id="ago" onclick="askAdmin()">Send</button></div>`}
+const LUMIX_ASKS=["Which orders need action today?","What is low on stock?","How are sales so far?","Which products are hidden?"];
+function adLumix(){setTimeout(renderAdminChat,0);return `<div class="lmx">
+<div class="lmx-head"><div><h2 class="ph">Ask Lumix</h2><p class="hint">Lumix reads your orders, products and stock to answer questions and suggest next steps. It can’t change anything, and customer names, phone numbers and addresses are never shared with it.</p></div>${V.achat.length?'<button type="button" class="g" onclick="lmxClear()">Clear chat</button>':""}</div>
+<div id="alog" class="lmx-log" aria-live="polite"></div>
+<div class="lmx-asks">${LUMIX_ASKS.map(q=>`<button type="button" class="chip" data-q="${esc(q)}" onclick="askAdmin(this.dataset.q)">${esc(q)}</button>`).join("")}</div>
+<form class="lmx-bar" onsubmit="event.preventDefault();askAdmin()"><input id="aq" maxlength="800" placeholder="Ask about orders, stock or sales" aria-label="Ask Lumix"><button type="submit" id="ago">Send</button></form></div>`}
+const LMX_SHOW=6;
 function renderAdminChat(){const el=$("alog");if(!el)return;el.textContent="";
-  if(!V.achat.length){const p=document.createElement("p");p.style.cssText="color:var(--mute);margin:0";p.textContent="Ask about orders, products, stock or sales.";el.appendChild(p)}
-  for(const m of V.achat){const p=document.createElement("p"),u=m.role==="user";p.textContent=m.text;p.style.cssText="margin:0 0 8px;padding:8px 12px;border-radius:12px;max-width:85%;"+(u?"margin-left:auto;background:var(--terra);color:var(--ink)":"background:#f1ecf4;color:var(--purple)");el.appendChild(p)}
-  el.scrollTop=el.scrollHeight}
-async function askAdmin(){const i=$("aq"),t=((i&&i.value)||"").trim();if(t.length<2||V.achatBusy)return;
-  V.achat.push({role:"user",text:t.slice(0,800)});if(i)i.value="";V.achatBusy=1;renderAdminChat();const b=$("ago");if(b)b.disabled=true;
-  try{const d=await api("/admin/ai",{method:"POST",body:{messages:V.achat.slice(-12).map(m=>({role:m.role,content:m.text}))}});V.achat.push({role:"assistant",text:d.reply})}
-  catch(e){V.achat.push({role:"assistant",text:"Lumix couldn’t answer just now."})}
-  finally{V.achatBusy=0;if(b)b.disabled=false;renderAdminChat();const q=$("aq");if(q&&!LOCATE_OK)q.focus()}}
+if(!V.achat.length){const p=document.createElement("p");p.className="lmx-empty";p.textContent="Hi! Ask me anything about your shop, or tap a suggestion below.";el.appendChild(p)}
+const shown=V.achat.slice(-LMX_SHOW);if(V.achat.length>LMX_SHOW){const n=document.createElement("p");n.className="lmx-more";n.textContent="Earlier messages are hidden. Clear chat to start fresh.";el.appendChild(n)}
+for(const m of shown){const p=document.createElement("p");p.className="lmx-m "+(m.role==="user"?"u":"a");p.textContent=m.text;el.appendChild(p)}
+if(V.achatBusy){const p=document.createElement("p");p.className="lmx-m a think";p.textContent="Lumix is checking your shop…";el.appendChild(p)}
+}
+async function askAdmin(text){const i=$("aq"),t=(text!=null?String(text):((i&&i.value)||"")).trim();if(t.length<2||V.achatBusy)return;
+V.achat.push({role:"user",text:t.slice(0,800)});if(i)i.value="";V.achatBusy=1;renderAdminChat();const b=$("ago");if(b)b.disabled=true;
+try{const d=await api("/admin/ai",{method:"POST",body:{messages:V.achat.slice(-12).map(m=>({role:m.role,content:m.text}))}});
+V.achat.push({role:"assistant",text:(d.reply||"").trim()||"I didn’t get an answer. Try asking in a different way."})}
+catch(e){const m=e&&e.message||"";V.achat.push({role:"assistant",text:m&&!/fetch|load failed|network/i.test(m)?m:"I couldn’t reach the assistant just now. Check your connection and try again."})}
+finally{V.achatBusy=0;if(b)b.disabled=false;renderAdminChat();if(AD.tab=="lumix"&&!LOCATE_OK){const q=$("aq");q&&q.focus()}}}
+function lmxClear(){V.achat=[];draw()}
 /* admin: support contact details and the customer messages inbox */
 function adSupport(){const s=V.set,inp=(k,l,h)=>`<label class="fld">${l}<input value="${esc(s[k]||"")}" onchange="V.set.${k}=this.value;ss()">${h?`<small>${h}</small>`:""}</label>`;
 if(!V.sup&&!V.supLoad){V.supLoad=1;api("/admin/support").then(d=>{V.sup=d;V.supLoad=0;draw()}).catch(()=>{V.supLoad=0})}
