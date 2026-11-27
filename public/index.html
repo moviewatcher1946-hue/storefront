@@ -477,6 +477,8 @@ html{background:var(--bg)}
 .lav.lmx-av.sm svg{width:30px;height:30px}
 .rail a svg:has(rect),.tab svg:has(rect){overflow:visible}
 .tab .lmx-av,.tab svg[viewBox="0 0 64 64"]{width:20px;height:20px;border-radius:6px}
+/* mobile: show the account avatar (it was hidden with the other header text) so people can sign out */
+@media(max-width:720px){.us #ub .av{display:grid;width:36px;height:36px}.us #ub{min-width:44px;min-height:44px;justify-content:center}}
 </style></head><body>
 <div id="offline" hidden role="status">You’re offline. Showing saved items. Ordering needs a connection.</div>
 <div class="shell"><aside class="rail" id="rail" style="view-transition-name:rail"></aside><div class="col">
@@ -537,7 +539,8 @@ document.title=s.name||"Likha: Youth Craft"}
 const go=h=>location.hash=h,isA=()=>P.user&&P.user.role=="admin";
 /* modals and sign-in */
 function closeM(){const m=document.querySelector("#m .modal");if(!m)return;m.classList.add("out");setTimeout(()=>$("m").innerHTML="",180)}
-function auth(){if(P.user)return signout();$("m").innerHTML=`<div class="modal" onclick="if(event.target==this)closeM()"><div><h3>Sign in</h3>${V.gid?'<p style="margin:0 0 14px;color:var(--mute)">Sign in or create an account with Google.</p><div id="gb"></div>':'<p>Google sign-in is not set up yet.</p>'}</div></div>`;if(V.gid)gis()}
+function signoutAsk(){$("m").innerHTML=`<div class="modal" onclick="if(event.target==this)closeM()"><div><h3>Sign out?</h3><p style="margin:0 0 14px;color:var(--mute)">${esc(P.user.name)}</p><div style="display:flex;gap:8px"><button onclick="closeM();signout()">Sign out</button><button class="g" onclick="closeM()">Cancel</button></div></div></div>`}
+function auth(){if(P.user)return matchMedia("(max-width:720px)").matches?signoutAsk():signout();$("m").innerHTML=`<div class="modal" onclick="if(event.target==this)closeM()"><div><h3>Sign in</h3>${V.gid?'<p style="margin:0 0 14px;color:var(--mute)">Sign in or create an account with Google.</p><div id="gb"></div>':'<p>Google sign-in is not set up yet.</p>'}</div></div>`;if(V.gid)gis()}
 function gis(){const run=()=>{google.accounts.id.initialize({client_id:V.gid,callback:r=>login("/auth/google",{credential:r.credential})});google.accounts.id.renderButton($("gb"),{theme:"outline",size:"large",width:290})};if(window.google&&google.accounts)return run();const s=document.createElement("script");s.src="https://accounts.google.com/gsi/client";s.onload=run;document.head.appendChild(s)}
 async function login(u,b){try{const j=await api(u,{method:"POST",body:b});swClear();P.token=j.token;P.user=j.user;save();V.ol=0;V.orders=[];closeM();await load();toast("Signed in as "+j.user.name);draw()}catch(e){}}
 function signout(){swClear();P.user=null;P.token="";P.ct={};save();V.ol=0;V.orders=[];load().then(()=>{draw(1);if(location.hash=="#admin")go("")})}
