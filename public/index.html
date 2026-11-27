@@ -466,6 +466,17 @@ html{background:var(--bg)}
 .tiles .tl .chg{padding:3px 6px!important;font-size:9.5px!important;line-height:1.2}
 .tiles .rmT{padding:3px 6px!important;font-size:9.5px!important}
 }
+
+/* ===== Lumix logo ===== */
+.lmx-av{flex:none;width:44px;height:44px;border-radius:14px;overflow:hidden;display:inline-flex;box-shadow:0 4px 14px #530c6c33}
+.lmx-av svg{width:100%;height:100%;display:block}
+.lmx-title{display:flex;align-items:center;gap:12px}.lmx-title .ph{margin:0}
+.lav.lmx-av{width:44px;height:44px;background:none;border-radius:14px;box-shadow:0 4px 14px #530c6c33}
+.lav.lmx-av svg{width:44px;height:44px}
+.lav.lmx-av.sm{width:30px;height:30px;border-radius:10px;align-self:flex-end}
+.lav.lmx-av.sm svg{width:30px;height:30px}
+.rail a svg:has(rect),.tab svg:has(rect){overflow:visible}
+.tab .lmx-av,.tab svg[viewBox="0 0 64 64"]{width:20px;height:20px;border-radius:6px}
 </style></head><body>
 <div id="offline" hidden role="status">You’re offline. Showing saved items. Ordering needs a connection.</div>
 <div class="shell"><aside class="rail" id="rail" style="view-transition-name:rail"></aside><div class="col">
@@ -509,7 +520,7 @@ function fetchGeo(paths){const todo=paths.filter(p=>!G.lists[p]);if(!todo.length
 Promise.all(todo.map(p=>G.lists[p]=api("/geo"+p).then(d=>{G.data[p]=d}).catch(()=>{G.data[p]=[]}))).then(()=>draw())}
 function setA(o){P.addr={...P.addr,...o};save();draw()}
 const IC={plus:"M12 5v14M5 12h14",check:"M5 12l5 5 10-10",x:"M6 6l12 12M18 6L6 18",trash:"M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13",dl:"M12 4v11m0 0l-4-4m4 4l4-4M5 20h14",heart:"M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z",cam:"M4 8h3l1.6-2.4h6.8L17 8h3v11H4zM12 16.5a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6z",chev:"M9 6l6 6-6 6",home:"M3 11l9-8 9 8v10H3zM9 21v-7h6v7",grid:"M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z",bag:"M6 7h12l1 13H5zM9 7a3 3 0 0 1 6 0",rec:"M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",pin:"M12 21s7-6.2 7-11a7 7 0 0 0-14 0c0 4.8 7 11 7 11zM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",set:"M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6",chat:"M4 5h16v11h-8l-5 4v-4H4z"};
-const ic=n=>`<svg viewBox="0 0 24 24"><path d="${IC[n]}"/></svg>`;
+const ic=n=>n==="lumix"?lumixMark():`<svg viewBox="0 0 24 24"><path d="${IC[n]}"/></svg>`;
 let lastN=0;
 function theme(){const h=location.hash.slice(1),A=isA(),s=V.set;for(const k in s.col)document.documentElement.style.setProperty(k,s.col[k]);
 const nm=esc(s.name||"Likha: Youth Craft");$("brand").textContent=s.name||"Likha: Youth Craft";$("brand").style.display=s.logoWide?"none":"";
@@ -780,7 +791,7 @@ async function bk(){const r=await fetch("/api/admin/export",{headers:{authorizat
    Everything here is plain, labelled and tap-friendly. Products are edited in one sheet with an explicit Save button. */
 const AD={tab:"orders",of:"todo",oq:"",pq:"",pf:"all"},LOW=5,SIZES=["XS","S","M","L","XL","2XL","3XL"];
 let AE=null; /* the product being edited in the sheet (null = sheet closed) */
-const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"],["support","Support","rec"],["lumix","Ask Lumix","chat"]];
+const TABS=[["orders","Orders","rec"],["products","Products","bag"],["look","Store look","set"],["ship","Delivery & pickup","pin"],["backup","Backup","dl"],["support","Support","rec"],["lumix","Ask Lumix","lumix"]];
 const adGo=(tab,of,pf)=>{AD.tab=tab;if(of)AD.of=of;if(pf)AD.pf=pf;draw()};
 
 /* ---------- orders ---------- */
@@ -908,7 +919,7 @@ const setTownFee=(n,v)=>{V.set.townFees={...(V.set.townFees||{})};v===""?delete 
 V.achat=V.achat||[];
 const LUMIX_ASKS=["Which orders need action today?","What is low on stock?","How are sales so far?","Which products are hidden?"];
 function adLumix(){setTimeout(renderAdminChat,0);return `<div class="lmx">
-<div class="lmx-head"><div><h2 class="ph">Ask Lumix</h2><p class="hint">Lumix reads your orders, products and stock to answer questions and suggest next steps. It can’t change anything, and customer names, phone numbers and addresses are never shared with it.</p></div>${V.achat.length?'<button type="button" class="g" onclick="lmxClear()">Clear chat</button>':""}</div>
+<div class="lmx-head"><div class="lmx-title"><span class="lmx-av">${lumixMark()}</span><h2 class="ph">Ask Lumix</h2></div><p class="hint">Lumix reads your orders, products and stock to answer questions and suggest next steps. It can’t change anything, and customer names, phone numbers and addresses are never shared with it.</p></div>${V.achat.length?'<button type="button" class="g" onclick="lmxClear()">Clear chat</button>':""}</div>
 <div id="alog" class="lmx-log" aria-live="polite"></div>
 <div class="lmx-asks">${LUMIX_ASKS.map(q=>`<button type="button" class="chip" data-q="${esc(q)}" onclick="askAdmin(this.dataset.q)">${esc(q)}</button>`).join("")}</div>
 <form class="lmx-bar" onsubmit="event.preventDefault();askAdmin()"><input id="aq" maxlength="800" placeholder="Ask about orders, stock or sales" aria-label="Ask Lumix"><button type="submit" id="ago">Send</button></form></div>`}
@@ -940,14 +951,15 @@ V.chat=V.chat||[];V.supView=V.supView||"help";
 const TOPIC_TILES=["Order or delivery","Payment","Product question","Returns or cancellation","Other"];
 const contactLines=()=>{const s=V.set;return [s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("")||'<p class="mute">Contact details coming soon.</p>'};
 /* Lumix starts the conversation: a greeting bubble and quick-reply buttons appear until the customer types something */
-const LUMIX_MARK=`<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M42 22 H78 A18 18 0 0 1 96 40 V64 A18 18 0 0 1 78 82 H56 L38 98 L40 82 H42 A18 18 0 0 1 24 64 V40 A18 18 0 0 1 42 22 Z" fill="#111111"/><path d="M60 36 Q62 50 76 52 Q62 54 60 68 Q58 54 44 52 Q58 50 60 36 Z" fill="#F0EDEB"/></svg>`;
+/* Lumix logo: a white speech bubble with an orange spark, on the shop purple. Used everywhere Lumix appears. */
+function lumixMark(size){const d=size?` width="${size}" height="${size}"`:"";return `<svg viewBox="0 0 64 64"${d} aria-hidden="true" focusable="false"><defs><linearGradient id="lmxg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a2a8f"/><stop offset="1" stop-color="#3f0a52"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#lmxg)"/><path d="M22 15h20a9 9 0 0 1 9 9v9a9 9 0 0 1-9 9h-9l-8 6.5 1-6.5h-4a9 9 0 0 1-9-9v-9a9 9 0 0 1 9-9z" fill="#ffffff"/><path d="M32 19.5c.6 4.6 3.6 7.6 8.4 8.4-4.8.8-7.8 3.8-8.4 8.4-.6-4.6-3.6-7.6-8.4-8.4 4.8-.8 7.8-3.8 8.4-8.4z" fill="#E7832D"/></svg>`}
 const GREETING="Hi, I’m Lumix, ready to help! Ask me about delivery, fees, payment or pickup, or pick a quick option below.";
 const SEND_ICON='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 11.5l18-8-7.5 17-2.5-6.5z" fill="#fff"/></svg>';
 function renderChat(){const el=$("chatlog");if(!el)return;
   if(!V.chat.length)V.chat.push({role:"assistant",text:GREETING,greet:1});
   el.textContent="";
   for(const m of V.chat){const u=m.role==="user",row=document.createElement("div");row.className="msg "+(u?"u":"a");
-    if(!u){const av=document.createElement("span");av.className="lav sm";av.innerHTML=LUMIX_MARK;row.appendChild(av)}
+    if(!u){const av=document.createElement("span");av.className="lav sm";av.innerHTML=lumixMark();row.appendChild(av)}
     const p=document.createElement("p");p.className="bub";p.textContent=m.text;row.appendChild(p);el.appendChild(row);
     if(m.handoff){const box=document.createElement("div");box.className="handoff";const q=document.createElement("p");q.textContent="I can’t fully answer this. You can browse help topics or talk to a person.";const r=document.createElement("div");r.className="row";const h2=document.createElement("button");h2.type="button";h2.className="g";h2.textContent="See help topics";h2.onclick=()=>{go("support/help");draw()};const b=document.createElement("button");b.type="button";b.textContent="Talk to a person";b.onclick=talkHuman;r.appendChild(h2);r.appendChild(b);box.appendChild(q);box.appendChild(r);el.appendChild(box)}}
   if(V.chat.length===1&&V.chat[0].greet){const row=document.createElement("div");row.className="qrow";
@@ -966,7 +978,7 @@ async function askAI(text){const i=$("chatq"),t=((text!=null?text:(i&&i.value))|
 function support(h){if(h==="support/help")return supHelp();if(h==="support/contact")return supForm();if(h==="support/more")return supMore();return supChat()}
 /* page 1 */
 function supChat(){return `<div class="sup-head"><h2 class="ph">Help &amp; Support</h2></div>
-<section class="chatcard chatfull" aria-label="Chat with Lumix"><header class="chathead"><span class="lav">${LUMIX_MARK}</span><div><b>Lumix</b><small><i class="dot"></i>Online · delivery, fees, payment and pickup</small></div><button type="button" class="g chatmore" onclick="go('support/more');draw()">More options</button></header>
+<section class="chatcard chatfull" aria-label="Chat with Lumix"><header class="chathead"><span class="lav lmx-av">${lumixMark()}</span><div><b>Lumix</b><small><i class="dot"></i>Online · delivery, fees, payment and pickup</small></div><button type="button" class="g chatmore" onclick="go('support/more');draw()">More options</button></header>
 <div id="chatlog" class="chatlog" aria-live="polite"></div>
 <form class="chatbar" onsubmit="event.preventDefault();askAI()"><input id="chatq" maxlength="500" placeholder="Type your question…" aria-label="Your question"><button type="submit" id="chatgo" aria-label="Send">${SEND_ICON}</button></form></section>`}
 function supMore(){return `<button type="button" class="g back" onclick="go('support');draw()">← Back to chat</button>
