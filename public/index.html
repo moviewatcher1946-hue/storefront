@@ -564,8 +564,8 @@ html.kbd .lmx .lmx-log{flex:1 1 auto;height:auto!important;min-height:0!importan
 .adm .acard.open .ag,.adm .acard.open .ai{animation:admUp .28s var(--out) both}
 .adm .lmx-m:last-child{animation:admPop .26s var(--out)}
 .adm .lmx-m.think{animation:admBlink 1.2s infinite}
-#lmxdock{position:fixed;right:14px;bottom:calc(var(--nav-h,60px) + 14px);z-index:30;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 20px 8px 8px;border-radius:999px;background:var(--terra);color:var(--ink);font-size:16px;font-weight:800;box-shadow:0 10px 26px -8px #530c6c99;animation:admDock .5s var(--out) both,admPulse 2.8s 1s infinite}
-#lmxdock svg{width:40px;height:40px;flex:none}
+#lmxdock{position:fixed;right:14px;bottom:calc(var(--nav-h,60px) + 14px);z-index:30;display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 22px 6px 14px;border-radius:999px;background:var(--terra);color:var(--ink);font-size:16px;font-weight:800;box-shadow:0 10px 26px -8px #530c6c99;animation:admDock .5s var(--out) both,admPulse 2.8s 1s infinite}
+#lmxdock svg{width:44px;height:44px;flex:none}
 #lmxdock:active{transform:scale(.96)}
 @media(min-width:721px){#lmxdock{right:24px;bottom:24px}}
 html.kbd #lmxdock{display:none}
@@ -1050,7 +1050,11 @@ const TOPIC_TILES=["Order or delivery","Payment","Product question","Returns or 
 const contactLines=()=>{const s=V.set;return [s.supportPhone&&`<p><b>Phone</b><br><a href="tel:${esc(s.supportPhone)}">${esc(s.supportPhone)}</a></p>`,s.supportEmail&&`<p><b>Email</b><br><a href="mailto:${esc(s.supportEmail)}">${esc(s.supportEmail)}</a></p>`,s.supportHours&&`<p><b>Hours</b><br>${esc(s.supportHours)}</p>`].filter(Boolean).join("")||'<p class="mute">Contact details coming soon.</p>'};
 /* Lumix starts the conversation: a greeting bubble and quick-reply buttons appear until the customer types something */
 /* Lumix logo: a white speech bubble with an orange spark, on the shop purple. Used everywhere Lumix appears. */
-function lumixMark(size){const d=size?` width="${size}" height="${size}"`:"";return `<svg viewBox="0 0 64 64"${d} aria-hidden="true" focusable="false"><defs><linearGradient id="lmxg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a2a8f"/><stop offset="1" stop-color="#3f0a52"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#lmxg)"/><g transform="translate(32 32) scale(.62) translate(-46.6 -45.2)"><circle cx="21.6" cy="29.8" r="6" fill="#fff"/><circle cx="71.6" cy="29.8" r="6" fill="#fff"/><g fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round"><line x1="46.6" y1="29.8" x2="21.6" y2="60.6"/><line x1="60.3" y1="43.8" x2="46.6" y2="60.6"/></g></g></svg>`}
+let LMXN=0;
+function lumixMark(size,bare){const d=size?` width="${size}" height="${size}"`:"",sh=c=>`<circle cx="21.6" cy="29.8" r="6" fill="${c}"/><circle cx="71.6" cy="29.8" r="6" fill="${c}"/><g fill="none" stroke="${c}" stroke-width="12" stroke-linecap="round"><line x1="46.6" y1="29.8" x2="21.6" y2="60.6"/><line x1="60.3" y1="43.8" x2="46.6" y2="60.6"/></g>`;
+if(bare)return `<svg viewBox="6.6 5.2 80 80"${d} aria-hidden="true" focusable="false">${sh("#3f0a52")}</svg>`;
+const id="lmxg"+(++LMXN);
+return `<svg viewBox="0 0 64 64"${d} aria-hidden="true" focusable="false"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a2a8f"/><stop offset="1" stop-color="#3f0a52"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#${id})"/><g transform="translate(32 32) scale(.62) translate(-46.6 -45.2)">${sh("#fff")}</g></svg>`}
 const GREETING="Hi, I’m Lumix, ready to help! Ask me about delivery, fees, payment or pickup, or pick a quick option below.";
 const SEND_ICON='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 11.5l18-8-7.5 17-2.5-6.5z" fill="#fff"/></svg>';
 function renderChat(){const el=$("chatlog");if(!el)return;
@@ -1136,7 +1140,7 @@ const TS=["Pick delivery or pickup in your cart.","Search for items with the sea
 function tour(i=0){if(i>=TS.length){closeM();P.toured=1;save();return}$("m").innerHTML=`<div class="modal${i?" st":""}"><div><h3>Quick tour</h3><div class="dots">${TS.map((_,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div><p>${TS[i]}</p><button onclick="tour(${i+1})" style="margin-top:6px">${i==TS.length-1?"Finish":"Next"}</button> <button class="g" onclick="tour(9)" style="margin-top:6px">Skip</button></div></div>`}
 /* Lumix chats on phones: while the keyboard is open the chat fills the visible screen, so the page never scrolls away */
 function adDock(){let d=$("lmxdock");const on=isA()&&location.hash=="#admin"&&AD.tab!="lumix";if(!on){if(d)d.remove();return}
-if(!d){d=document.createElement("button");d.id="lmxdock";d.type="button";d.setAttribute("aria-label","Ask Lumix");d.innerHTML=lumixMark(40)+"<span>Ask Lumix</span>";d.onclick=()=>{AD.tab="lumix";AD.fx=1;draw()};document.body.appendChild(d)}}
+if(!d){d=document.createElement("button");d.id="lmxdock";d.type="button";d.setAttribute("aria-label","Ask Lumix");d.innerHTML=lumixMark(44,1)+"<span>Ask Lumix</span>";d.onclick=()=>{AD.tab="lumix";AD.fx=1;draw()};document.body.appendChild(d)}}
 let kbY;
 function kbSync(){const h=document.documentElement,a=document.activeElement;if(h.classList.contains("kbd")&&!(a&&a.matches&&a.matches("#chatq,#aq")))h.classList.remove("kbd")}
 {const vv=window.visualViewport,h=document.documentElement,mob=()=>matchMedia("(max-width:720px)").matches,chatIn=t=>t&&t.matches&&t.matches("#chatq,#aq");
